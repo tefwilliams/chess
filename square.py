@@ -1,6 +1,11 @@
 
 from __future__ import annotations
-from repository import PieceTypes
+from pieces.king import King
+from pieces.queen import Queen
+from pieces.bishop import Bishop
+from pieces.knight import Knight
+from pieces.rook import Rook
+from pieces.pawn import Pawn
 from coordinates import Coordinates
 from typing import Union
 from piece import Piece
@@ -10,26 +15,32 @@ class Square:
     def __init__(self: Square, coordinates: Coordinates) -> None:
         self.__coordinates = coordinates
         self.piece = self.__get_starting_piece()
+        
+        if self.piece:
+            self.piece_symbol = self.piece.symbol
 
     def __get_starting_piece(self: Square) -> Union[Piece, None]:
         if self.__coordinates.y in [1, 6]:
-            return Piece(PieceTypes.pawn)
+            color = 'white' if self.__coordinates.y == 6 else 'black'
+            return Pawn(color)
 
         if self.__coordinates.y in [0, 7]:
+            color = 'white' if self.__coordinates.y == 7 else 'black'
+
             if self.__coordinates.x in [0, 7]:
-                return Piece(PieceTypes.rook)
+                return Rook(color)
 
             if self.__coordinates.x in [1, 6]:
-                return Piece(PieceTypes.knight)
+                return Knight(color)
 
             if self.__coordinates.x in [2, 5]:
-                return Piece(PieceTypes.bishop)
+                return Bishop(color)
 
             if self.__coordinates.x == 3:
-                return Piece(PieceTypes.queen)
+                return Queen(color)
 
             if self.__coordinates.x == 4:
-                return Piece(PieceTypes.king)
+                return King(color)
 
 
     @property

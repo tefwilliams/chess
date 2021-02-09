@@ -18,4 +18,24 @@ def generate_new_board() -> list[list[Square]]:
 
     return board
 
-generate_new_board()
+board = generate_new_board()
+
+def print_board(board: list[list[Square]]) -> None:
+    board_icons: list[list[str]] = []
+
+    for row in board:
+        row_icons: list[str] = []
+
+        for square in row:
+            try:
+                row_icons.append(square.piece_symbol)
+
+            except AttributeError:
+                row_icons.append(' ')
+
+        board_icons.append(row_icons)
+
+    print(board_icons)
+
+print_board(board)
+
