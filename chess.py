@@ -20,22 +20,31 @@ def generate_new_board() -> list[list[Square]]:
 
 board = generate_new_board()
 
-def print_board(board: list[list[Square]]) -> None:
-    board_icons: list[list[str]] = []
+def display_board(board: list[list[Square]]) -> None:
+    board_dimensions = Coordinates((8, 8))
+
+    print("\n" + "  ", end = '')
+
+    for i in range(board_dimensions.x):
+        column_number = i + 1
+        print("| %s " %column_number, end = '')
+
+    print("| ")
+    print_row_break(board_dimensions.x)
 
     for row in board:
-        row_icons: list[str] = []
+        print("%s " %chr(65), end='')
 
         for square in row:
-            try:
-                row_icons.append(square.piece_symbol)
+            print("| %s " %square.symbol, end='')
 
-            except AttributeError:
-                row_icons.append(' ')
+        print("| ")
+        print_row_break(board_dimensions.x)
 
-        board_icons.append(row_icons)
+    print("\n")
 
-    print(board_icons)
+def print_row_break(row_length: int):
+    dashes_per_column = 4
+    print("-" * (row_length + 1) * dashes_per_column)
 
-print_board(board)
-
+display_board(board)
