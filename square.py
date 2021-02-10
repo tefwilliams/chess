@@ -6,9 +6,9 @@ from pieces.bishop import Bishop
 from pieces.knight import Knight
 from pieces.rook import Rook
 from pieces.pawn import Pawn
+from pieces.piece import Piece
 from coordinates import Coordinates
 from typing import Union
-from piece import Piece
 
 
 class Square:
