@@ -24,13 +24,13 @@ class Board(list[list[Square]]):
 
         return board
 
-    def __getitem__(self: Board, coordinates: Union[int, Coordinates]):
-        if type(coordinates) is int:
-            return self[coordinates]
+    # def __getitem__(self: Board, coordinates: Union[int, Coordinates]):
+    #     if type(coordinates) is int:
+    #         return self[coordinates]
 
-        if type(coordinates) is Coordinates:
-            y, x = coordinates
-            return self[y][x]
+    #     if type(coordinates) is Coordinates:
+    #         y, x = coordinates
+    #         return self[y][x]
 
     @property
     def shape(self: Board) -> Coordinates:
