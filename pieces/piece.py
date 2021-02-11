@@ -1,14 +1,11 @@
 
 from __future__ import annotations
 from abc import abstractproperty
-from typing import Union
-from repository import PieceTypes
-
-Color = 'white' or 'black'
+from player import Player
 
 
 class Piece:
-    def __init__(self: Piece, color = 'white', *args, **kwargs) -> None:
+    def __init__(self: Piece, color: Player = 'white', *args, **kwargs) -> None:
         self.__color = color
 
     @property

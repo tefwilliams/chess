@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from piece import Piece
+from pieces.piece import Piece
 
 
 class Rook(Piece):
