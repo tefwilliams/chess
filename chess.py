@@ -56,8 +56,8 @@ def take_turn(board: Board, player: Player) -> None:
     move_from_coordinates = get_coordinates("Enter which square to move from: ")
     move_to_coordinates = get_coordinates("Enter which square to move to: ")
 
-    move_from_square = board[move_from_coordinates.y][move_from_coordinates.x]
-    move_to_square = board[move_to_coordinates.y][move_to_coordinates.x]
+    move_from_square = board[move_from_coordinates]
+    move_to_square = board[move_to_coordinates]
 
     move_to_square.piece = move_from_square.piece
     move_from_square.piece = None

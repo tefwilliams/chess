@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+from typing import Union
 from coordinates import Coordinates
 from square import Square
 
@@ -23,8 +24,13 @@ class Board(list[list[Square]]):
 
         return board
 
-    # def __getitem__(self: Board, coordinates: Coordinates) -> Square:
-    #     return self[coordinates.y][coordinates.x]
+    def __getitem__(self: Board, coordinates: Union[int, Coordinates]):
+        if type(coordinates) is int:
+            return self[coordinates]
+
+        if type(coordinates) is Coordinates:
+            y, x = coordinates
+            return self[y][x]
 
     @property
     def shape(self: Board) -> Coordinates:
