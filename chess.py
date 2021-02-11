@@ -1,28 +1,14 @@
 
+from board import Board
 from player import Player
 from coordinates import Coordinates
-from square import Square
 
 
-def generate_new_board() -> list[list[Square]]:
-    board_dimensions = Coordinates((8, 8))
-    board: list[list[Square]] = []
+board = Board()
+print(board[0][0])
 
-    for i in range(board_dimensions.y):
-        row: list[Square] = []
-
-        for j in range(board_dimensions.x):
-            coordinates = Coordinates((i, j))
-            row.append(Square(coordinates))
-
-        board.append(row)
-
-    return board
-
-board = generate_new_board()
-
-def display_board(board: list[list[Square]]) -> None:
-    board_dimensions = Coordinates((8, 8))
+def display_board(board: Board) -> None:
+    board_dimensions = board.shape
 
     print("\n" + "  ", end = '')
 
@@ -48,26 +34,33 @@ def print_row_break(row_length: int):
     dashes_per_column = 4
     print("-" * (row_length + 1) * dashes_per_column)
 
-def play(board):
-    player_color = 'white'
+# display_board(board)
+
+def play(board: Board):
+    player: Player = 'white'
 
     for i in range(1):
-        move(player_color)
+        take_turn(board, player)
 
-    swap_player(player_color)
+    swap_player(player)
     display_board(board)
-
 
 def swap_player(player: Player) -> None:
     player = 'black' if player == 'white' else 'white'
 
-def move(player: Player) -> None:
+def take_turn(board: Board, player: Player) -> None:
     display_board(board)
 
     print("%s's turn" %('White' if player == 'white' else 'Black'))
 
     move_from_coordinates = get_coordinates("Enter which square to move from: ")
     move_to_coordinates = get_coordinates("Enter which square to move to: ")
+
+    move_from_square = board[move_from_coordinates.y][move_from_coordinates.x]
+    move_to_square = board[move_to_coordinates.y][move_to_coordinates.x]
+
+    move_to_square.piece = move_from_square.piece
+    move_from_square.piece = None
 
 
 def get_coordinates(input_text: str) -> Coordinates:
@@ -102,3 +95,4 @@ def format_coordinates(coordinates: str) -> tuple[int, int]:
 
     return (y_grid_values.index(coordinates[0]), x_grid_values.index(coordinates[1]))
 
+play(board)
