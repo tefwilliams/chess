@@ -15,7 +15,6 @@ class Square:
     def __init__(self: Square, coordinates: Coordinates) -> None:
         self.__coordinates = coordinates
         self.piece = self.__get_starting_piece()
-        self.symbol = self.piece.symbol if self.piece else ' '
 
     def __get_starting_piece(self: Square) -> Union[Piece, None]:
         if self.__coordinates.y in [1, 6]:
@@ -44,3 +43,7 @@ class Square:
     @property
     def coordinates(self: Square) -> tuple[int, int]:
         return self.__coordinates
+
+    @property
+    def symbol(self: Square) -> str:
+        return self.piece.symbol if self.piece else ' '
