@@ -9,6 +9,7 @@ class Piece:
         self.__color: Player = 'white' if coordinates.y in [0, 1] else 'black'
         self.coordinates = coordinates
 
+    # Will need to abstract this
     def move(self: Piece, coordinates: Coordinates) -> None:
         self.coordinates = coordinates
 
@@ -16,6 +17,7 @@ class Piece:
     def color(self: Piece) -> Player:
         return self.__color
 
+    # Is this properly abstracted?
     @property
     def symbol(self: Piece) -> str:
         ...
