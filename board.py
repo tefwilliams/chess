@@ -1,29 +1,24 @@
 
 from __future__ import annotations
-from pieces.king import King
-from pieces.queen import Queen
-from pieces.bishop import Bishop
-from pieces.knight import Knight
-from pieces.rook import Rook
-from pieces.pawn import Pawn
+from pieces.pieces import Pieces
 from pieces.piece import Piece
 from coordinates import Coordinates
 
 
 class Board:
-    __shape = Coordinates((8, 8))
+    shape = Coordinates((8, 8))
 
     def __init__(self: Board) -> None:
-        self.__initialize_pieces()
+        self.initialize_pieces()
 
-    def __initialize_pieces(self: Board) -> None:
+    def initialize_pieces(self: Board) -> None:
+        board_dimensions = Board.shape
         pieces: list[Piece] = []
 
-        for i in range(self.__shape.y):
-            for j in range(self.__shape.x):
+        for i in range(board_dimensions.y):
+            for j in range(board_dimensions.x):
                 coordinates = Coordinates((i, j))
-
-                starting_piece = get_starting_piece(coordinates)
+                starting_piece = Pieces.get_starting_piece(coordinates)
                 
                 if starting_piece:
                     pieces.append(starting_piece)
@@ -53,27 +48,3 @@ class Board:
 
     def __in_check(self: Board) -> bool:
         return False
-
-    @property
-    def shape(self: Board) -> Coordinates:
-        return self.__shape
-
-def get_starting_piece(coordinates: Coordinates) -> Piece | None:
-    if coordinates.y in [1, 6]:
-        return Pawn(coordinates)
-
-    if coordinates.y in [0, 7]:
-        if coordinates.x in [0, 7]:
-            return Rook(coordinates)
-
-        if coordinates.x in [1, 6]:
-            return Knight(coordinates)
-
-        if coordinates.x in [2, 5]:
-            return Bishop(coordinates)
-
-        if coordinates.x == 3:
-            return Queen(coordinates)
-
-        if coordinates.x == 4:
-            return King(coordinates)

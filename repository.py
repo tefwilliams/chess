@@ -4,7 +4,7 @@ from board import Board
 
 
 def display_board(board: Board) -> None:
-    board_dimensions = board.shape
+    board_dimensions = Board.shape
 
     print("\n" + "  ", end = '')
 

@@ -6,7 +6,7 @@ from player import Player
 
 class Piece:
     def __init__(self: Piece, coordinates: Coordinates) -> None:
-        self.__color: Player = 'white' if coordinates.y in [6, 7] else 'black'
+        self.__color: Player = 'white' if coordinates.y in [0, 1] else 'black'
         self.coordinates = coordinates
 
     def move(self: Piece, coordinates: Coordinates) -> None:
