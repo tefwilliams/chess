@@ -47,10 +47,10 @@ class Coordinates(tuple[int, int]):
         if len(coordinates) != 2:
             return False
 
-        if coordinates[0] not in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+        if coordinates[0] not in Coordinates.y_grid_values:
             return False
 
-        if coordinates[1] not in ['1', '2', '3', '4', '5', '6', '7', '8']:
+        if coordinates[1] not in Coordinates.x_grid_values:
             return False
 
         return True
