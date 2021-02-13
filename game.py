@@ -30,8 +30,11 @@ class Game:
         if not piece_to_move:
             raise ValueError("No piece at %s" % Coordinates.convert_to_grid_value(coordinates_to_move_from))
         
+        if piece_to_move.color != self.player:
+            raise ValueError("You cannot move the opposing team's piece")
+        
         coordinates_to_move_to = Coordinates.get_coordinates("Enter which square to move to: ")
-        self.board.move(piece_to_move, coordinates_to_move_to)
+        self.board.move(self.player, piece_to_move, coordinates_to_move_to)
 
     def __swap_player(self: Game) -> None:
         self.player = 'black' if self.player == 'white' else 'white'

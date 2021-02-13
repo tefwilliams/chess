@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+from player import Player
 from pieces.pieces import Pieces
 from pieces.piece import Piece
 from coordinates import Coordinates
@@ -36,15 +37,26 @@ class Board:
 
         return pieces_with_coordinates.pop()
 
-    def move(self: Board, piece: Piece, coordinates: Coordinates) -> None:
+    def move(self: Board, player: Player, piece: Piece, coordinates: Coordinates) -> None:
         if piece.coordinates == coordinates:
             raise ValueError("Can't move piece to same location")
 
-        if self.__in_check():
-            return
+        piece_at_destination = self.get_piece(coordinates)
 
-        if not self.get_piece(coordinates):
+        if not piece_at_destination:
             piece.move(coordinates)
+
+        elif piece_at_destination.color != player:
+            piece.move(coordinates)
+            self.__pieces.remove(piece_at_destination)
+
+        else:
+            raise ValueError("You cannot move to a space occupied by one of your pieces")
+
+        if self.__in_check():
+            raise ValueError("You can't make this move because it will leave you in check")
+
+        
 
     def __in_check(self: Board) -> bool:
         return False
