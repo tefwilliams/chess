@@ -6,11 +6,11 @@ from coordinates import Coordinates
 class Movement:
     @staticmethod
     def is_horizontal(starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
-        return starting_coordinates.x == finishing_coordinates.x
+        return starting_coordinates.y == finishing_coordinates.y
 
     @staticmethod
     def is_vertical(starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
-        return starting_coordinates.y == finishing_coordinates.y
+        return starting_coordinates.x == finishing_coordinates.x
 
     @staticmethod
     def is_diagonal(starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
