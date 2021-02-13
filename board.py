@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+from movement import Movement
 from player import Player
 from pieces.pieces import Pieces
 from pieces.piece import Piece
@@ -41,6 +42,9 @@ class Board:
         if piece.coordinates == coordinates:
             raise ValueError("Can't move piece to same location")
 
+        if self.__move_obstructed(piece.coordinates, coordinates):
+            raise ValueError("Movement obstucted by another piece")
+
         piece_at_destination = self.get_piece(coordinates)
 
         if not piece_at_destination:
@@ -55,6 +59,15 @@ class Board:
 
         if self.__in_check():
             raise ValueError("You can't make this move because it will leave you in check")
+
+    def __move_obstructed(self: Board, starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
+        movement_steps = Movement.get_steps(starting_coordinates, finishing_coordinates)
+
+        for step in movement_steps:
+            if self.get_piece(step):
+                return True
+
+        return False
 
     def __in_check(self: Board) -> bool:
         return False
