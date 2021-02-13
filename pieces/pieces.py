@@ -31,3 +31,5 @@ class Pieces:
 
             if coordinates.x == 4:
                 return King(coordinates)
+
+        raise ValueError("No piece at %s" % coordinates)
