@@ -56,7 +56,5 @@ class Board:
         if self.__in_check():
             raise ValueError("You can't make this move because it will leave you in check")
 
-        
-
     def __in_check(self: Board) -> bool:
         return False

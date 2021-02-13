@@ -11,7 +11,13 @@ class Piece:
 
     # Will need to abstract this
     def move(self: Piece, coordinates: Coordinates) -> None:
+        if not self.can_move(coordinates):
+            raise ValueError("Cannot move to that square")
+
         self.coordinates = coordinates
+
+    def can_move(self: Piece, coordinates: Coordinates) -> bool:
+        ...
 
     @property
     def color(self: Piece) -> Player:
