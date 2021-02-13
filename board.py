@@ -37,7 +37,7 @@ class Board:
 
         return pieces_with_coordinates.pop()
 
-    def move(self: Board, player: Player, piece: Piece, coordinates: Coordinates) -> None:
+    def evaluate_move(self: Board, player: Player, piece: Piece, coordinates: Coordinates) -> None:
         if piece.coordinates == coordinates:
             raise ValueError("Can't move piece to same location")
 
