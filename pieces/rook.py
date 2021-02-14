@@ -3,6 +3,7 @@ from __future__ import annotations
 from movement import Movement
 from coordinates import Coordinates
 from pieces.piece import Piece
+import board
 
 
 class Rook(Piece):
@@ -15,4 +16,5 @@ class Rook(Piece):
         return self.__symbol
 
     def can_move(self: Rook, coordinates: Coordinates) -> bool:
-        return Movement.is_horizontal(self.coordinates, coordinates) or Movement.is_vertical(self.coordinates, coordinates)
+        return (Movement.is_horizontal(self.coordinates, coordinates) 
+            or Movement.is_vertical(self.coordinates, coordinates))

@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+from movement import Movement
 from coordinates import Coordinates
 from pieces.piece import Piece
 
@@ -12,4 +13,7 @@ class Bishop(Piece):
     @property
     def symbol(self: Bishop) -> str:
         return self.__symbol
+
+    def can_move(self: Bishop, coordinates: Coordinates) -> bool:
+        return Movement.is_diagonal(self.coordinates, coordinates)
         

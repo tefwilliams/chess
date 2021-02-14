@@ -45,8 +45,7 @@ class Movement:
         horizontal_steps = list(range(starting_coordinates.x, finishing_coordinates.x))
         vertical_steps = [starting_coordinates.y] * len(horizontal_steps)
 
-        steps = list(zip(horizontal_steps, vertical_steps))
-        steps.pop(0) # Remove starting coordinates
+        steps = list(zip(vertical_steps, horizontal_steps))
 
         return [Coordinates(step) for step in steps]
 
@@ -55,8 +54,7 @@ class Movement:
         vertical_steps = list(range(starting_coordinates.y, finishing_coordinates.y))
         horizontal_steps = [starting_coordinates.x] * len(vertical_steps)
 
-        steps = list(zip(horizontal_steps, vertical_steps))
-        steps.pop(0) # Remove starting coordinates
+        steps = list(zip(vertical_steps, horizontal_steps))
 
         return [Coordinates(step) for step in steps]
 
@@ -68,8 +66,7 @@ class Movement:
         if len(horizontal_steps) != len(vertical_steps):
             raise ValueError("Expected horizontal and vertical steps to be the same length")
 
-        steps = list(zip(horizontal_steps, vertical_steps))
-        steps.pop(0) # Remove starting coordinates
+        steps = list(zip(vertical_steps, horizontal_steps))
 
         return [Coordinates(step) for step in steps]
 

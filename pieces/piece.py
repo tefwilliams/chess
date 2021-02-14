@@ -2,6 +2,7 @@
 from __future__ import annotations
 from coordinates import Coordinates
 from player import Player
+import board
 
 
 class Piece:
@@ -10,13 +11,13 @@ class Piece:
         self.coordinates = coordinates
 
     # Will need to abstract this
-    def move(self: Piece, coordinates: Coordinates) -> None:
-        if not self.can_move(coordinates):
+    def move(self: Piece, coordinates: Coordinates, board: board.Board) -> None:
+        if not self.can_move(coordinates, board):
             raise ValueError("Cannot move to that square")
 
         self.coordinates = coordinates
 
-    def can_move(self: Piece, coordinates: Coordinates) -> bool:
+    def can_move(self: Piece, coordinates: Coordinates, board: board.Board) -> bool:
         ...
 
     @property

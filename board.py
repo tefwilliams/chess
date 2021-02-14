@@ -48,10 +48,10 @@ class Board:
         piece_at_destination = self.get_piece(coordinates)
 
         if not piece_at_destination:
-            piece.move(coordinates)
+            piece.move(coordinates, self)
 
         elif piece_at_destination.color != player:
-            piece.move(coordinates)
+            piece.move(coordinates, self)
             self.__pieces.remove(piece_at_destination)
 
         else:
@@ -62,6 +62,7 @@ class Board:
 
     def __move_obstructed(self: Board, starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
         movement_steps = Movement.get_steps(starting_coordinates, finishing_coordinates)
+        movement_steps.pop(0) # Remove starting coordinates
 
         for step in movement_steps:
             if self.get_piece(step):

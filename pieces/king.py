@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+from movement import Movement
 from coordinates import Coordinates
 from pieces.piece import Piece
 
@@ -12,4 +13,12 @@ class King(Piece):
     @property
     def symbol(self: King) -> str:
         return self.__symbol
+
+    def can_move(self: King, coordinates: Coordinates) -> bool:
+        number_of_steps = len(Movement.get_steps(self.coordinates, coordinates))
+
+        if number_of_steps == 1:
+            return True
+
+        return False
         
