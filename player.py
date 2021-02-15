@@ -1,4 +1,6 @@
-from typing import Literal
+from enum import Enum
 
 
-Player = Literal['white', 'black']
+class Player(Enum):
+    white = 0
+    black = 1

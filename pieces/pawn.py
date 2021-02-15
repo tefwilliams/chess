@@ -2,14 +2,14 @@
 from __future__ import annotations
 from movement import Movement
 from coordinates import Coordinates
-from pieces.piece import Piece
+from pieces.piece import Piece, PieceTypes
 import board
 
 
 class Pawn(Piece):
     def __init__(self: Pawn, coordinates: Coordinates) -> None:
         super().__init__(coordinates)
-        self.__symbol = '\u2659' if self.color == 'white' else '\u265F'
+        self.__symbol = '\u2659' if self.player == 'white' else '\u265F'
         self.__has_moved = False
 
     @property
@@ -40,10 +40,14 @@ class Pawn(Piece):
         if not Movement.is_vertical(self.coordinates, coordinates):
             return False
 
-        if self.color == 'white' and self.coordinates.y > coordinates.y:
+        if self.player == 'white' and self.coordinates.y > coordinates.y:
             return True
 
-        if self.color == 'black' and self.coordinates.y < coordinates.y:
+        if self.player == 'black' and self.coordinates.y < coordinates.y:
             return True
 
         return False
+
+    @property
+    def type(self: Pawn) -> PieceTypes:
+        return PieceTypes.pawn

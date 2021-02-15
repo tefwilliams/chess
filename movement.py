@@ -37,12 +37,17 @@ class Movement:
 
         if Movement.is_diagonal(starting_coordinates, finishing_coordinates):
             return Movement.__get_diagonal_steps(starting_coordinates, finishing_coordinates)
+
+        if Movement.is_knight(starting_coordinates, finishing_coordinates):
+            return [Coordinates(starting_coordinates)]
         
-        return []
+        raise ValueError("Not a valid movement")
 
     @staticmethod
     def __get_horizontal_steps(starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> list[Coordinates]:
-        horizontal_steps = list(range(starting_coordinates.x, finishing_coordinates.x))
+        step = 1 if starting_coordinates.x < finishing_coordinates.x else -1
+
+        horizontal_steps = list(range(starting_coordinates.x, finishing_coordinates.x, step))
         vertical_steps = [starting_coordinates.y] * len(horizontal_steps)
 
         steps = list(zip(vertical_steps, horizontal_steps))
@@ -51,7 +56,9 @@ class Movement:
 
     @staticmethod
     def __get_vertical_steps(starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> list[Coordinates]:
-        vertical_steps = list(range(starting_coordinates.y, finishing_coordinates.y))
+        step = 1 if starting_coordinates.y < finishing_coordinates.y else -1
+
+        vertical_steps = list(range(starting_coordinates.y, finishing_coordinates.y, step))
         horizontal_steps = [starting_coordinates.x] * len(vertical_steps)
 
         steps = list(zip(vertical_steps, horizontal_steps))
@@ -60,8 +67,11 @@ class Movement:
 
     @staticmethod
     def __get_diagonal_steps(starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> list[Coordinates]:
-        horizontal_steps = list(range(starting_coordinates.x, finishing_coordinates.x))
-        vertical_steps = list(range(starting_coordinates.y, finishing_coordinates.y))
+        horizontal_step = 1 if starting_coordinates.x < finishing_coordinates.x else -1
+        vertical_step = 1 if starting_coordinates.y < finishing_coordinates.y else -1
+
+        horizontal_steps = list(range(starting_coordinates.x, finishing_coordinates.x, horizontal_step))
+        vertical_steps = list(range(starting_coordinates.y, finishing_coordinates.y, vertical_step))
 
         if len(horizontal_steps) != len(vertical_steps):
             raise ValueError("Expected horizontal and vertical steps to be the same length")
