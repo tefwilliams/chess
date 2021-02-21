@@ -10,10 +10,10 @@ class Piece:
 
     def __init__(self: Piece, coordinates: Coordinates) -> None:
         self.__color = Color.white if coordinates.y in [0, 1] else Color.black
-        self.coordinates = coordinates
+        self.__coordinates = coordinates
 
     def move(self: Piece, coordinates: Coordinates) -> None:
-        self.coordinates = coordinates
+        self.__coordinates = coordinates
 
     def can_move(self: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> bool:
         ...
@@ -21,6 +21,10 @@ class Piece:
     @property
     def color(self: Piece) -> Color:
         return self.__color
+
+    @property
+    def coordinates(self: Piece) -> Coordinates:
+        return self.__coordinates
 
     @property
     def symbol(self: Piece) -> str:

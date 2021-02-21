@@ -11,9 +11,9 @@ class Board:
     shape = Coordinates((8, 8))
 
     def __init__(self: Board) -> None:
-        self.initialize_pieces()
+        self.__initialize_pieces()
 
-    def initialize_pieces(self: Board) -> None:
+    def __initialize_pieces(self: Board) -> None:
         board_dimensions = Board.shape
         pieces: list[Piece] = []
 
@@ -88,7 +88,7 @@ class Board:
         king_coordinates = self.__get_king(color).coordinates
 
         opposing_color = Color.get_opposing_color(color)
-        opposing_color_pieces = self.get_player_pieces(opposing_color)
+        opposing_color_pieces = self.get_color_pieces(opposing_color)
 
         return self.__can_any_piece_move(opposing_color_pieces, king_coordinates)
 
@@ -116,11 +116,11 @@ class Board:
 
         return king_with_color_list.pop()
 
-    def get_player_pieces(self: Board, color: Color) -> list[Piece]:
+    def get_color_pieces(self: Board, color: Color) -> list[Piece]:
         return [piece for piece in self.__pieces if piece.color == color]
 
     def __any_possible_moves(self: Board, player: Color) -> bool:
-        player_pieces = self.get_player_pieces(player)
+        player_pieces = self.get_color_pieces(player)
 
         for i in range(self.shape.y):
             for j in range(self.shape.x):
