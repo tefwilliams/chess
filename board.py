@@ -1,11 +1,10 @@
 
 from __future__ import annotations
 from movement import Movement
-from player import Color, Player
+from player import Color
 from pieces.pieces import Pieces
 from pieces.piece import Piece, PieceTypes
 from coordinates import Coordinates
-from copy import deepcopy
 
 
 class Board:

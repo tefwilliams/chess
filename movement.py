@@ -1,6 +1,6 @@
 
-
 from coordinates import Coordinates
+
 
 # TODO - look at zero checking for movement
 class Movement:

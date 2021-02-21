@@ -3,7 +3,7 @@ from __future__ import annotations
 from coordinates import Coordinates
 from repository import display_board
 from board import Board
-from player import Color, Player
+from player import Player
 
 
 class Game:
