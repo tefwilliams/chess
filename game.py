@@ -35,6 +35,8 @@ class Game:
                 
                 if piece_to_move.player != self.__player:
                     raise ValueError("You cannot move the opposing team's piece")
+
+                print("\n" + "You have chosen: %s" % piece_to_move.symbol)
                 
                 coordinates_to_move_to = Coordinates.get_coordinates("Enter which square to move to: ")
                 return self.board.evaluate_move(piece_to_move, coordinates_to_move_to)

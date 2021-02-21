@@ -38,9 +38,6 @@ class Pawn(Piece):
 
         return False
 
-    def move(self: Pawn, coordinates: Coordinates) -> None:
-        self.coordinates = coordinates
-
     def __movement_is_backward(self: Pawn, coordinates: Coordinates) -> bool:
         if not Movement.is_vertical(self.coordinates, coordinates):
             return False

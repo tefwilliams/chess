@@ -22,7 +22,6 @@ class Piece:
     def player(self: Piece) -> Player:
         return self.__player
 
-    # Is this properly abstracted?
     @property
     def symbol(self: Piece) -> str:
         ...

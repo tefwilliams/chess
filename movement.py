@@ -2,7 +2,7 @@
 
 from coordinates import Coordinates
 
-
+# TODO - look at zero checking for movement
 class Movement:
     @staticmethod
     def is_horizontal(starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:

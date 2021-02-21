@@ -18,7 +18,7 @@ class Coordinates(tuple[int, int]):
                 return Coordinates.convert_from_grid_value(coordinates_as_string)
 
             except ValueError as e:
-                print("\n%s" % e)
+                print("\n" + "%s" % e)
 
     @staticmethod
     def convert_from_grid_value(coordinates: str) -> Coordinates:

@@ -43,28 +43,24 @@ class Board:
         starting_coordinates = piece.coordinates
         piece_at_destination = self.get_piece(coordinates)
 
-        try:
-            if piece.coordinates == coordinates:
-                raise ValueError("Can't move piece to same square")
+        if piece.coordinates == coordinates:
+            raise ValueError("Can't move piece to same square")
 
-            if not piece.can_move(coordinates, piece_at_destination):
-                raise ValueError("A %s cannot move to that sqaure" % piece.type.name)
+        if not piece.can_move(coordinates, piece_at_destination):
+            raise ValueError("A %s cannot move to that sqaure" % piece.type.name)
 
-            if self.move_obstructed(piece.coordinates, coordinates):
-                raise ValueError("Movement obstucted by another piece")
+        if self.__move_obstructed(piece.coordinates, coordinates):
+            raise ValueError("Movement obstucted by another piece")
 
-            if piece_at_destination and piece_at_destination.player == piece.player:
-                raise ValueError("You cannot move to a square occupied by one of your pieces")
+        if piece_at_destination and piece_at_destination.player == piece.player:
+            raise ValueError("You cannot move to a square occupied by one of your pieces")
 
-            if should_move:
-                self.__move_piece(piece, coordinates, piece_at_destination)
+        if should_move:
+            self.__move_piece(piece, coordinates, piece_at_destination)
 
-            if self.__in_check(piece.player):
-                raise ValueError("You can't make this move because it will leave you in check")
-
-        except ValueError as e:
+        if self.__in_check(piece.player):
             self.__restore(piece, starting_coordinates, piece_at_destination)
-            raise ValueError(e)        
+            raise ValueError("You can't make this move because it will leave you in check")
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
         if piece_at_destination:
@@ -78,7 +74,7 @@ class Board:
         if removed_piece and removed_piece not in self.__pieces:
             self.__pieces.append(removed_piece)
 
-    def move_obstructed(self: Board, starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
+    def __move_obstructed(self: Board, starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
         movement_steps = Movement.get_steps(starting_coordinates, finishing_coordinates)
         movement_steps.pop(0) # Remove starting coordinates
 
@@ -88,7 +84,7 @@ class Board:
 
         return False
 
-    # Pull methods onto player?
+    # TODO - pull methods onto player?
     def __in_check(self: Board, player: Player) -> bool:
         king_coordinates = self.__get_king(player).coordinates
 
