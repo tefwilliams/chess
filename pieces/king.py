@@ -8,7 +8,7 @@ from pieces.piece import Piece, PieceTypes
 class King(Piece):
     def __init__(self: King, coordinates: Coordinates) -> None:
         super().__init__(coordinates)
-        self.__symbol = '\u2654' if self.player == 'white' else '\u265A'
+        self.__symbol = '\u2654' if self.color == 'white' else '\u265A'
 
     @property
     def symbol(self: King) -> str:

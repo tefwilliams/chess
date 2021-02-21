@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 from movement import Movement
-from player import Player
+from player import Color, Player
 from pieces.pieces import Pieces
 from pieces.piece import Piece, PieceTypes
 from coordinates import Coordinates
@@ -52,13 +52,13 @@ class Board:
         if self.__move_obstructed(piece.coordinates, coordinates):
             raise ValueError("Movement obstucted by another piece")
 
-        if piece_at_destination and piece_at_destination.player == piece.player:
+        if piece_at_destination and piece_at_destination.color == piece.color:
             raise ValueError("You cannot move to a square occupied by one of your pieces")
 
         if should_move:
             self.__move_piece(piece, coordinates, piece_at_destination)
 
-        if self.__in_check(piece.player):
+        if self.__in_check(piece.color):
             self.__restore(piece, starting_coordinates, piece_at_destination)
             raise ValueError("You can't make this move because it will leave you in check")
 
@@ -85,13 +85,13 @@ class Board:
         return False
 
     # TODO - pull methods onto player?
-    def __in_check(self: Board, player: Player) -> bool:
-        king_coordinates = self.__get_king(player).coordinates
+    def __in_check(self: Board, color: Color) -> bool:
+        king_coordinates = self.__get_king(color).coordinates
 
-        opposing_player = Player.black if player == Player.white else Player.white
-        opposing_player_pieces = self.get_player_pieces(opposing_player)
+        opposing_color = Color.get_opposing_color(color)
+        opposing_color_pieces = self.get_player_pieces(opposing_color)
 
-        return self.__can_any_piece_move(opposing_player_pieces, king_coordinates)
+        return self.__can_any_piece_move(opposing_color_pieces, king_coordinates)
 
     def __can_any_piece_move(self: Board, pieces: list[Piece], coordinates: Coordinates) -> bool:
         for piece in pieces:
@@ -106,21 +106,21 @@ class Board:
 
         return False
 
-    def __get_king(self: Board, player: Player) -> Piece:
-        player_king_list = [piece for piece in self.__pieces if piece.type == PieceTypes.king and piece.player == player]
+    def __get_king(self: Board, color: Color) -> Piece:
+        king_with_color_list = [piece for piece in self.__pieces if piece.type == PieceTypes.king and piece.color == color]
 
-        if len(player_king_list) > 1:
-            raise ValueError("More than one king on %s team" % player)
+        if len(king_with_color_list) > 1:
+            raise ValueError("More than one king on %s team" % color)
 
-        if len(player_king_list) == 0:
-            raise ValueError("No king on %s team" % player)
+        if len(king_with_color_list) == 0:
+            raise ValueError("No king on %s team" % color)
 
-        return player_king_list.pop()
+        return king_with_color_list.pop()
 
-    def get_player_pieces(self: Board, player: Player) -> list[Piece]:
-        return [piece for piece in self.__pieces if piece.player == player]
+    def get_player_pieces(self: Board, color: Color) -> list[Piece]:
+        return [piece for piece in self.__pieces if piece.color == color]
 
-    def __any_possible_moves(self: Board, player: Player) -> bool:
+    def __any_possible_moves(self: Board, player: Color) -> bool:
         player_pieces = self.get_player_pieces(player)
 
         for i in range(self.shape.y):
@@ -132,10 +132,10 @@ class Board:
 
         return False
 
-    def check_mate(self: Board, player: Player) -> bool:
-        can_get_out_of_check = self.__any_possible_moves(player)
-        return self.__in_check(player) and not can_get_out_of_check
+    def check_mate(self: Board, color: Color) -> bool:
+        can_get_out_of_check = self.__any_possible_moves(color)
+        return self.__in_check(color) and not can_get_out_of_check
 
-    def stale_mate(self: Board, player: Player) -> bool:
-        can_move = self.__any_possible_moves(player)
-        return not self.__in_check(player) and not can_move
+    def stale_mate(self: Board, color: Color) -> bool:
+        can_move = self.__any_possible_moves(color)
+        return not self.__in_check(color) and not can_move

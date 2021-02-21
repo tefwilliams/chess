@@ -8,7 +8,7 @@ from pieces.piece import Piece, PieceTypes
 class Pawn(Piece):
     def __init__(self: Pawn, coordinates: Coordinates) -> None:
         super().__init__(coordinates)
-        self.__symbol = '\u2659' if self.player == 'white' else '\u265F'
+        self.__symbol = '\u2659' if self.color == 'white' else '\u265F'
         self.__starting_coordinates = coordinates
 
     @property
@@ -42,10 +42,10 @@ class Pawn(Piece):
         if not Movement.is_vertical(self.coordinates, coordinates):
             return False
 
-        if self.player == 'white' and self.coordinates.y > coordinates.y:
+        if self.color == 'white' and self.coordinates.y > coordinates.y:
             return True
 
-        if self.player == 'black' and self.coordinates.y < coordinates.y:
+        if self.color == 'black' and self.coordinates.y < coordinates.y:
             return True
 
         return False

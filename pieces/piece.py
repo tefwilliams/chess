@@ -2,14 +2,14 @@
 from __future__ import annotations
 from enum import Enum
 from coordinates import Coordinates
-from player import Player
+from player import Color
 
 
 class Piece:
-    __player: Player
+    __color: Color
 
     def __init__(self: Piece, coordinates: Coordinates) -> None:
-        self.__player = Player.white if coordinates.y in [0, 1] else Player.black
+        self.__color = Color.white if coordinates.y in [0, 1] else Color.black
         self.coordinates = coordinates
 
     def move(self: Piece, coordinates: Coordinates) -> None:
@@ -19,8 +19,8 @@ class Piece:
         ...
 
     @property
-    def player(self: Piece) -> Player:
-        return self.__player
+    def color(self: Piece) -> Color:
+        return self.__color
 
     @property
     def symbol(self: Piece) -> str:
