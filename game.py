@@ -40,10 +40,12 @@ class Game:
                 return self.board.evaluate_move(self.__player, piece_to_move, coordinates_to_move_to)
 
             except ValueError as e:
+                self.board.restore()
                 print("\n%s" % e)
 
     def __swap_player(self: Game) -> None:
         self.__player = Player.black if self.__player == Player.white else Player.white
 
-    def over(self: Game):
-        return self.board.check_mate(self.__player)
+    def over(self: Game) -> bool:
+        return (self.board.check_mate(self.__player)
+            or self.board.stale_mate(self.__player))

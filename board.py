@@ -5,6 +5,7 @@ from player import Player
 from pieces.pieces import Pieces
 from pieces.piece import Piece, PieceTypes
 from coordinates import Coordinates
+from copy import deepcopy
 
 
 class Board:
@@ -39,6 +40,8 @@ class Board:
         return pieces_with_coordinates.pop()
 
     def evaluate_move(self: Board, player: Player, piece: Piece, coordinates: Coordinates) -> None:
+        self.__backup_pieces = deepcopy(self.__pieces)
+
         if piece.coordinates == coordinates:
             raise ValueError("Can't move piece to same location")
 
@@ -58,6 +61,9 @@ class Board:
         if self.__in_check(player):
             raise ValueError("You can't make this move because it will leave you in check")
 
+    def restore(self: Board) -> None:
+        self.__pieces = deepcopy(self.__backup_pieces)
+
     def move_obstructed(self: Board, starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
         movement_steps = Movement.get_steps(starting_coordinates, finishing_coordinates)
         movement_steps.pop(0) # Remove starting coordinates
@@ -70,17 +76,42 @@ class Board:
 
     # Pull methods onto player?
     def __in_check(self: Board, player: Player) -> bool:
-        king = self.__get_king(player)
+        king_coordinates = self.__get_king(player).coordinates
+        # test_board = deepcopy(self)
 
-        opposing_team_pieces = [piece for piece in self.__pieces if piece.player != player]
+        opposing_player = Player.black if player == Player.white else Player.white
+        opposing_team_pieces = self.get_player_pieces(opposing_player)
 
-        for piece in opposing_team_pieces:
+        return self.__can_any_piece_move(player, opposing_team_pieces, king_coordinates)
+
+        # for piece in opposing_team_pieces:
+        #     try:
+        #         self.evaluate_move(player, piece, king_coordinates)
+        #         # piece.move(king_coordinates, self)
+
+        #     except ValueError:
+        #         pass
+
+        #     else:
+        #         return True
+
+        #     self.restore()
+
+        # return False
+
+    def __can_any_piece_move(self: Board, player: Player, pieces: list[Piece], coordinates: Coordinates) -> bool:
+        for piece in pieces:
             try:
-                piece.move(king.coordinates, self)
+                self.evaluate_move(player, piece, coordinates)
+                # piece.move(king_coordinates, self)
+
+            except ValueError:
+                pass
+
+            else:
                 return True
 
-            except:
-                ValueError
+            self.restore()
 
         return False
 
@@ -95,25 +126,36 @@ class Board:
 
         return player_king_list.pop()
 
+    def get_player_pieces(self: Board, player: Player) -> list[Piece]:
+        return [piece for piece in self.__pieces if piece.player == player]
+
+    def __any_possible_moves(self: Board, player: Player) -> bool:
+        test_board = deepcopy(self)
+        pieces = test_board.get_player_pieces(player)
+
+        for i in range(self.shape.y):
+            for j in range(self.shape.x):
+                coordinates = Coordinates((i, j))
+
+                if self.__can_any_piece_move(player, pieces, coordinates):
+                    return True
+
+                # for piece in pieces:
+                #     try:
+                #         test_board.evaluate_move(player, piece, coordinates)
+
+                #     except ValueError:
+                #         continue
+
+                #     else:
+                #         return True
+
+        return False
+
     def check_mate(self: Board, player: Player) -> bool:
-        king = self.__get_king(player)
-        possible_king_movements: list[Coordinates] = []
+        can_get_out_of_check = self.__any_possible_moves(player)
+        return self.__in_check(player) and not can_get_out_of_check
 
-        for i in range(-1, 1):
-            for j in range(-1, 1):
-                if i == j == 0:
-                    continue
-
-                possible_king_movements.append(Coordinates((i, j)))
-
-        king_can_move = False
-
-        for movement in possible_king_movements:
-            try:
-                self.evaluate_move(player, king, movement)
-                king_can_move = True
-
-            except:
-                ValueError
-
-        return self.__in_check(player) and not king_can_move
+    def stale_mate(self: Board, player: Player) -> bool:
+        can_move = self.__any_possible_moves(player)
+        return not self.__in_check(player) and not can_move
