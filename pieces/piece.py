@@ -3,7 +3,6 @@ from __future__ import annotations
 from enum import Enum
 from coordinates import Coordinates
 from player import Player
-import board
 
 
 class Piece:
@@ -13,16 +12,10 @@ class Piece:
         self.__player = Player.white if coordinates.y in [0, 1] else Player.black
         self.coordinates = coordinates
 
-    def move(self: Piece, coordinates: Coordinates, board: board.Board) -> None:
-        if not self.can_move(coordinates, board):
-            raise ValueError("Cannot move to that square")
-
-        if board.move_obstructed(self.coordinates, coordinates):
-            raise ValueError("Movement obstucted by another piece")
-
+    def move(self: Piece, coordinates: Coordinates) -> None:
         self.coordinates = coordinates
 
-    def can_move(self: Piece, coordinates: Coordinates, board: board.Board) -> bool:
+    def can_move(self: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> bool:
         ...
 
     @property

@@ -3,21 +3,23 @@ from __future__ import annotations
 from movement import Movement
 from coordinates import Coordinates
 from pieces.piece import Piece, PieceTypes
-import board
 
 
 class Pawn(Piece):
     def __init__(self: Pawn, coordinates: Coordinates) -> None:
         super().__init__(coordinates)
         self.__symbol = '\u2659' if self.player == 'white' else '\u265F'
-        self.__has_moved = False
+        self.__starting_coordinates = coordinates
 
     @property
     def symbol(self: Pawn) -> str:
         return self.__symbol
 
-    def can_move(self: Pawn, coordinates: Coordinates, board: board.Board) -> bool:
-        piece_at_destination = board.get_piece(coordinates)
+    @property
+    def __has_moved(self: Pawn) -> bool:
+        return self.coordinates != self.__starting_coordinates
+
+    def can_move(self: Pawn, coordinates: Coordinates, piece_at_destination: Piece | None) -> bool:
         number_of_steps = len(Movement.get_steps(self.coordinates, coordinates))
 
         if self.__movement_is_backward(coordinates):
@@ -35,6 +37,9 @@ class Pawn(Piece):
                 return True
 
         return False
+
+    def move(self: Pawn, coordinates: Coordinates) -> None:
+        self.coordinates = coordinates
 
     def __movement_is_backward(self: Pawn, coordinates: Coordinates) -> bool:
         if not Movement.is_vertical(self.coordinates, coordinates):

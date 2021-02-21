@@ -37,10 +37,9 @@ class Game:
                     raise ValueError("You cannot move the opposing team's piece")
                 
                 coordinates_to_move_to = Coordinates.get_coordinates("Enter which square to move to: ")
-                return self.board.evaluate_move(self.__player, piece_to_move, coordinates_to_move_to)
+                return self.board.evaluate_move(piece_to_move, coordinates_to_move_to)
 
             except ValueError as e:
-                self.board.restore()
                 print("\n%s" % e)
 
     def __swap_player(self: Game) -> None:

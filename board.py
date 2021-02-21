@@ -39,30 +39,44 @@ class Board:
 
         return pieces_with_coordinates.pop()
 
-    def evaluate_move(self: Board, player: Player, piece: Piece, coordinates: Coordinates) -> None:
-        self.__backup_pieces = deepcopy(self.__pieces)
-
-        if piece.coordinates == coordinates:
-            raise ValueError("Can't move piece to same location")
-
+    def evaluate_move(self: Board, piece: Piece, coordinates: Coordinates, should_move: bool = True) -> None:
+        starting_coordinates = piece.coordinates
         piece_at_destination = self.get_piece(coordinates)
 
-        # Look at way to move this into piece moving perhaps?
-        if not piece_at_destination:
-            piece.move(coordinates, self)
+        try:
+            if piece.coordinates == coordinates:
+                raise ValueError("Can't move piece to same square")
 
-        elif piece_at_destination.player != player:
-            piece.move(coordinates, self)
+            if not piece.can_move(coordinates, piece_at_destination):
+                raise ValueError("A %s cannot move to that sqaure" % piece.type.name)
+
+            if self.move_obstructed(piece.coordinates, coordinates):
+                raise ValueError("Movement obstucted by another piece")
+
+            if piece_at_destination and piece_at_destination.player == piece.player:
+                raise ValueError("You cannot move to a square occupied by one of your pieces")
+
+            if should_move:
+                self.__move_piece(piece, coordinates, piece_at_destination)
+
+            if self.__in_check(piece.player):
+                raise ValueError("You can't make this move because it will leave you in check")
+
+        except ValueError as e:
+            self.__restore(piece, starting_coordinates, piece_at_destination)
+            raise ValueError(e)        
+
+    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
+        if piece_at_destination:
             self.__pieces.remove(piece_at_destination)
 
-        else:
-            raise ValueError("You cannot move to a space occupied by one of your pieces")
+        piece.move(coordinates)
 
-        if self.__in_check(player):
-            raise ValueError("You can't make this move because it will leave you in check")
+    def __restore(self: Board, moved_piece: Piece, original_coordinates: Coordinates, removed_piece: Piece | None) -> None:
+        moved_piece.move(original_coordinates)
 
-    def restore(self: Board) -> None:
-        self.__pieces = deepcopy(self.__backup_pieces)
+        if removed_piece and removed_piece not in self.__pieces:
+            self.__pieces.append(removed_piece)
 
     def move_obstructed(self: Board, starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
         movement_steps = Movement.get_steps(starting_coordinates, finishing_coordinates)
@@ -77,41 +91,22 @@ class Board:
     # Pull methods onto player?
     def __in_check(self: Board, player: Player) -> bool:
         king_coordinates = self.__get_king(player).coordinates
-        # test_board = deepcopy(self)
 
         opposing_player = Player.black if player == Player.white else Player.white
-        opposing_team_pieces = self.get_player_pieces(opposing_player)
+        opposing_player_pieces = self.get_player_pieces(opposing_player)
 
-        return self.__can_any_piece_move(player, opposing_team_pieces, king_coordinates)
+        return self.__can_any_piece_move(opposing_player_pieces, king_coordinates)
 
-        # for piece in opposing_team_pieces:
-        #     try:
-        #         self.evaluate_move(player, piece, king_coordinates)
-        #         # piece.move(king_coordinates, self)
-
-        #     except ValueError:
-        #         pass
-
-        #     else:
-        #         return True
-
-        #     self.restore()
-
-        # return False
-
-    def __can_any_piece_move(self: Board, player: Player, pieces: list[Piece], coordinates: Coordinates) -> bool:
+    def __can_any_piece_move(self: Board, pieces: list[Piece], coordinates: Coordinates) -> bool:
         for piece in pieces:
             try:
-                self.evaluate_move(player, piece, coordinates)
-                # piece.move(king_coordinates, self)
+                self.evaluate_move(piece, coordinates, False)
 
             except ValueError:
                 pass
 
             else:
                 return True
-
-            self.restore()
 
         return False
 
@@ -130,25 +125,14 @@ class Board:
         return [piece for piece in self.__pieces if piece.player == player]
 
     def __any_possible_moves(self: Board, player: Player) -> bool:
-        test_board = deepcopy(self)
-        pieces = test_board.get_player_pieces(player)
+        player_pieces = self.get_player_pieces(player)
 
         for i in range(self.shape.y):
             for j in range(self.shape.x):
                 coordinates = Coordinates((i, j))
 
-                if self.__can_any_piece_move(player, pieces, coordinates):
+                if self.__can_any_piece_move(player_pieces, coordinates):
                     return True
-
-                # for piece in pieces:
-                #     try:
-                #         test_board.evaluate_move(player, piece, coordinates)
-
-                #     except ValueError:
-                #         continue
-
-                #     else:
-                #         return True
 
         return False
 
