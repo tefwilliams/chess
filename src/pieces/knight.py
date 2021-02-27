@@ -1,14 +1,15 @@
 
 from __future__ import annotations
-from movement import Movement
-from coordinates import Coordinates
-from pieces.piece import Piece, PieceTypes
+from .piece import Piece, PieceTypes
+from ..player import Color
+from ..movement import Movement
+from ..coordinates import Coordinates
 
 
 class Knight(Piece):
     def __init__(self: Knight, coordinates: Coordinates) -> None:
         super().__init__(coordinates)
-        self.__symbol = '\u2658' if self.color == 'white' else '\u265E'
+        self.__symbol = '\u2658' if self.color == Color.white else '\u265E'
 
     @property
     def symbol(self: Knight) -> str:

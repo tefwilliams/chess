@@ -1,13 +1,13 @@
 
 from __future__ import annotations
-from coordinates import Coordinates
-from pieces.piece import Piece
-from pieces.king import King
-from pieces.queen import Queen
-from pieces.bishop import Bishop
-from pieces.knight import Knight
-from pieces.rook import Rook
-from pieces.pawn import Pawn
+from .piece import Piece
+from .king import King
+from .queen import Queen
+from .bishop import Bishop
+from .knight import Knight
+from .rook import Rook
+from .pawn import Pawn
+from ..coordinates import Coordinates
 
 
 class Pieces:

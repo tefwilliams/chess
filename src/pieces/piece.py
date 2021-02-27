@@ -1,12 +1,12 @@
 
 from __future__ import annotations
 from enum import Enum
-from player import Color
 from typing import TYPE_CHECKING
+from ..player import Color
 
 if TYPE_CHECKING:
-    from coordinates import Coordinates
-    from board import Board
+    from ..coordinates import Coordinates
+    from ..board import Board
 
 
 class Piece:

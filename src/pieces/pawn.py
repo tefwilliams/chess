@@ -1,27 +1,24 @@
 
 from __future__ import annotations
-from movement import Movement
-from pieces.piece import Piece, PieceTypes
 from typing import TYPE_CHECKING
+from .piece import Piece, PieceTypes
+from ..player import Color
+from ..movement import Movement
 
 if TYPE_CHECKING:
-    from coordinates import Coordinates
-    from board import Board
+    from ..coordinates import Coordinates
+    from ..board import Board
 
 
 class Pawn(Piece):
     def __init__(self: Pawn, coordinates: Coordinates) -> None:
         super().__init__(coordinates)
-        self.__symbol = '\u2659' if self.color == 'white' else '\u265F'
+        self.__symbol = '\u2659' if self.color == Color.white else '\u265F'
         self.__starting_coordinates = coordinates
 
     @property
     def symbol(self: Pawn) -> str:
         return self.__symbol
-
-    # @property
-    # def __has_moved(self: Pawn) -> bool:
-    #     return self.coordinates != self.__starting_coordinates
 
     def can_move(self: Pawn, coordinates: Coordinates, board: Board) -> bool:
         piece_at_destination = board.get_piece(coordinates)

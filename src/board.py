@@ -1,10 +1,9 @@
 
 from __future__ import annotations
-from movement import Movement
-from player import Color
-from pieces.pieces import Pieces
-from pieces.piece import Piece, PieceTypes
-from coordinates import Coordinates
+from .movement import Movement
+from .player import Color
+from .pieces import Piece, Pieces, PieceTypes
+from .coordinates import Coordinates
 
 
 class Board:
@@ -39,7 +38,6 @@ class Board:
         return pieces_with_coordinates.pop()
 
     def evaluate_move(self: Board, piece: Piece, coordinates: Coordinates, should_move: bool = True) -> None:
-        starting_coordinates = piece.coordinates
         piece_at_destination = self.get_piece(coordinates)
 
         if piece.coordinates == coordinates:
@@ -53,6 +51,9 @@ class Board:
 
         if piece_at_destination and piece_at_destination.color == piece.color:
             raise ValueError("You cannot move to a square occupied by one of your pieces")
+
+        if piece_at_destination and piece_at_destination.type == PieceTypes.king:
+            raise ValueError("Can't take a king")
 
         self.__move_piece(piece, coordinates, piece_at_destination)
 
@@ -117,10 +118,10 @@ class Board:
         king_with_color_list = [piece for piece in self.__pieces if piece.type == PieceTypes.king and piece.color == color]
 
         if len(king_with_color_list) > 1:
-            raise ValueError("More than one king on %s team" % color)
+            raise ValueError("More than one king on %s team" % color.name)
 
         if len(king_with_color_list) == 0:
-            raise ValueError("No king on %s team" % color)
+            raise ValueError("No king on %s team" % color.name)
 
         return king_with_color_list.pop()
 

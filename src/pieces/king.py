@@ -1,19 +1,19 @@
 
 from __future__ import annotations
-from player import Color
-from movement import Movement
-from pieces.piece import Piece, PieceTypes
 from typing import TYPE_CHECKING
+from .piece import Piece, PieceTypes
+from ..player import Color
+from ..movement import Movement
 
 if TYPE_CHECKING:
-    from coordinates import Coordinates
-    from board import Board
+    from ..coordinates import Coordinates
+    from ..board import Board
 
 
 class King(Piece):
     def __init__(self: King, coordinates: Coordinates) -> None:
         super().__init__(coordinates)
-        self.__symbol = '\u2654' if self.color == 'white' else '\u265A'
+        self.__symbol = '\u2654' if self.color == Color.white else '\u265A'
 
     @property
     def symbol(self: King) -> str:
@@ -21,10 +21,6 @@ class King(Piece):
 
     def can_move(self: King, coordinates: Coordinates, board: Board) -> bool:
         number_of_steps = len(Movement.get_steps(self.coordinates, coordinates))
-
-        # Do I want this?
-        if board.is_square_attacked(coordinates, self.color):
-            return False
 
         if number_of_steps == 1:
             return True
