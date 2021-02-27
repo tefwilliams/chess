@@ -1,9 +1,9 @@
-import src
+from src import Pawn, Coordinates
 from tests.data.generate_board import generate_board
 
 def test_get_piece_returns_piece_with_specified_coordinates() -> None:
-    coordinates = src.Coordinates((1, 2))
-    piece = src.pieces.Pawn(coordinates)
+    coordinates = Coordinates((1, 2))
+    piece = Pawn(coordinates)
 
     board = generate_board([piece])
 

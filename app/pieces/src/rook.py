@@ -1,9 +1,9 @@
 
 from __future__ import annotations
+from app.player import Color
+from app.movement import Movement
+from app.coordinates import Coordinates
 from .piece import Piece, PieceTypes
-from ..player import Color
-from ..movement import Movement
-from ..coordinates import Coordinates
 
 
 class Rook(Piece):

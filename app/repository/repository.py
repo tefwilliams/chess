@@ -1,6 +1,6 @@
 
-from .coordinates import Coordinates
-from .board import Board
+from app.coordinates import Coordinates
+from app.board import Board
 
 # TODO - add letters/numbers to other sides
 def display_board(board: Board) -> None:

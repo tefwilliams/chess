@@ -1,5 +1,5 @@
 
-from .coordinates import Coordinates
+from app.coordinates import Coordinates
 
 
 # TODO - look at zero checking for movement

@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+from app.coordinates import Coordinates
 from .piece import Piece
 from .king import King
 from .queen import Queen
@@ -7,7 +8,6 @@ from .bishop import Bishop
 from .knight import Knight
 from .rook import Rook
 from .pawn import Pawn
-from ..coordinates import Coordinates
 
 
 class Pieces:
