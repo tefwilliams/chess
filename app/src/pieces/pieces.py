@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from app.coordinates import Coordinates
+from ...src.coordinates import Coordinates
 from .piece import Piece
 from .king import King
 from .queen import Queen

@@ -1,9 +1,9 @@
 
 from __future__ import annotations
-from app.coordinates import Coordinates
-from app.movement import Movement
-from app.player import Color
-from app.pieces import Piece, Pieces, PieceTypes
+from ...src.coordinates import Coordinates
+from ...src.movement import Movement
+from ...src.player import Color
+from ...src.pieces import Piece, Pieces, PieceTypes
 
 
 class Board:

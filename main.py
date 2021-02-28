@@ -1,4 +1,5 @@
-from app.game import Game
+
+from app.src import Game
 
 
 Game().play()

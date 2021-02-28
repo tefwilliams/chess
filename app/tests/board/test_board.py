@@ -1,6 +1,6 @@
 
-from app.pieces import Pawn
-from app.coordinates import Coordinates
+from app.src.pieces.pawn import Pawn
+from app.src.coordinates import Coordinates
 from .data.generate_board import generate_board
 
 
