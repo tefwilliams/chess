@@ -13,22 +13,24 @@ from .pawn import Pawn
 class Pieces:
     @staticmethod
     def get_starting_piece(coordinates: Coordinates) -> Piece | None:
+        color = Color.white if coordinates.y in [0, 1] else Color.black
+
         if coordinates.y in [1, 6]:
-            return Pawn(coordinates)
+            return Pawn(coordinates, color)
 
         if coordinates.y in [0, 7]:
             if coordinates.x in [0, 7]:
-                return Rook(coordinates)
+                return Rook(coordinates, color)
 
             if coordinates.x in [1, 6]:
-                return Knight(coordinates)
+                return Knight(coordinates, color)
 
             if coordinates.x in [2, 5]:
-                return Bishop(coordinates)
+                return Bishop(coordinates, color)
 
             if coordinates.x == 3:
-                return Queen(coordinates)
+                return Queen(coordinates, color)
 
             if coordinates.x == 4:
-                return King(coordinates)
+                return King(coordinates, color)
                 

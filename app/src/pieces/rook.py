@@ -7,8 +7,8 @@ from .piece import Piece, PieceTypes
 
 
 class Rook(Piece):
-    def __init__(self: Rook, coordinates: Coordinates) -> None:
-        super().__init__(coordinates)
+    def __init__(self: Rook, coordinates: Coordinates, color: Color) -> None:
+        super().__init__(coordinates, color)
         self.__symbol = '\u2656' if self.color == Color.white else '\u265C'
 
     @property

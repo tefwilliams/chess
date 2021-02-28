@@ -10,12 +10,10 @@ if TYPE_CHECKING:
 
 
 class Piece:
-    __color: Color
-    __has_moved = False
-
-    def __init__(self: Piece, coordinates: Coordinates) -> None:
-        self.__color = Color.white if coordinates.y in [0, 1] else Color.black
+    def __init__(self: Piece, coordinates: Coordinates, color: Color) -> None:
+        self.__color = color
         self.__coordinates = coordinates
+        self.__has_moved = False
         self.__set_backup_data()
 
     def move(self: Piece, coordinates: Coordinates) -> None:

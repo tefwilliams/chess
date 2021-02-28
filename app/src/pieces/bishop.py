@@ -7,8 +7,8 @@ from .piece import Piece, PieceTypes
 
 
 class Bishop(Piece):
-    def __init__(self: Bishop, coordinates: Coordinates) -> None:
-        super().__init__(coordinates)
+    def __init__(self: Bishop, coordinates: Coordinates, color: Color) -> None:
+        super().__init__(coordinates, color)
         self.__symbol = '\u2657' if self.color == Color.white else '\u265D'
 
     @property

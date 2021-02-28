@@ -7,8 +7,8 @@ from .piece import Piece, PieceTypes
 
 
 class Queen(Piece):
-    def __init__(self: Queen, coordinates: Coordinates) -> None:
-        super().__init__(coordinates)
+    def __init__(self: Queen, coordinates: Coordinates, color: Color) -> None:
+        super().__init__(coordinates, color)
         self.__symbol = '\u2655' if self.color == Color.white else '\u265B'
 
     @property

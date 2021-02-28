@@ -11,10 +11,9 @@ if TYPE_CHECKING:
 
 
 class Pawn(Piece):
-    def __init__(self: Pawn, coordinates: Coordinates) -> None:
-        super().__init__(coordinates)
+    def __init__(self: Pawn, coordinates: Coordinates, color: Color) -> None:
+        super().__init__(coordinates, color)
         self.__symbol = '\u2659' if self.color == Color.white else '\u265F'
-        self.__starting_coordinates = coordinates
 
     @property
     def symbol(self: Pawn) -> str:
