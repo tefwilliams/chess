@@ -73,6 +73,7 @@ class Board:
         return False
 
     # TODO - pull methods onto player?
+    # TODO - need to take into account pawn movement logic
     def is_square_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
         opposing_color = Color.get_opposing_color(color)
         opposing_color_pieces = self.get_color_pieces(opposing_color)

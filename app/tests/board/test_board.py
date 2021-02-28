@@ -24,12 +24,24 @@ def test_is_square_attacked_returns_true_when_piece_can_move_to_square() -> None
         generate_piece(PieceTypes.king, 'A4', Color.white),
         generate_piece(PieceTypes.king, 'G4', Color.black),
         generate_piece(PieceTypes.pawn, 'A1', Color.white),
-        generate_piece(PieceTypes.pawn, 'B2', Color.black)
+        # generate_piece(PieceTypes.pawn, 'B2', Color.black)
     ]
 
     square_coordinates = Coordinates.convert_from_grid_value('B2')
-    opposing_color_to_piece = Color.get_opposing_color(Color.black)
 
     board = Board(pieces)
 
-    assert board.is_square_attacked(square_coordinates, opposing_color_to_piece)
+    assert board.is_square_attacked(square_coordinates, Color.black)
+
+def test_is_square_attacked_returns_false_when_no_piece_can_move_to_square() -> None:
+    pieces = [
+        generate_piece(PieceTypes.king, 'A4', Color.white),
+        generate_piece(PieceTypes.king, 'G4', Color.black),
+        generate_piece(PieceTypes.pawn, 'A1', Color.white)
+    ]
+
+    square_coordinates = Coordinates.convert_from_grid_value('C3')
+
+    board = Board(pieces)
+
+    assert not board.is_square_attacked(square_coordinates, Color.black)
