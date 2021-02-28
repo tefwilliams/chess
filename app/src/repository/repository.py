@@ -4,7 +4,6 @@ from ...src.coordinates import Coordinates
 from ...src.board import Board
 
 
-# TODO - add letters/numbers to other sides
 def display_board(board: Board) -> None:
     print("\n")
     print_column_numbers()
