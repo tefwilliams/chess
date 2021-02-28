@@ -28,6 +28,14 @@ class Movement:
             or horizontal_movement == 1 and vertical_movement == 2)
 
     @staticmethod
+    def is_adjacent(starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
+        return ((Movement.is_horizontal(starting_coordinates, finishing_coordinates)
+            or Movement.is_vertical(starting_coordinates, finishing_coordinates)
+            or Movement.is_diagonal(starting_coordinates, finishing_coordinates))
+            and len(Movement.get_steps(starting_coordinates, finishing_coordinates)) == 1)
+
+
+    @staticmethod
     def get_steps(starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> list[Coordinates]:
         if Movement.is_horizontal(starting_coordinates, finishing_coordinates):
             return Movement.__get_horizontal_steps(starting_coordinates, finishing_coordinates)

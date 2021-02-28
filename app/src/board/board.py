@@ -80,8 +80,7 @@ class Board:
         opposing_king = self.__get_king(opposing_color)
         opposing_color_pieces.remove(opposing_king) # Prevent recursion problem
 
-        opposing_king_is_adjacent = len(Movement.get_steps(opposing_king.coordinates, coordinates)) == 1
-        return self.can_any_piece_move(opposing_color_pieces, coordinates) or opposing_king_is_adjacent
+        return self.can_any_piece_move(opposing_color_pieces, coordinates) or Movement.is_adjacent(coordinates, opposing_king.coordinates)
 
     def __is_in_check(self: Board, color: Color) -> bool:
         king_coordinates = self.__get_king(color).coordinates
