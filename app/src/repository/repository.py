@@ -1,6 +1,8 @@
 
+from ...src.pieces import Piece, Pieces
 from ...src.coordinates import Coordinates
 from ...src.board import Board
+
 
 # TODO - add letters/numbers to other sides
 def display_board(board: Board) -> None:
@@ -33,3 +35,17 @@ def display_board(board: Board) -> None:
 def print_row_break(row_length: int):
     dashes_per_column = 4
     print("-" * (row_length + 1) * dashes_per_column)
+
+def get_starting_pieces() -> list[Piece]:
+    board_dimensions = Board.shape
+    pieces: list[Piece] = []
+
+    for i in range(board_dimensions.y):
+        for j in range(board_dimensions.x):
+            coordinates = Coordinates((i, j))
+            starting_piece = Pieces.get_starting_piece(coordinates)
+            
+            if starting_piece:
+                pieces.append(starting_piece)
+
+    return pieces

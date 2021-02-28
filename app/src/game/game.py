@@ -1,14 +1,14 @@
 
 from __future__ import annotations
 from ...src.coordinates import Coordinates
-from ...src.repository import display_board
+from ...src.repository import display_board, get_starting_pieces
 from ...src.board import Board
 from ...src.player import Player
 
 
 class Game:
     def __init__(self: Game) -> None:
-        self.board = Board()
+        self.board = Board(get_starting_pieces())
         self.__player = Player()
 
     def play(self: Game) -> None:

@@ -9,21 +9,7 @@ from ...src.pieces import Piece, Pieces, PieceTypes
 class Board:
     shape = Coordinates((8, 8))
 
-    def __init__(self: Board) -> None:
-        self.__initialize_pieces()
-
-    def __initialize_pieces(self: Board) -> None:
-        board_dimensions = Board.shape
-        pieces: list[Piece] = []
-
-        for i in range(board_dimensions.y):
-            for j in range(board_dimensions.x):
-                coordinates = Coordinates((i, j))
-                starting_piece = Pieces.get_starting_piece(coordinates)
-                
-                if starting_piece:
-                    pieces.append(starting_piece)
-
+    def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
 
     def get_piece(self: Board, coordinates: Coordinates) -> Piece | None:
