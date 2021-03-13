@@ -3,7 +3,7 @@ from __future__ import annotations
 from ...src.coordinates import Coordinates
 from ...src.movement import Movement
 from ...src.player import Color
-from ...src.pieces import Piece, Pieces, PieceTypes
+from ...src.pieces import Piece, PieceTypes
 
 
 class Board:
@@ -38,16 +38,13 @@ class Board:
         if piece_at_destination and piece_at_destination.color == piece.color:
             raise ValueError("You cannot move to a square occupied by one of your pieces")
 
-        if piece_at_destination and piece_at_destination.type == PieceTypes.king:
-            raise ValueError("Can't take a king")
-
         self.__move_piece(piece, coordinates, piece_at_destination)
 
         if self.__is_in_check(piece.color):
             self.__restore(piece, piece_at_destination)
             raise ValueError("You can't make this move because it will leave you in check")
 
-        if not should_move:
+        elif not should_move:
             self.__restore(piece, piece_at_destination)
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
@@ -76,18 +73,18 @@ class Board:
     # TODO - need to take into account pawn movement logic
     def is_square_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
         opposing_color = Color.get_opposing_color(color)
-        opposing_color_pieces = self.get_color_pieces(opposing_color)
+        opposing_color_pieces = self.__get_pieces_by_color(opposing_color)
 
         opposing_king = self.__get_king(opposing_color)
         opposing_color_pieces.remove(opposing_king) # Prevent recursion problem
 
-        return self.can_any_piece_move(opposing_color_pieces, coordinates) or Movement.is_adjacent(coordinates, opposing_king.coordinates)
+        return self.__can_any_piece_move(opposing_color_pieces, coordinates) or Movement.is_adjacent(coordinates, opposing_king.coordinates)
 
     def __is_in_check(self: Board, color: Color) -> bool:
         king_coordinates = self.__get_king(color).coordinates
         return self.is_square_attacked(king_coordinates, color)
 
-    def can_any_piece_move(self: Board, pieces: list[Piece], coordinates: Coordinates) -> bool:
+    def __can_any_piece_move(self: Board, pieces: list[Piece], coordinates: Coordinates) -> bool:
         for piece in pieces:
             try:
                 self.evaluate_move(piece, coordinates, False)
@@ -111,17 +108,17 @@ class Board:
 
         return king_with_color_list.pop()
 
-    def get_color_pieces(self: Board, color: Color) -> list[Piece]:
+    def __get_pieces_by_color(self: Board, color: Color) -> list[Piece]:
         return [piece for piece in self.__pieces if piece.color == color]
 
     def __any_possible_moves(self: Board, player: Color) -> bool:
-        player_pieces = self.get_color_pieces(player)
+        player_pieces = self.__get_pieces_by_color(player)
 
         for i in range(self.shape.y):
             for j in range(self.shape.x):
                 coordinates = Coordinates((i, j))
 
-                if self.can_any_piece_move(player_pieces, coordinates):
+                if self.__can_any_piece_move(player_pieces, coordinates):
                     return True
 
         return False

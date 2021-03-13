@@ -25,12 +25,12 @@ class King(Piece):
         if number_of_steps == 1:
             return True
 
-        if self.__is_castle(coordinates, board):
+        if self.__movement_is_castle(coordinates, board):
             return True
 
         return False
 
-    def __is_castle(self: King, coordinates: Coordinates, board: Board) -> bool:
+    def __movement_is_castle(self: King, coordinates: Coordinates, board: Board) -> bool:
         steps = Movement.get_steps(self.coordinates, coordinates)
         number_of_steps = len(steps)
         last_step = steps.pop()
