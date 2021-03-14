@@ -1,6 +1,6 @@
 
 from app.src import PieceTypes, Coordinates, Board, Color
-from app.tests.board.data.generate_piece import generate_piece
+from app.tests.data.generate_piece import generate_piece
 
 
 def test_get_piece_returns_piece_with_specified_coordinates() -> None:
@@ -19,29 +19,29 @@ def test_get_piece_returns_none_if_no_piece_has_specified_coordinates() -> None:
 
     assert board.get_piece(get_from_coordinates) == None
 
-def test_is_square_attacked_returns_true_when_piece_can_move_to_square() -> None:
-    pieces = [
-        generate_piece(PieceTypes.king, 'A4', Color.white),
-        generate_piece(PieceTypes.king, 'G4', Color.black),
-        generate_piece(PieceTypes.pawn, 'A1', Color.white),
-        # generate_piece(PieceTypes.pawn, 'B2', Color.black)
-    ]
+# def test_is_square_attacked_returns_true_when_piece_can_move_to_square() -> None:
+#     pieces = [
+#         generate_piece(PieceTypes.king, 'A4', Color.white),
+#         generate_piece(PieceTypes.king, 'G4', Color.black),
+#         generate_piece(PieceTypes.pawn, 'A1', Color.white),
+#         # generate_piece(PieceTypes.pawn, 'B2', Color.black)
+#     ]
 
-    square_coordinates = Coordinates.convert_from_grid_value('B2')
+#     square_coordinates = Coordinates.convert_from_grid_value('B2')
 
-    board = Board(pieces)
+#     board = Board(pieces)
 
-    assert board.is_square_attacked(square_coordinates, Color.black)
+#     assert board.is_square_attacked(square_coordinates, Color.black)
 
-def test_is_square_attacked_returns_false_when_no_piece_can_move_to_square() -> None:
-    pieces = [
-        generate_piece(PieceTypes.king, 'A4', Color.white),
-        generate_piece(PieceTypes.king, 'G4', Color.black),
-        generate_piece(PieceTypes.pawn, 'A1', Color.white)
-    ]
+# def test_is_square_attacked_returns_false_when_no_piece_can_move_to_square() -> None:
+#     pieces = [
+#         generate_piece(PieceTypes.king, 'A4', Color.white),
+#         generate_piece(PieceTypes.king, 'G4', Color.black),
+#         generate_piece(PieceTypes.pawn, 'A1', Color.white)
+#     ]
 
-    square_coordinates = Coordinates.convert_from_grid_value('C3')
+#     square_coordinates = Coordinates.convert_from_grid_value('C3')
 
-    board = Board(pieces)
+#     board = Board(pieces)
 
-    assert not board.is_square_attacked(square_coordinates, Color.black)
+#     assert not board.is_square_attacked(square_coordinates, Color.black)

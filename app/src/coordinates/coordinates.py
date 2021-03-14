@@ -3,12 +3,17 @@ from __future__ import annotations
 
 
 class Coordinates(tuple[int, int]):
+    maximum_size = 8 # TODO - Consider name
     y_grid_values = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     x_grid_values = ['1', '2', '3', '4', '5', '6', '7', '8']
 
     def __init__(self: Coordinates, coordinates: tuple[int, int]) -> None:
         self.x = coordinates[1]
         self.y = coordinates[0]
+
+    @property
+    def within_board(self: Coordinates) -> bool:
+        return self.y >= 0 and self.x >= 0 and self.y < Coordinates.maximum_size and self.x < Coordinates.maximum_size
 
     @staticmethod
     def get_coordinates(input_text: str) -> Coordinates:
@@ -54,3 +59,19 @@ class Coordinates(tuple[int, int]):
             return False
 
         return True
+
+class Direction(Coordinates):
+    @property
+    def is_vertical(self: Direction) -> bool:
+        return self.x == 0
+
+    @property
+    def is_horizontal(self: Direction) -> bool:
+        return self.y == 0
+
+    @property
+    def is_diagonal(self: Direction) -> bool:
+        return abs(self.y) == abs(self.x)
+
+    def step(self: Direction, starting_coordinates: Coordinates) -> Coordinates:
+        return Coordinates((self.y + starting_coordinates.y, self.x + starting_coordinates.x))

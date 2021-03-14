@@ -9,7 +9,7 @@ def display_board(board: Board) -> None:
     print_column_numbers()
     print_row_break()
 
-    for row_number in range(Board.shape.y):
+    for row_number in range(Board.size):
         print_row_start_letter(row_number)
         print_row_squares(row_number, board)
         print_row_end_letter(row_number)
@@ -19,13 +19,13 @@ def display_board(board: Board) -> None:
     print("\n")
 
 def print_row_break() -> None:
-    row_length = Board.shape.x
+    row_length = Board.size
     dashes_per_column = 4
     print("-" * ((row_length + 2) * dashes_per_column - 1))
 
 def print_column_numbers() -> None:
     print_row_start()
-    row_length = Board.shape.x
+    row_length = Board.size
 
     for i in range(row_length):
         column_number = Coordinates.x_grid_values[i]
@@ -46,7 +46,7 @@ def print_row_end_letter(row_number: int) -> None:
     print("| %s" % Coordinates.y_grid_values[row_number])
 
 def print_row_squares(row_number: int, board: Board) -> None:
-    row_length = Board.shape.x
+    row_length = Board.size
 
     for column_number in range(row_length):
         coordinates = Coordinates((row_number, column_number))
@@ -56,11 +56,11 @@ def print_row_squares(row_number: int, board: Board) -> None:
         print("| %s " % symbol, end='')
 
 def get_starting_pieces() -> list[Piece]:
-    board_dimensions = Board.shape
+    board_size = Board.size
     pieces: list[Piece] = []
 
-    for i in range(board_dimensions.y):
-        for j in range(board_dimensions.x):
+    for i in range(board_size):
+        for j in range(board_size):
             coordinates = Coordinates((i, j))
             starting_piece = Pieces.get_starting_piece(coordinates)
             

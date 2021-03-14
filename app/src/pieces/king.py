@@ -42,6 +42,10 @@ class King(Piece):
             and Movement.is_horizontal(self.coordinates, coordinates) 
             and not is_last_step_attacked)
 
+    def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
+        adjacent_squares = Movement.get_adjacent_squares(self.coordinates)
+        return board.get_unobstructed_squares(self, adjacent_squares)
+
     @property
     def type(self: King) -> PieceTypes:
         return PieceTypes.king

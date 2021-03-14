@@ -7,7 +7,7 @@ from ...src.pieces import Piece, PieceTypes
 
 
 class Board:
-    shape = Coordinates((8, 8))
+    size = Coordinates.maximum_size
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
@@ -58,6 +58,24 @@ class Board:
 
         if removed_piece and removed_piece not in self.__pieces:
             self.__pieces.append(removed_piece)
+
+    def get_unobstructed_squares(self: Board, piece: Piece, squares: list[list[Coordinates]]) -> list[Coordinates]:
+        unobstructed_squares: list[Coordinates] = []
+
+        for list_of_squares in squares:
+            for square in list_of_squares:
+                piece_at_destination = self.get_piece(square)
+
+                if piece_at_destination and piece_at_destination.color != piece.color:
+                    unobstructed_squares.append(square)
+                    break
+
+                elif piece_at_destination:
+                    break
+
+                unobstructed_squares.append(square)
+
+        return unobstructed_squares
 
     def __move_obstructed(self: Board, starting_coordinates: Coordinates, finishing_coordinates: Coordinates) -> bool:
         movement_steps = Movement.get_steps(starting_coordinates, finishing_coordinates)
@@ -114,8 +132,8 @@ class Board:
     def __any_possible_moves(self: Board, player: Color) -> bool:
         player_pieces = self.__get_pieces_by_color(player)
 
-        for i in range(self.shape.y):
-            for j in range(self.shape.x):
+        for i in range(self.size):
+            for j in range(self.size):
                 coordinates = Coordinates((i, j))
 
                 if self.__can_any_piece_move(player_pieces, coordinates):

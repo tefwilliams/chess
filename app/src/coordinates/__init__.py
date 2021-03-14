@@ -1,1 +1,1 @@
-from .coordinates import Coordinates
+from .coordinates import Coordinates, Direction

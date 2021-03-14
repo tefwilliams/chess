@@ -1,9 +1,13 @@
 
 from __future__ import annotations
+from typing import TYPE_CHECKING
 from ...src.player import Color
 from ...src.movement import Movement
-from ...src.coordinates import Coordinates
 from .piece import Piece, PieceTypes
+
+if TYPE_CHECKING:
+    from ...src.coordinates import Coordinates
+    from ...src.board import Board
 
 
 class Rook(Piece):
@@ -18,6 +22,10 @@ class Rook(Piece):
     def can_move(self: Rook, coordinates: Coordinates, *args) -> bool:
         return (Movement.is_horizontal(self.coordinates, coordinates) 
             or Movement.is_vertical(self.coordinates, coordinates))
+
+    def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
+        orthogonal_squares = Movement.get_orthogonal_squares(self.coordinates)
+        return board.get_unobstructed_squares(self, orthogonal_squares)
 
     @property
     def type(self: Rook) -> PieceTypes:

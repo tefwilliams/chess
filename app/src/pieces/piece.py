@@ -21,6 +21,9 @@ class Piece:
         self.__coordinates = coordinates
         self.__has_moved = True
 
+    def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
+        raise NotImplementedError
+
     def can_move(self: Piece, coordinates: Coordinates, board: Board) -> bool:
         raise NotImplementedError
 
