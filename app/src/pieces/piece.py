@@ -21,10 +21,10 @@ class Piece:
         self.__coordinates = coordinates
         self.__has_moved = True
 
-    def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
-        raise NotImplementedError
+    def update_possible_moves(self: Piece, board: Board) -> None:
+        self.__possible_moves = self.get_possible_moves(board)
 
-    def can_move(self: Piece, coordinates: Coordinates, board: Board) -> bool:
+    def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         raise NotImplementedError
 
     def restore(self: Piece) -> None:
@@ -44,6 +44,10 @@ class Piece:
     @property
     def has_moved(self: Piece) -> bool:
         return self.__has_moved
+
+    @property
+    def possible_moves(self: Piece) -> list[Coordinates]:
+        return self.__possible_moves
 
     @property
     def symbol(self: Piece) -> str:

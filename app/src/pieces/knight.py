@@ -19,12 +19,9 @@ class Knight(Piece):
     def symbol(self: Knight) -> str:
         return self.__symbol
 
-    def can_move(self: Knight, coordinates: Coordinates, *args) -> bool:
-        return Movement.is_knight(self.coordinates, coordinates)
-
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         knight_squares = Movement.get_knight_squares(self.coordinates)
-        return board.get_unobstructed_squares(self, knight_squares)
+        return board.get_unobstructed_squares(self.color, knight_squares)
 
     @property
     def type(self: Knight) -> PieceTypes:

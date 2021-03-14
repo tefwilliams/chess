@@ -19,13 +19,9 @@ class Rook(Piece):
     def symbol(self: Rook) -> str:
         return self.__symbol
 
-    def can_move(self: Rook, coordinates: Coordinates, *args) -> bool:
-        return (Movement.is_horizontal(self.coordinates, coordinates) 
-            or Movement.is_vertical(self.coordinates, coordinates))
-
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         orthogonal_squares = Movement.get_orthogonal_squares(self.coordinates)
-        return board.get_unobstructed_squares(self, orthogonal_squares)
+        return board.get_unobstructed_squares(self.color, orthogonal_squares)
 
     @property
     def type(self: Rook) -> PieceTypes:

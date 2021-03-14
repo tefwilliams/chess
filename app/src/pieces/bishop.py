@@ -19,12 +19,9 @@ class Bishop(Piece):
     def symbol(self: Bishop) -> str:
         return self.__symbol
 
-    def can_move(self: Bishop, coordinates: Coordinates, board) -> bool:
-        return Movement.is_diagonal(self.coordinates, coordinates)
-
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         diagonal_squares = Movement.get_diagonal_squares(self.coordinates)
-        return board.get_unobstructed_squares(self, diagonal_squares)
+        return board.get_unobstructed_squares(self.color, diagonal_squares)
 
     @property
     def type(self: Bishop) -> PieceTypes:

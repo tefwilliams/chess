@@ -27,6 +27,8 @@ class Game:
             print("%s's turn" % str(self.__player.color.name).capitalize())
 
             try:
+                self.board.update_all_possible_moves()
+                
                 coordinates_to_move_from = Coordinates.get_coordinates("Enter which square to move from: ")
                 piece_to_move = self.board.get_piece(coordinates_to_move_from)
 
@@ -39,10 +41,13 @@ class Game:
                 print("\n" + "You have chosen: %s" % piece_to_move.symbol)
                 
                 coordinates_to_move_to = Coordinates.get_coordinates("Enter which square to move to: ")
-                return self.board.evaluate_move(piece_to_move, coordinates_to_move_to)
+                self.board.evaluate_move(piece_to_move, coordinates_to_move_to)
 
             except ValueError as e:
                 print("\n%s" % e)
+
+            else:
+                break
 
     def over(self: Game) -> bool:
         return (self.board.check_mate(self.__player.color)
