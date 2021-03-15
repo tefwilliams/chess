@@ -19,29 +19,42 @@ def test_get_piece_returns_none_if_no_piece_has_specified_coordinates() -> None:
 
     assert board.get_piece(get_from_coordinates) == None
 
-# def test_is_square_attacked_returns_true_when_piece_can_move_to_square() -> None:
-#     pieces = [
-#         generate_piece(PieceTypes.king, 'A4', Color.white),
-#         generate_piece(PieceTypes.king, 'G4', Color.black),
-#         generate_piece(PieceTypes.pawn, 'A1', Color.white),
-#         # generate_piece(PieceTypes.pawn, 'B2', Color.black)
-#     ]
+def test_is_in_check_returns_true_when_king_in_check() -> None:
+    test_cases: list[tuple[PieceTypes, str]] = [
+        (PieceTypes.queen, 'A1'),
+        (PieceTypes.queen, 'F4'),
+        (PieceTypes.bishop, 'F2'),
+        (PieceTypes.rook, 'D8'),
+        (PieceTypes.knight, 'B3'),
+        (PieceTypes.pawn, 'E5')
+    ]
 
-#     square_coordinates = Coordinates.convert_from_grid_value('B2')
+    for black_piece, piece_coordinates in test_cases:
+        pieces = [
+            generate_piece(PieceTypes.king, 'D4', Color.white),
+            generate_piece(black_piece, piece_coordinates, Color.black)
+        ]
 
-#     board = Board(pieces)
+        board = Board(pieces)
 
-#     assert board.is_square_attacked(square_coordinates, Color.black)
+        assert board.is_in_check(Color.white)
 
-# def test_is_square_attacked_returns_false_when_no_piece_can_move_to_square() -> None:
-#     pieces = [
-#         generate_piece(PieceTypes.king, 'A4', Color.white),
-#         generate_piece(PieceTypes.king, 'G4', Color.black),
-#         generate_piece(PieceTypes.pawn, 'A1', Color.white)
-#     ]
+def test_is_in_check_returns_false_when_king_in_check() -> None:
+    test_cases: list[tuple[PieceTypes, str]] = [
+        (PieceTypes.queen, 'A2'),
+        (PieceTypes.queen, 'F3'),
+        (PieceTypes.bishop, 'F8'),
+        (PieceTypes.rook, 'E2'),
+        (PieceTypes.knight, 'B2'),
+        (PieceTypes.pawn, 'E1')
+    ]
 
-#     square_coordinates = Coordinates.convert_from_grid_value('C3')
+    for black_piece, piece_coordinates in test_cases:
+        pieces = [
+            generate_piece(PieceTypes.king, 'D4', Color.white),
+            generate_piece(black_piece, piece_coordinates, Color.black)
+        ]
 
-#     board = Board(pieces)
+        board = Board(pieces)
 
-#     assert not board.is_square_attacked(square_coordinates, Color.black)
+        assert not board.is_in_check(Color.white)

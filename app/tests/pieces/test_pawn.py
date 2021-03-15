@@ -3,12 +3,12 @@ from app.src import Board, Coordinates, Color, PieceTypes
 from app.tests.data.generate_piece import generate_piece
 
 
-def test_pawn_can_move_forward_if_no_piece_there() -> None:
+def test_pawn_can_move_one_or_two_forward_if_it_has_not_moved() -> None:
     pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
 
     board = Board([pawn])
 
-    assert Coordinates.convert_from_grid_value('B2') in pawn.get_possible_moves(board)
+    assert pawn.get_possible_moves(board).sort() == [Coordinates.convert_from_grid_value('C2'), Coordinates.convert_from_grid_value('B2')].sort()
 
 def test_pawn_can_move_two_forward_if_it_has_not_moved() -> None:
     pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
