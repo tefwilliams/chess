@@ -39,7 +39,7 @@ def test_is_in_check_returns_true_when_king_in_check() -> None:
 
         assert board.is_in_check(Color.white)
 
-def test_is_in_check_returns_false_when_king_in_check() -> None:
+def test_is_in_check_returns_false_when_king_not_in_check() -> None:
     test_cases: list[tuple[PieceTypes, str]] = [
         (PieceTypes.queen, 'A2'),
         (PieceTypes.queen, 'F3'),
