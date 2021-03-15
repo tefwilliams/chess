@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+from app.src.player.player import Color
 from ...src.coordinates import Coordinates
 from ...src.repository import display_board, get_starting_pieces
 from ...src.board import Board
@@ -17,9 +18,14 @@ class Game:
             self.__take_turn()
             self.__player.swap_color()
 
-        # TODO - add ending message
-
         display_board(self.board)
+
+        if self.board.check_mate(self.__player.color):
+            opposing_player_color = Color.get_opposing_color(self.__player.color)
+            print("%s in check mate. %s wins!" % (str(self.__player.color.name).capitalize(), str(opposing_player_color.name).capitalize()) + "\n")
+
+        elif self.board.stale_mate(self.__player.color):
+            print("%s in stale mate. It's a draw!" % str(self.__player.color.name).capitalize() + "\n")
 
     def __take_turn(self: Game) -> None:
         while True:
