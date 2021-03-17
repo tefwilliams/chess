@@ -58,7 +58,7 @@ class Board:
     def get_unobstructed_squares(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
         unobstructed_squares: list[Coordinates] = []
 
-        for list_of_squares in squares:
+        for list_of_squares in squares: # TODO - clarify what this is doing
             for square in list_of_squares:
                 piece_at_destination = self.get_piece(square)
 
@@ -74,7 +74,6 @@ class Board:
         return unobstructed_squares
 
     # TODO - pull methods onto player?
-    # TODO - need to take into account pawn movement logic
     def is_in_check(self: Board, color: Color) -> bool:
         king_coordinates = self.__get_king(color).coordinates
         return self.square_is_attacked(king_coordinates, color)
@@ -130,15 +129,13 @@ class Board:
     def __get_pieces_by_color(self: Board, color: Color) -> list[Piece]:
         return [piece for piece in self.__pieces if piece.color == color]
 
-    def __any_possible_moves(self: Board, player: Color) -> bool:
-        player_pieces = self.__get_pieces_by_color(player)
+    def __any_possible_moves(self: Board, color: Color) -> bool:
+        player_pieces = self.__get_pieces_by_color(color)
+        list_of_coordinates = [Coordinates((y, x)) for y in range(self.size) for x in range(self.size)]
 
-        for i in range(self.size):
-            for j in range(self.size):
-                coordinates = Coordinates((i, j))
-
-                if self.__can_any_piece_move(player_pieces, coordinates):
-                    return True
+        for coordinates in list_of_coordinates:
+            if self.__can_any_piece_move(player_pieces, coordinates):
+                return True
 
         return False
 
