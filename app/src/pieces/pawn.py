@@ -23,26 +23,14 @@ class Pawn(Piece):
         possible_moves: list[list[Coordinates]] = []
         vertical_direction = 1 if self.color == Color.white else -1
 
-        directions = [Direction((y, x)) for y in [vertical_direction] for x in [-1, 0, 1]]
+        squares = Movement.get_pawn_squares(self.coordinates, vertical_direction, self.has_moved)
+        attack_squares = Movement.get_pawn_attack_squares(self.coordinates, vertical_direction)
 
-        for direction in directions:
-            moves_in_direction: list[Coordinates] = []
-            adjacent_square_in_direction = direction.step(self.coordinates)
-            piece_at_destination = board.get_piece(adjacent_square_in_direction)
+        for list_of_squares in squares:
+            possible_moves.append([square for square in list_of_squares if not board.get_piece(square)])
 
-            if direction.is_vertical and not piece_at_destination:
-                moves_in_direction.append(adjacent_square_in_direction)
-
-                if not self.has_moved:
-                    square_two_forward = direction.step(adjacent_square_in_direction)
-
-                    if not board.get_piece(square_two_forward):
-                        moves_in_direction.append(square_two_forward)
-
-            elif direction.is_diagonal and piece_at_destination:
-                moves_in_direction.append(adjacent_square_in_direction)
-
-            possible_moves.append(moves_in_direction)
+        for list_of_squares in attack_squares:
+            possible_moves.append([square for square in list_of_squares if board.get_piece(square)])
 
         return board.get_unobstructed_squares(self.color, possible_moves)
 

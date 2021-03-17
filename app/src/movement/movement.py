@@ -62,3 +62,27 @@ class Movement:
             knight_squares.append([square for square in squares_in_direction if square.within_board])
 
         return knight_squares
+
+    @staticmethod
+    def get_pawn_squares(origin_coordinates: Coordinates, movement_direction: int, has_moved: bool) -> list[list[Coordinates]]:
+        direction = Direction((movement_direction, 0))
+
+        adjacent_square_in_direction = direction.step(origin_coordinates)
+        squares_in_direction = [adjacent_square_in_direction]
+
+        if not has_moved:
+            squares_in_direction.append((direction.step(adjacent_square_in_direction)))
+
+        return [[square for square in squares_in_direction if square.within_board]]
+
+    @staticmethod
+    def get_pawn_attack_squares(origin_coordinates: Coordinates, movement_direction: int) -> list[list[Coordinates]]:
+        pawn_squares: list[list[Coordinates]] = []
+
+        directions = [Direction((movement_direction, x)) for x in [-1, 1]]
+
+        for direction in directions:
+            squares_in_direction = [direction.step(origin_coordinates)]
+            pawn_squares.append([square for square in squares_in_direction if square.within_board])
+
+        return pawn_squares

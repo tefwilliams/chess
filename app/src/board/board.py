@@ -1,6 +1,5 @@
 
 from __future__ import annotations
-from app.src.pieces import bishop
 from ...src.coordinates import Coordinates, Direction
 from ...src.movement import Movement
 from ...src.player import Color

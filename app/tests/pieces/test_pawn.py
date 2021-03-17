@@ -25,7 +25,7 @@ def test_pawn_cannot_move_two_forward_if_it_has_moved() -> None:
 
     assert not Coordinates.convert_from_grid_value('D2') in pawn.get_possible_moves(board)
 
-def test_pawn_can_move_forward_diagonally_if_piece_there() -> None:
+def test_pawn_can_move_forward_diagonally_if_enemy_piece_there() -> None:
     pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
 
     pieces = [
@@ -36,6 +36,18 @@ def test_pawn_can_move_forward_diagonally_if_piece_there() -> None:
     board = Board(pieces)
 
     assert Coordinates.convert_from_grid_value('B1') in pawn.get_possible_moves(board)
+
+def test_pawn_cannot_move_forward_diagonally_if_fiendly_piece_there() -> None:
+    pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
+
+    pieces = [
+        pawn,
+        generate_piece(PieceTypes.rook, 'B1', Color.white)
+    ]
+
+    board = Board(pieces)
+
+    assert Coordinates.convert_from_grid_value('B1') not in pawn.get_possible_moves(board)
 
 def test_pawn_cannot_move_two_forward_diagonally() -> None:
     pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
@@ -55,3 +67,10 @@ def test_pawn_cannot_move_backward() -> None:
     board = Board([pawn])
 
     assert not Coordinates.convert_from_grid_value('A1') in pawn.get_possible_moves(board)
+
+def test_pawn_cannot_move_out_of_board() -> None:
+    pawn = generate_piece(PieceTypes.pawn, 'H2', Color.white)
+
+    board = Board([pawn])
+
+    assert len(pawn.get_possible_moves(board)) == 0
