@@ -77,43 +77,28 @@ class Board:
     # TODO - need to take into account pawn movement logic
     def is_in_check(self: Board, color: Color) -> bool:
         king_coordinates = self.__get_king(color).coordinates
+        return self.square_is_attacked(king_coordinates, color)
 
-        diagonal_squares = self.get_unobstructed_squares(color, Movement.get_diagonal_squares(king_coordinates))
-        orthogonal_squares = self.get_unobstructed_squares(color, Movement.get_orthogonal_squares(king_coordinates))
-        knight_squares = self.get_unobstructed_squares(color, Movement.get_knight_squares(king_coordinates))
-        adjacent_squares = self.get_unobstructed_squares(color, Movement.get_adjacent_squares(king_coordinates))
+    def square_is_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
+        diagonal_squares = self.get_unobstructed_squares(color, Movement.get_diagonal_squares(coordinates))
+        orthogonal_squares = self.get_unobstructed_squares(color, Movement.get_orthogonal_squares(coordinates))
+        knight_squares = self.get_unobstructed_squares(color, Movement.get_knight_squares(coordinates))
+        adjacent_squares = self.get_unobstructed_squares(color, Movement.get_adjacent_squares(coordinates))
+        pawn_attack_squares = self.get_unobstructed_squares(color, Movement.get_pawn_attack_squares(coordinates, color))
 
-        vertical_direction = 1 if color == Color.white else -1
+        enemy_color = Color.get_opposing_color(color)
 
-        for horizontal_direction in [-1, 1]:
-            direction = Direction((vertical_direction, horizontal_direction))
-            piece_at_destination = self.get_piece(direction.step(king_coordinates))
+        return (self.__enemy_piece_is_at_square(diagonal_squares, [PieceTypes.bishop, PieceTypes.queen], enemy_color)
+            or self.__enemy_piece_is_at_square(orthogonal_squares, [PieceTypes.rook, PieceTypes.queen], enemy_color)
+            or self.__enemy_piece_is_at_square(pawn_attack_squares, [PieceTypes.pawn], enemy_color)
+            or self.__enemy_piece_is_at_square(knight_squares, [PieceTypes.knight], enemy_color)
+            or self.__enemy_piece_is_at_square(adjacent_squares, [PieceTypes.king], enemy_color))
 
-            if piece_at_destination and piece_at_destination.color != color and piece_at_destination.type == PieceTypes.pawn:
-                return True
-
-        for square in diagonal_squares:
+    def __enemy_piece_is_at_square(self, list_of_squares: list[Coordinates], list_of_pieces: list[PieceTypes], enemy_color: Color) -> bool:
+        for square in list_of_squares:
             piece_at_destination = self.get_piece(square)
 
-            if piece_at_destination and piece_at_destination.color != color and (piece_at_destination.type == PieceTypes.bishop or piece_at_destination.type == PieceTypes.queen):
-                return True
-
-        for square in orthogonal_squares:
-            piece_at_destination = self.get_piece(square)
-
-            if piece_at_destination and piece_at_destination.color != color and (piece_at_destination.type == PieceTypes.rook or piece_at_destination.type == PieceTypes.queen):
-                return True
-
-        for square in knight_squares:
-            piece_at_destination = self.get_piece(square)
-
-            if piece_at_destination and piece_at_destination.color != color and piece_at_destination.type == PieceTypes.knight:
-                return True
-
-        for square in adjacent_squares:
-            piece_at_destination = self.get_piece(square)
-
-            if piece_at_destination and piece_at_destination.color != color and piece_at_destination.type == PieceTypes.king:
+            if piece_at_destination and piece_at_destination.color == enemy_color and piece_at_destination.type in list_of_pieces:
                 return True
 
         return False

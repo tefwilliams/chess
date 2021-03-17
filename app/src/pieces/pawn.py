@@ -23,8 +23,8 @@ class Pawn(Piece):
         possible_moves: list[list[Coordinates]] = []
         vertical_direction = 1 if self.color == Color.white else -1
 
-        squares = Movement.get_pawn_squares(self.coordinates, vertical_direction, self.has_moved)
-        attack_squares = Movement.get_pawn_attack_squares(self.coordinates, vertical_direction)
+        squares = Movement.get_pawn_squares(self.coordinates, self.color, self.has_moved)
+        attack_squares = Movement.get_pawn_attack_squares(self.coordinates, self.color)
 
         for list_of_squares in squares:
             possible_moves.append([square for square in list_of_squares if not board.get_piece(square)])

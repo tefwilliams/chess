@@ -1,4 +1,5 @@
 
+from ...src.player import Color
 from ...src.coordinates import Coordinates, Direction
 
 
@@ -55,7 +56,7 @@ class Movement:
     def get_knight_squares(origin_coordinates: Coordinates) -> list[list[Coordinates]]:
         knight_squares: list[list[Coordinates]] = []
 
-        directions = [Direction((y, x)) for y in [-2, -1, 1, 2] for x in [-2, -1, 1, 2] if not y == x and not y == -x]
+        directions = [Direction((y, x)) for y in [-2, -1, 1, 2] for x in [-2, -1, 1, 2] if not abs(y) == abs(x)]
 
         for direction in directions:
             squares_in_direction = [direction.step(origin_coordinates)]
@@ -64,8 +65,10 @@ class Movement:
         return knight_squares
 
     @staticmethod
-    def get_pawn_squares(origin_coordinates: Coordinates, movement_direction: int, has_moved: bool) -> list[list[Coordinates]]:
-        direction = Direction((movement_direction, 0))
+    def get_pawn_squares(origin_coordinates: Coordinates, color: Color, has_moved: bool) -> list[list[Coordinates]]:
+        y = 1 if color == Color.white else -1
+
+        direction = Direction((y, 0))
 
         adjacent_square_in_direction = direction.step(origin_coordinates)
         squares_in_direction = [adjacent_square_in_direction]
@@ -76,10 +79,11 @@ class Movement:
         return [[square for square in squares_in_direction if square.within_board]]
 
     @staticmethod
-    def get_pawn_attack_squares(origin_coordinates: Coordinates, movement_direction: int) -> list[list[Coordinates]]:
+    def get_pawn_attack_squares(origin_coordinates: Coordinates, color: Color) -> list[list[Coordinates]]:
         pawn_squares: list[list[Coordinates]] = []
+        y = 1 if color == Color.white else -1
 
-        directions = [Direction((movement_direction, x)) for x in [-1, 1]]
+        directions = [Direction((y, x)) for x in [-1, 1]]
 
         for direction in directions:
             squares_in_direction = [direction.step(origin_coordinates)]
