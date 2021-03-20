@@ -11,6 +11,8 @@ if TYPE_CHECKING:
 
 
 class Bishop(Piece):
+    type = PieceTypes.bishop
+
     def __init__(self: Bishop, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
         self.__symbol = '\u2657' if self.color == Color.white else '\u265D'
@@ -22,8 +24,4 @@ class Bishop(Piece):
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         diagonal_squares = Movement.get_diagonal_squares(self.coordinates)
         return board.get_unobstructed_squares(self.color, diagonal_squares)
-
-    @property
-    def type(self: Bishop) -> PieceTypes:
-        return PieceTypes.bishop
         

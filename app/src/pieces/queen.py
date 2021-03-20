@@ -11,6 +11,8 @@ if TYPE_CHECKING:
 
 
 class Queen(Piece):
+    type = PieceTypes.queen
+
     def __init__(self: Queen, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
         self.__symbol = '\u2655' if self.color == Color.white else '\u265B'
@@ -23,7 +25,3 @@ class Queen(Piece):
         diagonal_squares = Movement.get_diagonal_squares(self.coordinates)
         orthogonal_squares = Movement.get_orthogonal_squares(self.coordinates)
         return board.get_unobstructed_squares(self.color, diagonal_squares + orthogonal_squares)
-
-    @property
-    def type(self: Queen) -> PieceTypes:
-        return PieceTypes.queen

@@ -10,11 +10,33 @@ if TYPE_CHECKING:
 
 
 class Piece:
+    type: PieceTypes
+
     def __init__(self: Piece, coordinates: Coordinates, color: Color) -> None:
         self.__color = color
         self.__coordinates = coordinates
         self.__has_moved = False
         self.__set_backup_data()
+
+    @property
+    def symbol(self: Piece) -> str:
+        raise NotImplementedError
+ 
+    @property
+    def color(self: Piece) -> Color:
+        return self.__color
+
+    @property
+    def coordinates(self: Piece) -> Coordinates:
+        return self.__coordinates
+
+    @property
+    def has_moved(self: Piece) -> bool:
+        return self.__has_moved
+
+    @property
+    def possible_moves(self: Piece) -> list[Coordinates]:
+        return self.__possible_moves
 
     def move(self: Piece, coordinates: Coordinates) -> None:
         self.__set_backup_data()
@@ -33,29 +55,6 @@ class Piece:
     def __set_backup_data(self: Piece,) -> None:
         self.__backup_data = self.__coordinates, self.has_moved
 
-    @property
-    def color(self: Piece) -> Color:
-        return self.__color
-
-    @property
-    def coordinates(self: Piece) -> Coordinates:
-        return self.__coordinates
-
-    @property
-    def has_moved(self: Piece) -> bool:
-        return self.__has_moved
-
-    @property
-    def possible_moves(self: Piece) -> list[Coordinates]:
-        return self.__possible_moves
-
-    @property
-    def symbol(self: Piece) -> str:
-        raise NotImplementedError
-
-    @property
-    def type(self: Piece) -> PieceTypes:
-        raise NotImplementedError
 
 class PieceTypes(Enum):
     king = 0

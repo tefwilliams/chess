@@ -11,6 +11,8 @@ if TYPE_CHECKING:
 
 
 class King(Piece):
+    type = PieceTypes.king
+
     def __init__(self: King, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
         self.__symbol = '\u2654' if self.color == Color.white else '\u265A'
@@ -22,8 +24,4 @@ class King(Piece):
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         adjacent_squares = Movement.get_adjacent_squares(self.coordinates)
         return board.get_unobstructed_squares(self.color, adjacent_squares)
-
-    @property
-    def type(self: King) -> PieceTypes:
-        return PieceTypes.king
         

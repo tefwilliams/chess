@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 from enum import Enum
 
@@ -15,6 +16,7 @@ class Player:
 
     def get_opposing_color(self: Player) -> Color:
         return Color.get_opposing_color(self.__color)
+
 
 # TODO - pull class into new file
 class Color(Enum):

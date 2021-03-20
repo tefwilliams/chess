@@ -1,6 +1,5 @@
 
 from __future__ import annotations
-from app.src.player.player import Color
 from ...src.coordinates import Coordinates
 from ...src.repository import display_board, get_starting_pieces
 from ...src.board import Board
@@ -12,22 +11,11 @@ class Game:
         self.board = Board(get_starting_pieces())
         self.__player = Player()
 
-    def play(self: Game) -> None:
+    @property
+    def player(self: Game) -> Player:
+        return self.__player
 
-        while not self.over():
-            self.__take_turn()
-            self.__player.swap_color()
-
-        display_board(self.board)
-
-        if self.board.check_mate(self.__player.color):
-            opposing_player_color = Color.get_opposing_color(self.__player.color)
-            print("%s in check mate. %s wins!" % (str(self.__player.color.name).capitalize(), str(opposing_player_color.name).capitalize()) + "\n")
-
-        elif self.board.stale_mate(self.__player.color):
-            print("%s in stale mate. It's a draw!" % str(self.__player.color.name).capitalize() + "\n")
-
-    def __take_turn(self: Game) -> None:
+    def take_turn(self: Game) -> None:
         while True:
             display_board(self.board)
             print("%s's turn" % str(self.__player.color.name).capitalize())
@@ -56,5 +44,10 @@ class Game:
                 break
 
     def over(self: Game) -> bool:
-        return (self.board.check_mate(self.__player.color)
-            or self.board.stale_mate(self.__player.color))
+        return self.check_mate() or self.stale_mate()
+
+    def check_mate(self: Game) -> bool:
+        return self.board.check_mate(self.__player.color)
+
+    def stale_mate(self: Game) -> bool:
+        return self.board.stale_mate(self.__player.color)

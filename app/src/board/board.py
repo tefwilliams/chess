@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from ...src.coordinates import Coordinates, Direction
+from ...src.coordinates import Coordinates
 from ...src.movement import Movement
 from ...src.player import Color
 from ...src.pieces import Piece, PieceTypes
