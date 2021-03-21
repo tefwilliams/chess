@@ -1,6 +1,6 @@
 
 import pytest
-from app.src import Board, Coordinates, Color, PieceTypes
+from app.src import Board, Coordinates, Color, PieceTypes, Piece
 from app.tests.data.generate_piece import generate_piece
 
 
@@ -13,7 +13,8 @@ from app.tests.data.generate_piece import generate_piece
         ('F6', False),
         ('F3', True),
         ('E5', True),
-        ('G4', True)
+        ('G4', True),
+        ('E4', True)
     ]
 )
 def test_king_can_only_move_to_adjacent_squares(square_to_move_to: str, should_be_able_to_move: bool) -> None:
@@ -25,26 +26,44 @@ def test_king_can_only_move_to_adjacent_squares(square_to_move_to: str, should_b
 
     assert can_move == should_be_able_to_move
 
-def test_king_cannot_move_if_obstructed() -> None:
-    king = generate_piece(PieceTypes.king, 'A1', Color.white)
+@pytest.mark.parametrize(
+    "square_to_move_to, obstructing_piece",
+    [
+        ('F3', generate_piece(PieceTypes.bishop, 'F3', Color.white)),
+        ('E5', generate_piece(PieceTypes.rook, 'E5', Color.white)),
+        ('G4', generate_piece(PieceTypes.queen, 'G4', Color.white)),
+        ('E4', generate_piece(PieceTypes.pawn, 'E4', Color.white))
+    ]
+)
+def test_king_cannot_move_if_obstructed(square_to_move_to: str, obstructing_piece: Piece) -> None:
+    king = generate_piece(PieceTypes.king, 'F4', Color.white)
 
     pieces = [
         king,
-        generate_piece(PieceTypes.bishop, 'B2', Color.white)
+        obstructing_piece
     ]
 
     board = Board(pieces)
 
-    assert not Coordinates.convert_from_grid_value('E5') in king.get_possible_moves(board)
+    assert not Coordinates.convert_from_grid_value(square_to_move_to) in king.get_possible_moves(board)
 
-def test_king_can_take_opposing_piece() -> None:
-    king = generate_piece(PieceTypes.king, 'A1', Color.white)
+@pytest.mark.parametrize(
+    "square_to_move_to, opposing_piece",
+    [
+        ('F3', generate_piece(PieceTypes.bishop, 'F3', Color.black)),
+        ('E5', generate_piece(PieceTypes.rook, 'E5', Color.black)),
+        ('G4', generate_piece(PieceTypes.queen, 'G4', Color.black)),
+        ('E4', generate_piece(PieceTypes.pawn, 'E4', Color.black))
+    ]
+)
+def test_king_can_take_opposing_piece(square_to_move_to: str, opposing_piece: Piece) -> None:
+    king = generate_piece(PieceTypes.king, 'F4', Color.white)
 
     pieces = [
         king,
-        generate_piece(PieceTypes.bishop, 'B2', Color.black)
+        opposing_piece
     ]
 
     board = Board(pieces)
 
-    assert Coordinates.convert_from_grid_value('B2') in king.get_possible_moves(board)
+    assert Coordinates.convert_from_grid_value(square_to_move_to) in king.get_possible_moves(board)
