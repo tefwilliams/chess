@@ -17,7 +17,7 @@ from app.tests.data.generate_piece import generate_piece
         ('G2', True)
     ]
 )
-def test_knight_can_only_move_to_adjacent_squares(square_to_move_to: str, should_be_able_to_move: bool) -> None:
+def test_knight_can_only_move_to_knight_squares(square_to_move_to: str, should_be_able_to_move: bool) -> None:
     knight = generate_piece(PieceTypes.knight, 'F4', Color.white)
 
     board = Board([knight])
