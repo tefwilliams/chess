@@ -4,8 +4,9 @@ from app.src import Board, Coordinates, Color, PieceTypes
 from app.tests.data.generate_piece import generate_piece
 
 
-def supply_king_can_move() -> list[tuple[str, bool]]:
-    return [
+@pytest.mark.parametrize(
+    "square_to_move_to, should_be_able_to_move", 
+    [
         ('A2', False),
         ('B1', False),
         ('B4', False),
@@ -14,8 +15,7 @@ def supply_king_can_move() -> list[tuple[str, bool]]:
         ('E5', True),
         ('G4', True)
     ]
-
-@pytest.mark.parametrize("square_to_move_to, should_be_able_to_move", supply_king_can_move())
+)
 def test_king_can_only_move_to_adjacent_squares(square_to_move_to: str, should_be_able_to_move: bool) -> None:
     king = generate_piece(PieceTypes.king, 'F4', Color.white)
 
