@@ -1,6 +1,6 @@
 
-from ...src.player import Color
-from ...src.coordinates import Coordinates, Direction
+from ..player import Color
+from ..coordinates import Coordinates, Direction
 
 
 class Movement:

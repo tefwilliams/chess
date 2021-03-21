@@ -1,7 +1,7 @@
 
 from __future__ import annotations
-from ...src.player import Color
-from ...src.coordinates import Coordinates
+from ..player import Color
+from ..coordinates import Coordinates
 from .piece import Piece
 from .king import King
 from .queen import Queen

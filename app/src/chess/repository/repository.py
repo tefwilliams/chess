@@ -1,7 +1,7 @@
 
-from ...src.pieces import Piece, Pieces
-from ...src.coordinates import Coordinates
-from ...src.board import Board
+from ..pieces import Piece, Pieces
+from ..coordinates import Coordinates
+from ..board import Board
 
 
 def display_board(board: Board) -> None:

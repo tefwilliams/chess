@@ -1,13 +1,13 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from ...src.player import Color
-from ...src.movement import Movement
+from ..player import Color
+from ..movement import Movement
 from .piece import Piece, PieceTypes
 
 if TYPE_CHECKING:
-    from ...src.coordinates import Coordinates
-    from ...src.board import Board
+    from ...chess.coordinates import Coordinates
+    from ...chess.board import Board
 
 
 class King(Piece):

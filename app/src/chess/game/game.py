@@ -1,9 +1,9 @@
 
 from __future__ import annotations
-from ...src.coordinates import Coordinates
-from ...src.repository import display_board, get_starting_pieces
-from ...src.board import Board
-from ...src.player import Player
+from ..coordinates import Coordinates
+from ..repository import display_board, get_starting_pieces
+from ..board import Board
+from ..player import Player
 
 
 class Game:

@@ -2,11 +2,11 @@
 from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING
-from ...src.player import Color
+from ..player import Color
 
 if TYPE_CHECKING:
-    from ...src.coordinates import Coordinates
-    from ...src.board import Board
+    from ...chess.coordinates import Coordinates
+    from ...chess.board import Board
 
 
 class Piece:

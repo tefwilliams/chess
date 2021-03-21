@@ -1,7 +1,7 @@
 
 import pytest
-from app.src import Board, Coordinates, Color, PieceTypes, Piece
-from app.tests.data.generate_piece import generate_piece
+from chess import Board, Coordinates, Color, PieceTypes, Piece
+from generate_piece import generate_piece
 
 
 @pytest.mark.parametrize(
