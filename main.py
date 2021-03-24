@@ -1,5 +1,5 @@
 
-from app.src import Game, Color, display_board
+from chess import Game, Color, display_board
 
 
 game = Game()

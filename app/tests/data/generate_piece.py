@@ -1,4 +1,4 @@
-from app.src import Piece, PieceTypes, Color, Coordinates, Bishop, King, Knight, Pawn, Queen, Rook
+from chess import Piece, PieceTypes, Color, Coordinates, Bishop, King, Knight, Pawn, Queen, Rook
 
 def generate_piece(piece_type: PieceTypes, coordinates_as_string: str, color: Color) -> Piece:
     coordinates = Coordinates.convert_from_grid_value(coordinates_as_string)
