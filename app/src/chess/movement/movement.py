@@ -11,13 +11,7 @@ class Movement:
         directions = [Direction((y, x)) for y in [-1, 1] for x in [-1, 1]]
 
         for direction in directions:
-            squares_in_direction: list[Coordinates] = []
-            destination_coordinates = direction.step(origin_coordinates)
-
-            while destination_coordinates.within_board:
-                squares_in_direction.append(destination_coordinates)
-                destination_coordinates = direction.step(destination_coordinates)
-
+            squares_in_direction = Movement.__get_squares_in_direction(origin_coordinates, direction)
             diagonal_squares.append(squares_in_direction)
 
         return diagonal_squares
@@ -29,13 +23,7 @@ class Movement:
         directions = [Direction((y, x)) for y in [-1, 0, 1] for x in [-1, 0, 1] if abs(y + x) == 1]
 
         for direction in directions:
-            squares_in_direction: list[Coordinates] = []
-            destination_coordinates = direction.step(origin_coordinates)
-
-            while destination_coordinates.within_board:
-                squares_in_direction.append(destination_coordinates)
-                destination_coordinates = direction.step(destination_coordinates)
-
+            squares_in_direction = Movement.__get_squares_in_direction(origin_coordinates, direction)
             orthogonal_squares.append(squares_in_direction)
 
         return orthogonal_squares
@@ -47,8 +35,8 @@ class Movement:
         directions = [Direction((y, x)) for y in [-1, 0, 1] for x in [-1, 0, 1] if not y == x == 0]
 
         for direction in directions:
-            squares_in_direction = [direction.step(origin_coordinates)]
-            adjacent_squares.append([square for square in squares_in_direction if square.within_board])
+            squares_in_direction = Movement.__get_squares_in_direction(origin_coordinates, direction, 1)
+            adjacent_squares.append(squares_in_direction)
 
         return adjacent_squares
 
@@ -59,8 +47,8 @@ class Movement:
         directions = [Direction((y, x)) for y in [-2, -1, 1, 2] for x in [-2, -1, 1, 2] if not abs(y) == abs(x)]
 
         for direction in directions:
-            squares_in_direction = [direction.step(origin_coordinates)]
-            knight_squares.append([square for square in squares_in_direction if square.within_board])
+            squares_in_direction = Movement.__get_squares_in_direction(origin_coordinates, direction, 1)
+            knight_squares.append(squares_in_direction)
 
         return knight_squares
 
@@ -70,13 +58,10 @@ class Movement:
 
         direction = Direction((y, 0))
 
-        adjacent_square_in_direction = direction.step(origin_coordinates)
-        squares_in_direction = [adjacent_square_in_direction]
-
         if not has_moved:
-            squares_in_direction.append((direction.step(adjacent_square_in_direction)))
+            return [Movement.__get_squares_in_direction(origin_coordinates, direction, 2)]
 
-        return [[square for square in squares_in_direction if square.within_board]]
+        return [Movement.__get_squares_in_direction(origin_coordinates, direction, 1)]
 
     @staticmethod
     def get_pawn_attack_squares(origin_coordinates: Coordinates, color: Color) -> list[list[Coordinates]]:
@@ -86,7 +71,25 @@ class Movement:
         directions = [Direction((y, x)) for x in [-1, 1]]
 
         for direction in directions:
-            squares_in_direction = [direction.step(origin_coordinates)]
-            pawn_squares.append([square for square in squares_in_direction if square.within_board])
+            squares_in_direction = Movement.__get_squares_in_direction(origin_coordinates, direction, 1)
+            pawn_squares.append(squares_in_direction)
 
         return pawn_squares
+
+    @staticmethod
+    def __get_squares_in_direction(origin_coordinates: Coordinates, direction: Direction, number_of_steps: int = None) -> list[Coordinates]:
+        squares_in_direction: list[Coordinates] = []
+        square_in_direction = origin_coordinates
+
+        if number_of_steps:
+            for i in range(number_of_steps):
+                square_in_direction = direction.step(square_in_direction)
+                squares_in_direction.append(square_in_direction)
+
+            return [square for square in squares_in_direction if square.within_board]
+
+        while square_in_direction.within_board:
+            square_in_direction = direction.step(square_in_direction)
+            squares_in_direction.append(square_in_direction)
+
+        return squares_in_direction
