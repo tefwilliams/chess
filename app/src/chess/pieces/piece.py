@@ -35,6 +35,10 @@ class Piece:
         return self.__has_moved
 
     @property
+    def has_just_moved_two_squares(self: Piece) -> bool:
+        raise NotImplementedError
+
+    @property
     def possible_moves(self: Piece) -> list[Coordinates]:
         return self.__possible_moves
 

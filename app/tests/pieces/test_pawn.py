@@ -37,6 +37,20 @@ def test_pawn_can_move_forward_diagonally_if_enemy_piece_there() -> None:
 
     assert Coordinates.convert_from_grid_value('B1') in pawn.get_possible_moves(board)
 
+def test_pawn_can_move_forward_diagonally_via_en_passant() -> None:
+    pawn = generate_piece(PieceTypes.pawn, 'E2', Color.white)
+    enemy_pawn = generate_piece(PieceTypes.pawn, 'G1', Color.white)
+
+    pieces = [
+        pawn,
+        enemy_pawn
+    ]
+
+    board = Board(pieces)
+    enemy_pawn.move(Coordinates.convert_from_grid_value('E1'))
+
+    assert Coordinates.convert_from_grid_value('F1') in pawn.get_possible_moves(board)
+
 def test_pawn_cannot_move_forward_diagonally_if_fiendly_piece_there() -> None:
     pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
 

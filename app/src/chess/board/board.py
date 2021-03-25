@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from ..coordinates import Coordinates
+from ..coordinates import Coordinates, Direction
 from ..movement import Movement
 from ..player import Color
 from ..pieces import Piece, PieceTypes
@@ -72,6 +72,14 @@ class Board:
                 unobstructed_squares.append(square)
 
         return unobstructed_squares
+
+    def en_passant(self: Board, coordinates: Coordinates, color: Color) -> bool:
+        y = -1 if color == Color.white else 1
+
+        direction = Direction((y, 0))
+        piece_at_destination = self.get_piece(direction.step((coordinates)))
+
+        return piece_at_destination is not None and piece_at_destination.type == PieceTypes.pawn and piece_at_destination.has_just_moved_two_squares
 
     # TODO - pull methods onto player?
     def is_in_check(self: Board, color: Color) -> bool:
