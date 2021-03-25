@@ -83,8 +83,8 @@ class Board:
 
     # TODO - pull methods onto player?
     def is_in_check(self: Board, color: Color) -> bool:
-        king_coordinates = self.__get_king(color).coordinates
-        return self.square_is_attacked(king_coordinates, color)
+        king = self.__get_king(color)
+        return king is not None and self.square_is_attacked(king.coordinates, color)
 
     def square_is_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
         diagonal_squares = self.get_unobstructed_squares(color, Movement.get_diagonal_squares(coordinates))
@@ -123,14 +123,14 @@ class Board:
 
         return False
 
-    def __get_king(self: Board, color: Color) -> Piece:
+    def __get_king(self: Board, color: Color) -> Piece | None:
         king_with_color_list = [piece for piece in self.__pieces if piece.type == PieceTypes.king and piece.color == color]
 
         if len(king_with_color_list) > 1:
             raise ValueError("More than one king on %s team" % color.name)
 
         if len(king_with_color_list) == 0:
-            raise ValueError("No king on %s team" % color.name)
+            return None
 
         return king_with_color_list.pop()
 

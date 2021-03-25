@@ -21,7 +21,8 @@ def test_pawn_cannot_move_two_forward_if_it_has_moved() -> None:
     pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
 
     board = Board([pawn])
-    pawn.move(Coordinates.convert_from_grid_value('B2'))
+
+    board.evaluate_move(pawn, Coordinates.convert_from_grid_value('B2'))
 
     assert Coordinates.convert_from_grid_value('D2') not in pawn.get_possible_moves(board)
 
@@ -47,7 +48,8 @@ def test_pawn_can_move_via_en_passant_if_enemy_pawn_has_just_moved_two_squares()
     ]
 
     board = Board(pieces)
-    enemy_pawn.move(Coordinates.convert_from_grid_value('E1'))
+    
+    board.evaluate_move(enemy_pawn, Coordinates.convert_from_grid_value('E1'))
 
     assert Coordinates.convert_from_grid_value('F1') in pawn.get_possible_moves(board)
 
@@ -63,8 +65,9 @@ def test_pawn_cannot_move_via_en_passant_if_another_piece_has_moved() -> None:
     ]
 
     board = Board(pieces)
-    enemy_pawn.move(Coordinates.convert_from_grid_value('E1'))
-    other_enempy_piece.move(Coordinates.convert_from_grid_value('G4'))
+
+    board.evaluate_move(enemy_pawn, Coordinates.convert_from_grid_value('E1'))
+    board.evaluate_move(other_enempy_piece, Coordinates.convert_from_grid_value('G4'))
 
     assert Coordinates.convert_from_grid_value('F1') not in pawn.get_possible_moves(board)
 
