@@ -39,6 +39,8 @@ class Board:
         elif not should_move:
             self.__restore(piece, piece_at_destination)
 
+        self.__last_piece_to_move = piece
+
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
         if piece_at_destination:
             self.__pieces.remove(piece_at_destination)
@@ -73,13 +75,21 @@ class Board:
 
         return unobstructed_squares
 
-    def en_passant(self: Board, coordinates: Coordinates, color: Color) -> bool:
+    def can_move_via_en_passant(self: Board, coordinates: Coordinates, color: Color) -> bool:
         y = -1 if color == Color.white else 1
 
         direction = Direction((y, 0))
         piece_at_destination = self.get_piece(direction.step((coordinates)))
 
-        return piece_at_destination is not None and piece_at_destination.color != color and piece_at_destination.type == PieceTypes.pawn and piece_at_destination.has_just_moved_two_squares
+        if not piece_at_destination:
+            return False
+
+        piece_has_just_moved_two_squares = abs(piece_at_destination.coordinates.y - piece_at_destination.previous_coordinates.y) == 2
+
+        return (piece_at_destination.color != color 
+            and piece_at_destination.type == PieceTypes.pawn 
+            and piece_at_destination == self.__last_piece_to_move
+            and piece_has_just_moved_two_squares)
 
     # TODO - pull methods onto player?
     def is_in_check(self: Board, color: Color) -> bool:

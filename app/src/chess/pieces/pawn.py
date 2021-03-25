@@ -40,7 +40,7 @@ class Pawn(Piece):
             possible_moves.append([square for square in list_of_squares if not board.get_piece(square)])
 
         for list_of_squares in attack_squares:
-            possible_moves.append([square for square in list_of_squares if board.get_piece(square) or board.en_passant(square, self.color)])
+            possible_moves.append([square for square in list_of_squares if board.get_piece(square) or board.can_move_via_en_passant(square, self.color)])
 
         return board.get_unobstructed_squares(self.color, possible_moves)
 
