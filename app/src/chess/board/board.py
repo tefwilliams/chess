@@ -11,7 +11,11 @@ class Board:
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
-        self.update_all_possible_moves()
+        self.__update_all_possible_moves()
+
+    @property
+    def pieces(self: Board) -> list[Piece]:
+        return self.__pieces
 
     def get_piece(self: Board, coordinates: Coordinates) -> Piece | None:
         pieces_with_coordinates = [piece for piece in self.__pieces if piece.coordinates == coordinates]
@@ -25,10 +29,17 @@ class Board:
         return pieces_with_coordinates.pop()
 
     def evaluate_move(self: Board, piece: Piece, coordinates: Coordinates, should_move: bool = True) -> None:
+        if should_move:
+            self.__update_all_possible_moves()
+            
         piece_at_destination = self.get_piece(coordinates)
 
         if coordinates not in piece.possible_moves:
             raise ValueError("You cannot make this move")
+
+        if not piece_at_destination and piece.type == PieceTypes.pawn and self.en_passant_valid(coordinates, piece.color):
+            y = -1 if piece.color == Color.white else 1
+            piece_at_destination = self.get_piece(Direction((y, 0)).step(coordinates))
 
         self.__move_piece(piece, coordinates, piece_at_destination) 
 
@@ -39,7 +50,8 @@ class Board:
         elif not should_move:
             self.__restore(piece, piece_at_destination)
 
-        self.__last_piece_to_move = piece
+        else:
+            self.__last_piece_to_move = piece
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
         if piece_at_destination:
@@ -53,7 +65,7 @@ class Board:
         if removed_piece and removed_piece not in self.__pieces:
             self.__pieces.append(removed_piece)
 
-    def update_all_possible_moves(self: Board) -> None:
+    def __update_all_possible_moves(self: Board) -> None:
         for piece in self.__pieces:
             piece.update_possible_moves(self)
 

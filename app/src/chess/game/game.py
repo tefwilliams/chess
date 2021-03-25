@@ -20,9 +20,7 @@ class Game:
             display_board(self.board)
             print("%s's turn" % str(self.__player.color.name).capitalize())
 
-            try:
-                self.board.update_all_possible_moves()
-                
+            try:           
                 coordinates_to_move_from = Coordinates.get_coordinates("Enter which square to move from: ")
                 piece_to_move = self.board.get_piece(coordinates_to_move_from)
 

@@ -61,3 +61,20 @@ def test_is_in_check_returns_false_when_king_not_in_check(black_piece, piece_coo
     board = Board(pieces)
 
     assert not board.is_in_check(Color.white)
+
+def test_move_via_en_passant_removes_piece() -> None:
+    pawn = generate_piece(PieceTypes.pawn, 'E2', Color.white)
+    enemy_pawn = generate_piece(PieceTypes.pawn, 'G1', Color.black)
+
+    pieces = [
+        pawn,
+        enemy_pawn
+    ]
+
+    board = Board(pieces)
+    
+    board.evaluate_move(enemy_pawn, Coordinates.convert_from_grid_value('E1'))
+    board.evaluate_move(pawn, Coordinates.convert_from_grid_value('F1'))
+
+    assert enemy_pawn not in board.pieces
+
