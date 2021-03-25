@@ -14,9 +14,8 @@ class Piece:
 
     def __init__(self: Piece, coordinates: Coordinates, color: Color) -> None:
         self.__color = color
+        self.__previous_coordinates = coordinates
         self.__coordinates = coordinates
-        self.__has_moved = False
-        self.__set_backup_data()
 
     @property
     def symbol(self: Piece) -> str:
@@ -31,8 +30,12 @@ class Piece:
         return self.__coordinates
 
     @property
+    def previous_coordinates(self: Piece) -> Coordinates:
+        return self.__previous_coordinates
+
+    @property
     def has_moved(self: Piece) -> bool:
-        return self.__has_moved
+        return self.__previous_coordinates != self.__coordinates
 
     @property
     def has_just_moved_two_squares(self: Piece) -> bool:
@@ -43,9 +46,8 @@ class Piece:
         return self.__possible_moves
 
     def move(self: Piece, coordinates: Coordinates) -> None:
-        self.__set_backup_data()
+        self.__previous_coordinates = self.__coordinates
         self.__coordinates = coordinates
-        self.__has_moved = True
 
     def update_possible_moves(self: Piece, board: Board) -> None:
         self.__possible_moves = self.get_possible_moves(board)
@@ -53,11 +55,8 @@ class Piece:
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         raise NotImplementedError
 
-    def restore(self: Piece) -> None:
-        self.__coordinates, self.__has_moved = self.__backup_data
-
-    def __set_backup_data(self: Piece,) -> None:
-        self.__backup_data = self.__coordinates, self.has_moved
+    def revert_last_move(self: Piece) -> None:
+        self.__coordinates = self.__previous_coordinates
 
 
 class PieceTypes(Enum):

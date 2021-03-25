@@ -46,7 +46,7 @@ class Board:
         piece.move(coordinates)
 
     def __restore(self: Board, moved_piece: Piece, removed_piece: Piece | None) -> None:
-        moved_piece.restore()
+        moved_piece.revert_last_move()
 
         if removed_piece and removed_piece not in self.__pieces:
             self.__pieces.append(removed_piece)
@@ -79,7 +79,7 @@ class Board:
         direction = Direction((y, 0))
         piece_at_destination = self.get_piece(direction.step((coordinates)))
 
-        return piece_at_destination is not None and piece_at_destination.type == PieceTypes.pawn and piece_at_destination.has_just_moved_two_squares
+        return piece_at_destination is not None and piece_at_destination.color != color and piece_at_destination.type == PieceTypes.pawn and piece_at_destination.has_just_moved_two_squares
 
     # TODO - pull methods onto player?
     def is_in_check(self: Board, color: Color) -> bool:

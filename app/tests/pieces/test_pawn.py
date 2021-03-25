@@ -23,7 +23,7 @@ def test_pawn_cannot_move_two_forward_if_it_has_moved() -> None:
     board = Board([pawn])
     pawn.move(Coordinates.convert_from_grid_value('B2'))
 
-    assert not Coordinates.convert_from_grid_value('D2') in pawn.get_possible_moves(board)
+    assert Coordinates.convert_from_grid_value('D2') not in pawn.get_possible_moves(board)
 
 def test_pawn_can_move_forward_diagonally_if_enemy_piece_there() -> None:
     pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
@@ -37,9 +37,9 @@ def test_pawn_can_move_forward_diagonally_if_enemy_piece_there() -> None:
 
     assert Coordinates.convert_from_grid_value('B1') in pawn.get_possible_moves(board)
 
-def test_pawn_can_move_forward_diagonally_via_en_passant() -> None:
+def test_pawn_can_move_via_en_passant_if_enemy_pawn_has_just_moved_two_squares() -> None:
     pawn = generate_piece(PieceTypes.pawn, 'E2', Color.white)
-    enemy_pawn = generate_piece(PieceTypes.pawn, 'G1', Color.white)
+    enemy_pawn = generate_piece(PieceTypes.pawn, 'G1', Color.black)
 
     pieces = [
         pawn,
@@ -50,6 +50,23 @@ def test_pawn_can_move_forward_diagonally_via_en_passant() -> None:
     enemy_pawn.move(Coordinates.convert_from_grid_value('E1'))
 
     assert Coordinates.convert_from_grid_value('F1') in pawn.get_possible_moves(board)
+
+def test_pawn_cannot_move_via_en_passant_if_another_piece_has_moved() -> None:
+    pawn = generate_piece(PieceTypes.pawn, 'E2', Color.white)
+    enemy_pawn = generate_piece(PieceTypes.pawn, 'G1', Color.black)
+    other_enempy_piece = generate_piece(PieceTypes.bishop, 'H5', Color.black)
+
+    pieces = [
+        pawn,
+        enemy_pawn,
+        other_enempy_piece
+    ]
+
+    board = Board(pieces)
+    enemy_pawn.move(Coordinates.convert_from_grid_value('E1'))
+    other_enempy_piece.move(Coordinates.convert_from_grid_value('G4'))
+
+    assert Coordinates.convert_from_grid_value('F1') not in pawn.get_possible_moves(board)
 
 def test_pawn_cannot_move_forward_diagonally_if_fiendly_piece_there() -> None:
     pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
