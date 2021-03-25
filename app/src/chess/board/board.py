@@ -75,7 +75,7 @@ class Board:
 
         return unobstructed_squares
 
-    def can_move_via_en_passant(self: Board, coordinates: Coordinates, color: Color) -> bool:
+    def en_passant_valid(self: Board, coordinates: Coordinates, color: Color) -> bool:
         y = -1 if color == Color.white else 1
 
         direction = Direction((y, 0))

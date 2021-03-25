@@ -22,7 +22,6 @@ def test_bishop_can_only_move_diagonally(square_to_move_to: str, should_be_able_
     board = Board([bishop])
 
     can_move = Coordinates.convert_from_grid_value(square_to_move_to) in bishop.get_possible_moves(board)
-
     assert can_move == should_be_able_to_move
 
 @pytest.mark.parametrize(

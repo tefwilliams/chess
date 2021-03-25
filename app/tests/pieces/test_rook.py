@@ -22,7 +22,6 @@ def test_rook_can_only_move_diagonally_or_orthogonally(square_to_move_to: str, s
     board = Board([rook])
 
     can_move = Coordinates.convert_from_grid_value(square_to_move_to) in rook.get_possible_moves(board)
-
     assert can_move == should_be_able_to_move
 
 @pytest.mark.parametrize(
