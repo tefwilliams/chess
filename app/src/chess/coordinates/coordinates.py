@@ -3,7 +3,7 @@ from __future__ import annotations
 
 
 class Coordinates(tuple[int, int]):
-    maximum_size = 8 # TODO - Consider name
+    board_size = 8  # TODO - Consider name
     y_grid_values = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     x_grid_values = ['1', '2', '3', '4', '5', '6', '7', '8']
 
@@ -13,7 +13,7 @@ class Coordinates(tuple[int, int]):
 
     @property
     def within_board(self: Coordinates) -> bool:
-        return self.y >= 0 and self.x >= 0 and self.y < Coordinates.maximum_size and self.x < Coordinates.maximum_size
+        return self.y >= 0 and self.x >= 0 and self.y < Coordinates.board_size and self.x < Coordinates.board_size
 
     @staticmethod
     def get_coordinates(input_text: str) -> Coordinates:
@@ -59,6 +59,7 @@ class Coordinates(tuple[int, int]):
             return False
 
         return True
+
 
 class Direction(Coordinates):
     @property

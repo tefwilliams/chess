@@ -7,7 +7,7 @@ from ..pieces import Piece, PieceTypes
 
 
 class Board:
-    size = Coordinates.maximum_size
+    size = Coordinates.board_size
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces

@@ -53,6 +53,17 @@ class Movement:
         return knight_squares
 
     @staticmethod
+    def get_castle_squares(origin_coordinates: Coordinates) -> list[list[Coordinates]]:
+        castle_squares: list[list[Coordinates]] = []
+
+        directions = [Direction((0, x)) for x in [-1, 1]]
+
+        for direction in directions:
+            castle_squares.append(Movement.__get_squares_in_direction(origin_coordinates, direction))
+
+        return castle_squares
+
+    @staticmethod
     def get_pawn_squares(origin_coordinates: Coordinates, color: Color, has_moved: bool) -> list[list[Coordinates]]:
         y = 1 if color == Color.white else -1
 
@@ -92,4 +103,4 @@ class Movement:
             square_in_direction = direction.step(square_in_direction)
             squares_in_direction.append(square_in_direction)
 
-        return squares_in_direction
+        return [square for square in squares_in_direction if square.within_board]
