@@ -104,3 +104,44 @@ def test_king_can_move_via_castle(square_to_move_to: str, other_pieces: list[Pie
         square_to_move_to) in king.get_possible_moves(board)
 
     assert can_move == should_be_able_to_move
+
+
+def test_king_cannot_move_via_castle_if_rook_has_moved() -> None:
+    king = generate_piece(PieceTypes.king, 'A5', Color.white)
+
+    rook = generate_piece(PieceTypes.rook, 'A1', Color.white)
+
+    pieces = [
+        king,
+        rook
+    ]
+
+    board = Board(pieces)
+
+    board.evaluate_move(rook, Coordinates.convert_from_grid_value('B1'))
+    board.evaluate_move(rook, Coordinates.convert_from_grid_value('A1'))
+
+    assert Coordinates.convert_from_grid_value(
+        'A3') not in king.get_possible_moves(board)
+
+
+def test_king_cannot_move_via_castle_if_king_has_moved() -> None:
+    king = generate_piece(PieceTypes.king, 'A5', Color.white)
+
+    rooks = [
+        generate_piece(PieceTypes.rook, 'A1', Color.white),
+        generate_piece(PieceTypes.rook, 'A8', Color.white)
+    ]
+
+    pieces = [
+        king,
+        *rooks
+    ]
+
+    board = Board(pieces)
+
+    board.evaluate_move(king, Coordinates.convert_from_grid_value('B5'))
+    board.evaluate_move(king, Coordinates.convert_from_grid_value('A5'))
+
+    assert all(Coordinates.convert_from_grid_value(square) not
+               in king.get_possible_moves(board) for square in ['A3', 'A7'])

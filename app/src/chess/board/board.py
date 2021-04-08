@@ -117,11 +117,15 @@ class Board:
 
         enemy_color = Color.get_opposing_color(color)
 
-        return (self.__enemy_piece_is_at_square(diagonal_squares, [PieceTypes.bishop, PieceTypes.queen], enemy_color)
-            or self.__enemy_piece_is_at_square(orthogonal_squares, [PieceTypes.rook, PieceTypes.queen], enemy_color)
-            or self.__enemy_piece_is_at_square(pawn_attack_squares, [PieceTypes.pawn], enemy_color)
-            or self.__enemy_piece_is_at_square(knight_squares, [PieceTypes.knight], enemy_color)
-            or self.__enemy_piece_is_at_square(adjacent_squares, [PieceTypes.king], enemy_color))
+        squares_to_check_for_pieces = [
+            (diagonal_squares, [PieceTypes.bishop, PieceTypes.queen]),
+            (orthogonal_squares, [PieceTypes.rook, PieceTypes.queen]),
+            (pawn_attack_squares, [PieceTypes.pawn]),
+            (knight_squares, [PieceTypes.knight]),
+            (adjacent_squares, [PieceTypes.king])
+        ]
+
+        return any(self.__enemy_piece_is_at_square(list_of_squares, list_of_pieces, enemy_color) for list_of_squares, list_of_pieces in squares_to_check_for_pieces)
 
     def __enemy_piece_is_at_square(self, list_of_squares: list[Coordinates], list_of_pieces: list[PieceTypes], enemy_color: Color) -> bool:
         for square in list_of_squares:
