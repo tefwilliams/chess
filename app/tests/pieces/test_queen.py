@@ -22,7 +22,6 @@ def test_queen_can_only_move_diagonally_or_orthogonally(square_to_move_to: str, 
     board = Board([queen])
 
     can_move = Coordinates.convert_from_grid_value(square_to_move_to) in queen.get_possible_moves(board)
-
     assert can_move == should_be_able_to_move
 
 @pytest.mark.parametrize(

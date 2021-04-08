@@ -5,7 +5,7 @@ from generate_piece import generate_piece
 
 
 @pytest.mark.parametrize(
-    "square_to_move_to, should_be_able_to_move", 
+    "square_to_move_to, should_be_able_to_move",
     [
         ('A2', False),
         ('B1', False),
@@ -22,9 +22,10 @@ def test_king_can_only_move_to_adjacent_squares(square_to_move_to: str, should_b
 
     board = Board([king])
 
-    can_move = Coordinates.convert_from_grid_value(square_to_move_to) in king.get_possible_moves(board)
-
+    can_move = Coordinates.convert_from_grid_value(
+        square_to_move_to) in king.get_possible_moves(board)
     assert can_move == should_be_able_to_move
+
 
 @pytest.mark.parametrize(
     "square_to_move_to, obstructing_piece",
@@ -45,7 +46,9 @@ def test_king_cannot_move_if_obstructed(square_to_move_to: str, obstructing_piec
 
     board = Board(pieces)
 
-    assert not Coordinates.convert_from_grid_value(square_to_move_to) in king.get_possible_moves(board)
+    assert not Coordinates.convert_from_grid_value(
+        square_to_move_to) in king.get_possible_moves(board)
+
 
 @pytest.mark.parametrize(
     "square_to_move_to, opposing_piece",
@@ -66,4 +69,79 @@ def test_king_can_take_opposing_piece(square_to_move_to: str, opposing_piece: Pi
 
     board = Board(pieces)
 
-    assert Coordinates.convert_from_grid_value(square_to_move_to) in king.get_possible_moves(board)
+    assert Coordinates.convert_from_grid_value(
+        square_to_move_to) in king.get_possible_moves(board)
+
+
+@pytest.mark.parametrize(
+    "square_to_move_to, other_pieces, should_be_able_to_move",
+    [
+        ('A3', [], True),
+        ('A7', [generate_piece(PieceTypes.rook, 'E5', Color.black)], False),
+        ('A3', [generate_piece(PieceTypes.rook, 'E5', Color.black)], False),
+        ('A7', [generate_piece(PieceTypes.rook, 'E4', Color.black)], True),
+        ('A3', [generate_piece(PieceTypes.rook, 'E4', Color.black)], False),
+        ('A2', [generate_piece(PieceTypes.rook, 'E7', Color.black)], False)
+    ]
+)
+def test_king_can_move_via_castle(square_to_move_to: str, other_pieces: list[Piece], should_be_able_to_move: bool) -> None:
+    king = generate_piece(PieceTypes.king, 'A5', Color.white)
+
+    rooks = [
+        generate_piece(PieceTypes.rook, 'A1', Color.white),
+        generate_piece(PieceTypes.rook, 'A8', Color.white)
+    ]
+
+    pieces = [
+        king,
+        *rooks,
+        *other_pieces
+    ]
+
+    board = Board(pieces)
+
+    can_move = Coordinates.convert_from_grid_value(
+        square_to_move_to) in king.get_possible_moves(board)
+
+    assert can_move == should_be_able_to_move
+
+
+def test_king_cannot_move_via_castle_if_rook_has_moved() -> None:
+    king = generate_piece(PieceTypes.king, 'A5', Color.white)
+
+    rook = generate_piece(PieceTypes.rook, 'A1', Color.white)
+
+    pieces = [
+        king,
+        rook
+    ]
+
+    board = Board(pieces)
+
+    board.evaluate_move(rook, Coordinates.convert_from_grid_value('B1'))
+    board.evaluate_move(rook, Coordinates.convert_from_grid_value('A1'))
+
+    assert Coordinates.convert_from_grid_value(
+        'A3') not in king.get_possible_moves(board)
+
+
+def test_king_cannot_move_via_castle_if_king_has_moved() -> None:
+    king = generate_piece(PieceTypes.king, 'A5', Color.white)
+
+    rooks = [
+        generate_piece(PieceTypes.rook, 'A1', Color.white),
+        generate_piece(PieceTypes.rook, 'A8', Color.white)
+    ]
+
+    pieces = [
+        king,
+        *rooks
+    ]
+
+    board = Board(pieces)
+
+    board.evaluate_move(king, Coordinates.convert_from_grid_value('B5'))
+    board.evaluate_move(king, Coordinates.convert_from_grid_value('A5'))
+
+    assert all(Coordinates.convert_from_grid_value(square) not
+               in king.get_possible_moves(board) for square in ['A3', 'A7'])

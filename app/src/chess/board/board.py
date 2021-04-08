@@ -1,17 +1,21 @@
 
 from __future__ import annotations
-from ..coordinates import Coordinates
+from ..coordinates import Coordinates, Direction
 from ..movement import Movement
 from ..player import Color
 from ..pieces import Piece, PieceTypes
 
 
 class Board:
-    size = Coordinates.maximum_size
+    size = Coordinates.board_size
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
-        self.update_all_possible_moves()
+        self.__update_all_possible_moves()
+
+    @property
+    def pieces(self: Board) -> list[Piece]:
+        return self.__pieces
 
     def get_piece(self: Board, coordinates: Coordinates) -> Piece | None:
         pieces_with_coordinates = [piece for piece in self.__pieces if piece.coordinates == coordinates]
@@ -25,10 +29,17 @@ class Board:
         return pieces_with_coordinates.pop()
 
     def evaluate_move(self: Board, piece: Piece, coordinates: Coordinates, should_move: bool = True) -> None:
+        if should_move:
+            self.__update_all_possible_moves()
+            
         piece_at_destination = self.get_piece(coordinates)
 
         if coordinates not in piece.possible_moves:
             raise ValueError("You cannot make this move")
+
+        if not piece_at_destination and piece.type == PieceTypes.pawn and self.en_passant_valid(coordinates, piece.color):
+            y = -1 if piece.color == Color.white else 1
+            piece_at_destination = self.get_piece(Direction((y, 0)).step(coordinates))
 
         self.__move_piece(piece, coordinates, piece_at_destination) 
 
@@ -39,6 +50,9 @@ class Board:
         elif not should_move:
             self.__restore(piece, piece_at_destination)
 
+        else:
+            self.__last_piece_to_move = piece
+
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
         if piece_at_destination:
             self.__pieces.remove(piece_at_destination)
@@ -46,12 +60,12 @@ class Board:
         piece.move(coordinates)
 
     def __restore(self: Board, moved_piece: Piece, removed_piece: Piece | None) -> None:
-        moved_piece.restore()
+        moved_piece.revert_last_move()
 
         if removed_piece and removed_piece not in self.__pieces:
             self.__pieces.append(removed_piece)
 
-    def update_all_possible_moves(self: Board) -> None:
+    def __update_all_possible_moves(self: Board) -> None:
         for piece in self.__pieces:
             piece.update_possible_moves(self)
 
@@ -73,10 +87,26 @@ class Board:
 
         return unobstructed_squares
 
+    def en_passant_valid(self: Board, coordinates: Coordinates, color: Color) -> bool:
+        y = -1 if color == Color.white else 1
+
+        direction = Direction((y, 0))
+        piece_at_destination = self.get_piece(direction.step((coordinates)))
+
+        if not piece_at_destination:
+            return False
+
+        piece_has_just_moved_two_squares = abs(piece_at_destination.coordinates.y - piece_at_destination.previous_coordinates.y) == 2
+
+        return (piece_at_destination.color != color 
+            and piece_at_destination.type == PieceTypes.pawn 
+            and piece_at_destination == self.__last_piece_to_move
+            and piece_has_just_moved_two_squares)
+
     # TODO - pull methods onto player?
     def is_in_check(self: Board, color: Color) -> bool:
-        king_coordinates = self.__get_king(color).coordinates
-        return self.square_is_attacked(king_coordinates, color)
+        king = self.__get_king(color)
+        return king is not None and self.square_is_attacked(king.coordinates, color)
 
     def square_is_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
         diagonal_squares = self.get_unobstructed_squares(color, Movement.get_diagonal_squares(coordinates))
@@ -87,11 +117,15 @@ class Board:
 
         enemy_color = Color.get_opposing_color(color)
 
-        return (self.__enemy_piece_is_at_square(diagonal_squares, [PieceTypes.bishop, PieceTypes.queen], enemy_color)
-            or self.__enemy_piece_is_at_square(orthogonal_squares, [PieceTypes.rook, PieceTypes.queen], enemy_color)
-            or self.__enemy_piece_is_at_square(pawn_attack_squares, [PieceTypes.pawn], enemy_color)
-            or self.__enemy_piece_is_at_square(knight_squares, [PieceTypes.knight], enemy_color)
-            or self.__enemy_piece_is_at_square(adjacent_squares, [PieceTypes.king], enemy_color))
+        squares_to_check_for_pieces = [
+            (diagonal_squares, [PieceTypes.bishop, PieceTypes.queen]),
+            (orthogonal_squares, [PieceTypes.rook, PieceTypes.queen]),
+            (pawn_attack_squares, [PieceTypes.pawn]),
+            (knight_squares, [PieceTypes.knight]),
+            (adjacent_squares, [PieceTypes.king])
+        ]
+
+        return any(self.__enemy_piece_is_at_square(list_of_squares, list_of_pieces, enemy_color) for list_of_squares, list_of_pieces in squares_to_check_for_pieces)
 
     def __enemy_piece_is_at_square(self, list_of_squares: list[Coordinates], list_of_pieces: list[PieceTypes], enemy_color: Color) -> bool:
         for square in list_of_squares:
@@ -115,14 +149,14 @@ class Board:
 
         return False
 
-    def __get_king(self: Board, color: Color) -> Piece:
+    def __get_king(self: Board, color: Color) -> Piece | None:
         king_with_color_list = [piece for piece in self.__pieces if piece.type == PieceTypes.king and piece.color == color]
 
         if len(king_with_color_list) > 1:
             raise ValueError("More than one king on %s team" % color.name)
 
         if len(king_with_color_list) == 0:
-            raise ValueError("No king on %s team" % color.name)
+            return None
 
         return king_with_color_list.pop()
 

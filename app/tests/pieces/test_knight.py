@@ -23,7 +23,6 @@ def test_knight_can_only_move_to_knight_squares(square_to_move_to: str, should_b
     board = Board([knight])
 
     can_move = Coordinates.convert_from_grid_value(square_to_move_to) in knight.get_possible_moves(board)
-
     assert can_move == should_be_able_to_move
 
 @pytest.mark.parametrize(
