@@ -6,7 +6,7 @@ import pygame
 game = Game()
 screen = Screen()
 
-while not any(event.type == pygame.QUIT for event in pygame.event.get()) and not game.over():
+while not (screen.should_exit() or game.over()):
     screen.update(game.board)
     game.take_turn()
     game.player.swap_color()

@@ -1,11 +1,12 @@
 
 from __future__ import annotations
+from ..data import board_size, board_edge_thickness, board_border_thickness, square_size
+from math import floor
 
 
 class Coordinates(tuple[int, int]):
-    board_size = 8  # TODO - Consider name
     y_grid_values = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    x_grid_values = ['1', '2', '3', '4', '5', '6', '7', '8']
+    x_grid_values = ['8', '7', '6', '5', '4', '3', '2', '1']
 
     def __init__(self: Coordinates, coordinates: tuple[int, int]) -> None:
         self.x = coordinates[1]
@@ -13,7 +14,7 @@ class Coordinates(tuple[int, int]):
 
     @property
     def within_board(self: Coordinates) -> bool:
-        return self.y >= 0 and self.x >= 0 and self.y < Coordinates.board_size and self.x < Coordinates.board_size
+        return self.y >= 0 and self.x >= 0 and self.y < board_size and self.x < board_size
 
     @staticmethod
     def get_coordinates(input_text: str) -> Coordinates:
@@ -24,6 +25,18 @@ class Coordinates(tuple[int, int]):
 
             except ValueError as e:
                 print("\n" + "%s" % e)
+
+    @staticmethod
+    def get_coordinates_from_mouse_position(x_position: int, y_position: int) -> Coordinates | None:
+        x_coord = Coordinates.__get_coordinate_from_position(x_position)
+        y_coord = Coordinates.__get_coordinate_from_position(y_position)
+
+        return Coordinates((y_coord, x_coord))
+
+    @staticmethod
+    def __get_coordinate_from_position(position: int) -> int:
+        return floor((position - board_edge_thickness -
+                      board_border_thickness * 2) / square_size)
 
     @staticmethod
     def convert_from_grid_value(coordinates: str) -> Coordinates:

@@ -5,3 +5,4 @@ from .movement import *
 from .pieces import *
 from .player import *
 from .repository import *
+from .data import *
