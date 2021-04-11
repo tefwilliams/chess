@@ -5,7 +5,7 @@ import pygame
 game = Game()
 
 while not game.over():
-    game.update_display(game.board)
+    game.update_display()
     game.take_turn()
     game.player.swap_color()
 

@@ -6,7 +6,7 @@ from ..repository import display_board, get_starting_pieces
 from ..board import Board
 from ..player import Player
 from ..pieces import Piece
-from ..data import display_size, black, white, gray, board_size, board_edge_thickness, board_border_thickness, square_size
+from ..data import display_size, black, white, gray, yellow, board_size, board_edge_thickness, board_border_thickness, square_size
 
 
 class Game:
@@ -51,13 +51,10 @@ class Game:
                 origin_coordinates = self.__wait_for_coordinate_selection()
                 piece_to_move = self.board.get_piece(origin_coordinates)
 
-                if not piece_to_move:
-                    raise ValueError("No piece at %s" % Coordinates.convert_to_grid_value(
-                        origin_coordinates))
+                if not piece_to_move or piece_to_move.color != self.__player.color:
+                    continue
 
-                if piece_to_move.color != self.__player.color:
-                    raise ValueError(
-                        "You cannot move the opposing team's piece")
+                self.__highlight_square(origin_coordinates)
 
                 print("\n" + "You have chosen: %s" % piece_to_move.symbol)
 
@@ -86,16 +83,16 @@ class Game:
                     if coordinates and coordinates.within_board:
                         return coordinates
 
-    def update_display(self: Game, board: Board) -> None:
-        self.__create_empty_squares()
-
-        for piece in board.pieces:
-            self.__display_piece(piece)
-
+    def __highlight_square(self: Game, coordinates: Coordinates) -> None:
+        self.__create_square(coordinates, yellow)
         pygame.display.update()
 
-    def __create_empty_squares(self: Game) -> None:
-        [self.__create_empty_square(row_number, column_number)
+    def update_display(self: Game) -> None:
+        self.__create_squares()
+        pygame.display.update()
+
+    def __create_squares(self: Game) -> None:
+        [self.__create_square(Coordinates((row_number, column_number)))
          for row_number in range(board_size) for column_number in range(board_size)]
 
     def __create_board_edge(self: Game) -> None:
@@ -111,18 +108,24 @@ class Game:
         pygame.draw.rect(self.screen, gray, [
             inner_margin, inner_margin, inner_size, inner_size])
 
-    def __create_empty_square(self: Game, row_number: int, column_number: int) -> None:
-        square_color = white if (
-            row_number + column_number) % 2 == 0 else gray
+    def __create_square(self: Game, coordinates: Coordinates, square_color: tuple[int, int, int] = None) -> None:
+        if not square_color:
+            square_color = white if (
+                coordinates.y + coordinates.x) % 2 == 0 else gray
 
         pygame.draw.rect(self.screen, square_color,
-                         self.__get_square_parameters(row_number, column_number))
+                         self.__get_square_dimensions(coordinates))
 
-    def __get_square_parameters(self: Game, row_number: int, column_number: int) -> tuple[int, int, int, int]:
+        piece_at_square = self.board.get_piece(coordinates)
+
+        if piece_at_square:
+            self.__display_piece(piece_at_square)
+
+    def __get_square_dimensions(self: Game, coordinates: Coordinates) -> tuple[int, int, int, int]:
         board_margin = board_border_thickness * 2 + board_edge_thickness
 
-        left_margin = board_margin + square_size * column_number
-        top_margin = board_margin + square_size * row_number
+        left_margin = board_margin + square_size * coordinates.x
+        top_margin = board_margin + square_size * coordinates.y
 
         return (left_margin, top_margin, square_size, square_size)
 
