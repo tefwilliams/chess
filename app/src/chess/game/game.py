@@ -6,19 +6,20 @@ from ..repository import display_board, get_starting_pieces
 from ..board import Board
 from ..player import Player
 from ..pieces import Piece
-from ..data import display_size, black, white, gray, yellow, board_size, board_edge_thickness, board_border_thickness, square_size
+from ..data import display_size, black, white, cream, yellow, green, light_green, brown, light_brown, board_size, board_edge_thickness, board_border_thickness, square_size
 
 
 class Game:
     def __init__(self: Game) -> None:
         self.board = Board(get_starting_pieces())
+        self.__last_move: tuple[Coordinates, Coordinates]
         self.__player = Player()
         self.__intialize_display()
 
     def __intialize_display(self: Game) -> None:
         pygame.init()
         self.screen = pygame.display.set_mode((display_size, display_size))
-        self.screen.fill(gray)
+        self.screen.fill(brown)
 
         self.text_font = pygame.font.SysFont('arial', 25)
         self.symbol_font = pygame.font.SysFont('segoeuisymbol', 40)
@@ -29,8 +30,8 @@ class Game:
         pygame.display.set_icon(icon)
 
         self.__create_board_edge()
-        self.__label_columns()
-        self.__label_rows()
+        # self.__label_columns()
+        # self.__label_rows()
 
     @property
     def player(self: Game) -> Player:
@@ -47,19 +48,22 @@ class Game:
 
     def take_turn(self: Game) -> None:
         while True:
+            self.__update_display()
+
+            origin_coordinates = self.__wait_for_coordinate_selection()
+            piece_to_move = self.board.get_piece(origin_coordinates)
+
+            if not piece_to_move or piece_to_move.color != self.__player.color:
+                continue
+
+            self.__highlight_square(origin_coordinates)
+
+            destination_coordinates = self.__wait_for_coordinate_selection()
+
+            if destination_coordinates == origin_coordinates:
+                continue
+
             try:
-                origin_coordinates = self.__wait_for_coordinate_selection()
-                piece_to_move = self.board.get_piece(origin_coordinates)
-
-                if not piece_to_move or piece_to_move.color != self.__player.color:
-                    continue
-
-                self.__highlight_square(origin_coordinates)
-
-                print("\n" + "You have chosen: %s" % piece_to_move.symbol)
-
-                destination_coordinates = self.__wait_for_coordinate_selection()
-
                 self.board.evaluate_move(
                     piece_to_move, destination_coordinates)
 
@@ -67,28 +71,40 @@ class Game:
                 print("\n%s" % e)
 
             else:
+                self.__last_move = (origin_coordinates,
+                                    destination_coordinates)
                 break
 
+    @ staticmethod
+    def quit() -> None:
+        pygame.quit()
+        quit()
+
+    # TODO - maybe put on Coordinates
     def __wait_for_coordinate_selection(self: Game) -> Coordinates:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
+                    Game.quit()  # if put on coordinates maybe move this out of game?
 
                 if event.type == pygame.MOUSEBUTTONUP:
                     coordinates = Coordinates.get_coordinates_from_mouse_position(
                         *pygame.mouse.get_pos())
 
-                    if coordinates and coordinates.within_board:
+                    if coordinates.within_board:
                         return coordinates
 
     def __highlight_square(self: Game, coordinates: Coordinates) -> None:
-        self.__create_square(coordinates, yellow)
+        self.__create_square(coordinates, True)
         pygame.display.update()
 
-    def update_display(self: Game) -> None:
+    def __update_display(self: Game) -> None:
         self.__create_squares()
+
+        # if self.__last_move:
+        #     [self.__highlight_square(coordinates)
+        #      for coordinates in self.__last_move]
+
         pygame.display.update()
 
     def __create_squares(self: Game) -> None:
@@ -99,19 +115,22 @@ class Game:
         outer_margin = board_border_thickness
         outer_size = display_size - outer_margin * 2
 
-        pygame.draw.rect(self.screen, white, [
+        pygame.draw.rect(self.screen, light_brown, [
                          outer_margin, outer_margin, outer_size, outer_size])
 
         inner_margin = board_border_thickness + board_edge_thickness
         inner_size = display_size - inner_margin * 2
 
-        pygame.draw.rect(self.screen, gray, [
+        pygame.draw.rect(self.screen, brown, [
             inner_margin, inner_margin, inner_size, inner_size])
 
-    def __create_square(self: Game, coordinates: Coordinates, square_color: tuple[int, int, int] = None) -> None:
-        if not square_color:
-            square_color = white if (
-                coordinates.y + coordinates.x) % 2 == 0 else gray
+    def __create_square(self: Game, coordinates: Coordinates, highlighted: bool = False) -> None:
+        square_color = cream if (
+            coordinates.y + coordinates.x) % 2 == 0 else green
+
+        if highlighted:
+            square_color = yellow if (
+                coordinates.y + coordinates.x) % 2 == 0 else light_green
 
         pygame.draw.rect(self.screen, square_color,
                          self.__get_square_dimensions(coordinates))

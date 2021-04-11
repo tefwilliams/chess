@@ -27,10 +27,9 @@ class Coordinates(tuple[int, int]):
                 print("\n" + "%s" % e)
 
     @staticmethod
-    def get_coordinates_from_mouse_position(x_position: int, y_position: int) -> Coordinates | None:
+    def get_coordinates_from_mouse_position(x_position: int, y_position: int) -> Coordinates:
         x_coord = Coordinates.__get_coordinate_from_position(x_position)
         y_coord = Coordinates.__get_coordinate_from_position(y_position)
-
         return Coordinates((y_coord, x_coord))
 
     @staticmethod
