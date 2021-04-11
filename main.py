@@ -18,3 +18,4 @@ elif game.stale_mate():
           str(game.player.color.name).capitalize() + "\n")
 
 Game.quit()
+ 

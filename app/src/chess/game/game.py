@@ -41,19 +41,23 @@ class Game:
         return self.check_mate() or self.stale_mate()
 
     def check_mate(self: Game) -> bool:
-        return self.board.check_mate(self.__player.color)
+        return self.board.check_mate(self.player.color)
 
     def stale_mate(self: Game) -> bool:
-        return self.board.stale_mate(self.__player.color)
+        return self.board.stale_mate(self.player.color)
 
     def take_turn(self: Game) -> None:
+        origin_coordinates = None
+
         while True:
             self.__update_display()
 
-            origin_coordinates = self.__wait_for_coordinate_selection()
-            piece_to_move = self.board.get_piece(origin_coordinates)
+            if not origin_coordinates:
+                origin_coordinates = self.__wait_for_coordinate_selection()
 
-            if not piece_to_move or piece_to_move.color != self.__player.color:
+            piece_at_origin = self.board.get_piece(origin_coordinates)
+
+            if not piece_at_origin or piece_at_origin.color != self.__player.color:
                 continue
 
             self.__highlight_square(origin_coordinates)
@@ -61,16 +65,25 @@ class Game:
             destination_coordinates = self.__wait_for_coordinate_selection()
 
             if destination_coordinates == origin_coordinates:
+                origin_coordinates = None
+                continue
+
+            piece_at_destination = self.board.get_piece(
+                destination_coordinates)
+
+            if piece_at_destination and piece_at_destination.color == self.player.color:
+                origin_coordinates = destination_coordinates
                 continue
 
             try:
                 self.board.evaluate_move(
-                    piece_to_move, destination_coordinates)
+                    piece_at_origin, destination_coordinates)
 
             except ValueError as e:
                 print("\n%s" % e)
 
             else:
+                self.board.update_possible_moves()
                 self.__last_move = (origin_coordinates,
                                     destination_coordinates)
                 break
@@ -83,16 +96,23 @@ class Game:
     # TODO - maybe put on Coordinates
     def __wait_for_coordinate_selection(self: Game) -> Coordinates:
         while True:
+            coordinates = Coordinates.get_coordinates_from_mouse_position(
+                *pygame.mouse.get_pos())
+
+            piece_at_coordinates = self.board.get_piece(coordinates)
+
+            if piece_at_coordinates and piece_at_coordinates.color == self.player.color:
+                pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_HAND)
+
+            else:
+                pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_ARROW)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     Game.quit()  # if put on coordinates maybe move this out of game?
 
-                if event.type == pygame.MOUSEBUTTONUP:
-                    coordinates = Coordinates.get_coordinates_from_mouse_position(
-                        *pygame.mouse.get_pos())
-
-                    if coordinates.within_board:
-                        return coordinates
+                if event.type == pygame.MOUSEBUTTONUP and coordinates.within_board:
+                    return coordinates
 
     def __highlight_square(self: Game, coordinates: Coordinates) -> None:
         self.__create_square(coordinates, True)
@@ -101,6 +121,7 @@ class Game:
     def __update_display(self: Game) -> None:
         self.__create_squares()
 
+        # TODO - add highlighting for last move
         # if self.__last_move:
         #     [self.__highlight_square(coordinates)
         #      for coordinates in self.__last_move]

@@ -11,7 +11,7 @@ class Board:
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
-        self.__update_all_possible_moves()
+        self.update_possible_moves()
 
     @property
     def pieces(self: Board) -> list[Piece]:
@@ -30,32 +30,30 @@ class Board:
 
         return pieces_with_coordinates.pop()
 
-    def evaluate_move(self: Board, piece: Piece, coordinates: Coordinates, should_move: bool = True) -> None:
-        if should_move:
-            self.__update_all_possible_moves()
+    def evaluate_move(self: Board, piece_at_origin: Piece, destination_coordinates: Coordinates, should_move: bool = True) -> None:
+        piece_at_destination = self.get_piece(destination_coordinates)
 
-        piece_at_destination = self.get_piece(coordinates)
-
-        if coordinates not in piece.possible_moves:
+        if destination_coordinates not in piece_at_origin.possible_moves:
             raise ValueError("You cannot make this move")
 
-        if not piece_at_destination and piece.type == PieceTypes.pawn and self.en_passant_valid(coordinates, piece.color):
-            y = -1 if piece.color == Color.white else 1
+        if not piece_at_destination and piece_at_origin.type == PieceTypes.pawn and self.en_passant_valid(destination_coordinates, piece_at_origin.color):
+            y = -1 if piece_at_origin.color == Color.white else 1
             piece_at_destination = self.get_piece(
-                Direction((y, 0)).step(coordinates))
+                Direction((y, 0)).step(destination_coordinates))
 
-        self.__move_piece(piece, coordinates, piece_at_destination)
+        self.__move_piece(
+            piece_at_origin, destination_coordinates, piece_at_destination)
 
-        if self.is_in_check(piece.color):
-            self.__restore(piece, piece_at_destination)
+        if self.is_in_check(piece_at_origin.color):
+            self.__restore(piece_at_origin, piece_at_destination)
             raise ValueError(
                 "You can't make this move because it will leave you in check")
 
         elif not should_move:
-            self.__restore(piece, piece_at_destination)
+            self.__restore(piece_at_origin, piece_at_destination)
 
         else:
-            self.__last_piece_to_move = piece
+            self.__last_piece_to_move = piece_at_origin
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
         if piece_at_destination:
@@ -69,7 +67,7 @@ class Board:
         if removed_piece and removed_piece not in self.__pieces:
             self.__pieces.append(removed_piece)
 
-    def __update_all_possible_moves(self: Board) -> None:
+    def update_possible_moves(self: Board) -> None:
         for piece in self.__pieces:
             piece.update_possible_moves(self)
 
