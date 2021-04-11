@@ -1,13 +1,11 @@
 
 from chess import Game, Color, display_board
-from test import Screen
 import pygame
 
 game = Game()
-screen = Screen()
 
-while not (screen.should_exit() or game.over()):
-    screen.update(game.board)
+while not game.over():
+    game.update_display(game.board)
     game.take_turn()
     game.player.swap_color()
 
