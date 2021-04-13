@@ -1,10 +1,8 @@
 
 from __future__ import annotations
-from chess.pieces.piece import PieceTypes
 import pygame
 from ..coordinates import Coordinates
-from ..player import Color
-from ..repository import display_board, get_starting_pieces
+from ..repository import get_starting_pieces
 from ..board import Board
 from ..player import Player
 from ..pieces import Piece
@@ -31,8 +29,6 @@ class Game:
         pygame.display.set_icon(icon)
 
         self.__create_board_edge()
-        # self.__label_columns()
-        # self.__label_rows()
 
     @property
     def player(self: Game) -> Player:
@@ -169,62 +165,6 @@ class Game:
         top_margin = board_margin + square_size * coordinates.y
 
         return (left_margin, top_margin, square_size, square_size)
-
-    def __label_columns(self: Game) -> None:
-        board_margin = board_border_thickness * 2 + board_edge_thickness
-        column_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-
-        for column_number in range(board_size):
-            column_label = column_labels[column_number]
-
-            text = self.font.render(
-                column_label, True, black)
-
-            # TODO - consider calling get_rect() once
-            text_width = text.get_rect().width
-            text_height = text.get_rect().height
-
-            left_margin = board_margin + \
-                square_size * column_number + \
-                (square_size - text_width) / 2
-
-            top_margin = (board_margin - text_height) / 2
-
-            # TODO - consider naming of bottom_margin (not actually bottom margin)
-            bottom_margin = board_margin + \
-                square_size * board_size + \
-                top_margin
-
-            self.screen.blit(text, (left_margin, top_margin))
-            self.screen.blit(text, (left_margin, bottom_margin))
-
-    def __label_rows(self: Game) -> None:
-        board_margin = board_border_thickness * 2 + board_edge_thickness
-        row_labels = ['8', '7', '6', '5', '4', '3', '2', '1']
-
-        for row_number in range(board_size):
-            column_label = row_labels[row_number]
-
-            text = self.font.render(
-                column_label, True, black)
-
-            # TODO - consider calling get_rect() once
-            text_width = text.get_rect().width
-            text_height = text.get_rect().height
-
-            left_margin = (board_margin - text_width) / 2
-
-            # TODO - consider naming of right_margin (not actually right margin)
-            right_margin = board_margin + \
-                square_size * board_size + \
-                left_margin
-
-            top_margin = board_margin + \
-                square_size * row_number + \
-                (square_size - text_height) / 2
-
-            self.screen.blit(text, (left_margin, top_margin))
-            self.screen.blit(text, (right_margin, top_margin))
 
     def __display_piece(self: Game, piece: Piece) -> None:
         piece_icon = pygame.image.load('icons/%s_%s.png' % (piece.color.name, piece.type.name))

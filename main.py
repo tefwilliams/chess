@@ -1,6 +1,5 @@
 
-from chess import Game, Color, display_board
-import pygame
+from chess import Game, Color
 
 game = Game()
 
