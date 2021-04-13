@@ -1,7 +1,9 @@
 
 from __future__ import annotations
+from chess.pieces.piece import PieceTypes
 import pygame
 from ..coordinates import Coordinates
+from ..player import Color
 from ..repository import display_board, get_starting_pieces
 from ..board import Board
 from ..player import Player
@@ -21,12 +23,11 @@ class Game:
         self.screen = pygame.display.set_mode((display_size, display_size))
         self.screen.fill(brown)
 
-        self.text_font = pygame.font.SysFont('arial', 25)
-        self.symbol_font = pygame.font.SysFont('segoeuisymbol', 40)
+        self.font = pygame.font.SysFont('arial', 25)
 
         pygame.display.set_caption("Chess")
 
-        icon = pygame.image.load("icons/game_icon.png")
+        icon = pygame.image.load("icons/game_favicon.png")
         pygame.display.set_icon(icon)
 
         self.__create_board_edge()
@@ -176,7 +177,7 @@ class Game:
         for column_number in range(board_size):
             column_label = column_labels[column_number]
 
-            text = self.text_font.render(
+            text = self.font.render(
                 column_label, True, black)
 
             # TODO - consider calling get_rect() once
@@ -204,7 +205,7 @@ class Game:
         for row_number in range(board_size):
             column_label = row_labels[row_number]
 
-            text = self.text_font.render(
+            text = self.font.render(
                 column_label, True, black)
 
             # TODO - consider calling get_rect() once
@@ -226,22 +227,8 @@ class Game:
             self.screen.blit(text, (right_margin, top_margin))
 
     def __display_piece(self: Game, piece: Piece) -> None:
-        board_margin = board_border_thickness * 2 + board_edge_thickness
-        row_number, column_number = piece.coordinates
+        piece_icon = pygame.image.load('icons/%s_%s.png' % (piece.color.name, piece.type.name))
+        left_margin, top_margin, square_size, square_size = self.__get_square_dimensions(piece.coordinates)
 
-        symbol = self.symbol_font.render(
-            piece.symbol, True, black)
-
-        # TODO - consider calling get_rect() once
-        symbol_width = symbol.get_rect().width
-        symbol_height = symbol.get_rect().height
-
-        left_margin = board_margin + \
-            square_size * column_number + \
-            (square_size - symbol_width) / 2
-
-        top_margin = board_margin + \
-            square_size * row_number + \
-            (square_size - symbol_height) / 2
-
-        self.screen.blit(symbol, (left_margin, top_margin))
+        scaled_piece_icon = pygame.transform.scale(piece_icon, (square_size, square_size))
+        self.screen.blit(scaled_piece_icon, (left_margin, top_margin))

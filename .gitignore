@@ -2,3 +2,4 @@
 __pycache__
 chess_moves.txt
 **/chess.egg-info
+.DS_Store
