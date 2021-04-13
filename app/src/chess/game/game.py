@@ -55,6 +55,7 @@ class Game:
             piece_at_origin = self.board.get_piece(origin_coordinates)
 
             if not piece_at_origin or piece_at_origin.color != self.__player.color:
+                origin_coordinates = None
                 continue
 
             self.__highlight_square(origin_coordinates)
@@ -167,8 +168,23 @@ class Game:
         return (left_margin, top_margin, square_size, square_size)
 
     def __display_piece(self: Game, piece: Piece) -> None:
-        piece_icon = pygame.image.load('icons/%s_%s.png' % (piece.color.name, piece.type.name))
-        left_margin, top_margin, square_size, square_size = self.__get_square_dimensions(piece.coordinates)
+        piece_icon = pygame.image.load(
+            'icons/%s_%s.png' % (piece.color.name, piece.type.name))
+        left_margin, top_margin, square_size, square_size = self.__get_square_dimensions(
+            piece.coordinates)
 
-        scaled_piece_icon = pygame.transform.scale(piece_icon, (square_size, square_size))
+        icon_rect = piece_icon.get_rect()
+        icon_width = icon_rect.width
+        icon_height = icon_rect.height
+
+        aspect_ratio = icon_width / icon_height
+
+        icon_height = square_size * 0.8
+        icon_width = aspect_ratio * icon_height
+
+        left_margin += (square_size - icon_width) / 2
+        top_margin += (square_size - icon_height) / 2
+
+        scaled_piece_icon = pygame.transform.scale(
+            piece_icon, (round(icon_width), round(icon_height)))
         self.screen.blit(scaled_piece_icon, (left_margin, top_margin))
