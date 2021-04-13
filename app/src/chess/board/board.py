@@ -11,6 +11,7 @@ class Board:
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
+        self.__last_piece_to_move = None
         self.update_possible_moves()
 
     @property
@@ -54,6 +55,7 @@ class Board:
 
         else:
             self.__last_piece_to_move = piece_at_origin
+            self.update_possible_moves()
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
         if piece_at_destination:

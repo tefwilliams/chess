@@ -81,7 +81,7 @@ class Game:
                 print("\n%s" % e)
 
             else:
-                self.board.update_possible_moves()
+                # self.board.update_possible_moves()
                 self.__last_move = (origin_coordinates,
                                     destination_coordinates)
                 break
