@@ -18,5 +18,5 @@ class Bishop(Piece):
 
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         diagonal_squares = Movement.get_diagonal_squares(self.coordinates)
-        return board.get_unobstructed_squares(self.color, diagonal_squares)
+        return board.get_valid_moves(self, diagonal_squares)
         

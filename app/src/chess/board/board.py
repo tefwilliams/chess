@@ -75,10 +75,23 @@ class Board:
         each(lambda piece: piece.update_possible_moves(self), self.__pieces)
 
     def get_valid_moves(self: Board, piece: Piece, moves: list[list[Coordinates]]) -> list[Coordinates]:
-        valid_moves = sum(moves, [])
+        valid_moves = [move for list_of_moves in moves for move in list_of_moves]
 
         if not piece.type == PieceTypes.knight:
             valid_moves = self.get_unobstructed_squares(piece.color, moves)
+
+        for move in valid_moves:
+            piece_at_destination = self.get_piece(move)
+
+            if piece_at_destination:
+                self.__pieces.remove(piece_at_destination)
+            
+            piece.move(move)
+
+            if self.is_in_check(piece.color):
+                valid_moves.remove(move)
+
+            self.__restore(piece, piece_at_destination)
 
         return valid_moves
 
