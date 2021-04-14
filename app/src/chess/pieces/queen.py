@@ -15,11 +15,6 @@ class Queen(Piece):
 
     def __init__(self: Queen, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
-        self.__symbol = '\u2655' if self.color == Color.white else '\u265B'
-
-    @property
-    def symbol(self: Queen) -> str:
-        return self.__symbol
 
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         diagonal_squares = Movement.get_diagonal_squares(self.coordinates)

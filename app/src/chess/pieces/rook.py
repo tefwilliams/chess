@@ -15,11 +15,6 @@ class Rook(Piece):
 
     def __init__(self: Rook, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
-        self.__symbol = '\u2656' if self.color == Color.white else '\u265C'
-
-    @property
-    def symbol(self: Rook) -> str:
-        return self.__symbol
 
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         orthogonal_squares = Movement.get_orthogonal_squares(self.coordinates)

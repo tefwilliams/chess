@@ -15,11 +15,6 @@ class Knight(Piece):
 
     def __init__(self: Knight, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
-        self.__symbol = '\u2658' if self.color == Color.white else '\u265E'
-
-    @property
-    def symbol(self: Knight) -> str:
-        return self.__symbol
 
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         knight_squares = Movement.get_knight_squares(self.coordinates)

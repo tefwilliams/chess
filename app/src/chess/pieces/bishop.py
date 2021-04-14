@@ -15,11 +15,6 @@ class Bishop(Piece):
 
     def __init__(self: Bishop, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
-        self.__symbol = '\u2657' if self.color == Color.white else '\u265D'
-
-    @property
-    def symbol(self: Bishop) -> str:
-        return self.__symbol
 
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         diagonal_squares = Movement.get_diagonal_squares(self.coordinates)

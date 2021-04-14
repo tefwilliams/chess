@@ -16,10 +16,6 @@ class Piece:
         self.__color = color
         self.__previous_coordinates = coordinates
         self.__coordinates = coordinates
-
-    @property
-    def symbol(self: Piece) -> str:
-        raise NotImplementedError
  
     @property
     def color(self: Piece) -> Color:

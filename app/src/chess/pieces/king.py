@@ -15,11 +15,6 @@ class King(Piece):
 
     def __init__(self: King, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
-        self.__symbol = '\u2654' if self.color == Color.white else '\u265A'
-
-    @property
-    def symbol(self: King) -> str:
-        return self.__symbol
 
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         possible_moves: list[Coordinates] = []

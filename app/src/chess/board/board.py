@@ -143,7 +143,7 @@ class Board:
             (knight_squares, [PieceTypes.knight]),
             (adjacent_squares, [PieceTypes.king])
         ]
-        
+
         return any(self.__enemy_piece_is_at_square(list_of_squares, list_of_pieces, enemy_color) for list_of_squares, list_of_pieces in squares_to_check_for_pieces)
 
     def __enemy_piece_is_at_square(self, list_of_squares: list[Coordinates], list_of_pieces: list[PieceTypes], enemy_color: Color) -> bool:
@@ -169,16 +169,16 @@ class Board:
         return False
 
     def __get_king(self: Board, color: Color) -> Piece | None:
-        king_with_color_list = [
-            piece for piece in self.__pieces if piece.type == PieceTypes.king and piece.color == color]
+        player_pieces = self.__get_pieces_by_color(color)
+        player_king_list = list(filter(lambda piece: piece.type == PieceTypes.king, player_pieces))
 
-        if len(king_with_color_list) > 1:
-            raise ValueError("More than one king on %s team" % color.name)
+        if len(player_king_list) > 1:
+            raise RuntimeError("More than one king on %s team" % color.name)
 
-        if len(king_with_color_list) == 0:
+        if len(player_king_list) == 0:
             return None
 
-        return king_with_color_list.pop()
+        return player_king_list.pop()
 
     def __get_pieces_by_color(self: Board, color: Color) -> list[Piece]:
         return list(filter(lambda piece: piece.color == color, self.pieces))
@@ -188,11 +188,9 @@ class Board:
         list_of_coordinates = [Coordinates((y, x)) for y in range(
             self.size) for x in range(self.size)]
 
-        for coordinates in list_of_coordinates:
-            if self.__can_any_piece_move(player_pieces, coordinates):
-                return True
-
-        return False
+        # TODO - change this to piece first to make more readable
+        # also should end up being that length of possible moves is zero
+        return any(self.__can_any_piece_move(player_pieces, coordinates) for coordinates in list_of_coordinates)
 
     def check_mate(self: Board, color: Color) -> bool:
         return self.is_in_check(color) and not self.__any_possible_moves(color)

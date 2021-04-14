@@ -2,7 +2,7 @@
 from __future__ import annotations
 import pygame
 from ..coordinates import Coordinates
-from ..repository import get_starting_pieces
+from ..repository import get_starting_pieces, each
 from ..board import Board
 from ..player import Player
 from ..pieces import Piece
@@ -126,7 +126,7 @@ class Game:
                     return coordinates
 
     def __display_possible_moves(self: Game, list_of_moves: list[Coordinates]) -> None:
-        [self.__display_possible_move(move) for move in list_of_moves]
+        each(self.__display_possible_move, list_of_moves)
         pygame.display.update()
 
     def __display_possible_move(self: Game, coordinates: Coordinates) -> None:
