@@ -34,7 +34,7 @@ class Board:
 
         return pieces_with_coordinates.pop()
 
-    def evaluate_move(self: Board, piece_at_origin: Piece, destination_coordinates: Coordinates, should_move: bool = True) -> None:
+    def evaluate_move(self: Board, piece_at_origin: Piece, destination_coordinates: Coordinates) -> None:
         piece_at_destination = self.get_piece(destination_coordinates)
 
         if destination_coordinates not in piece_at_origin.possible_moves:
@@ -48,17 +48,8 @@ class Board:
         self.__move_piece(
             piece_at_origin, destination_coordinates, piece_at_destination)
 
-        if self.is_in_check(piece_at_origin.color):
-            self.__restore(piece_at_origin, piece_at_destination)
-            raise ValueError(
-                "You can't make this move because it will leave you in check")
-
-        elif not should_move:
-            self.__restore(piece_at_origin, piece_at_destination)
-
-        else:
-            self.__last_piece_to_move = piece_at_origin
-            self.update_possible_moves()
+        self.__last_piece_to_move = piece_at_origin
+        self.update_possible_moves()
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
         if piece_at_destination:
@@ -150,29 +141,11 @@ class Board:
             (adjacent_squares, [PieceTypes.king])
         ]
 
-        return any(self.__enemy_piece_is_at_square(list_of_squares, list_of_pieces, enemy_color) for list_of_squares, list_of_pieces in squares_to_check_for_pieces)
+        return any(map(lambda squares_and_pieces: self.__enemy_piece_is_at_square(*squares_and_pieces, enemy_color), squares_to_check_for_pieces))
 
     def __enemy_piece_is_at_square(self, list_of_squares: list[Coordinates], list_of_pieces: list[PieceTypes], enemy_color: Color) -> bool:
-        for square in list_of_squares:
-            piece_at_destination = self.get_piece(square)
-
-            if piece_at_destination and piece_at_destination.color == enemy_color and piece_at_destination.type in list_of_pieces:
-                return True
-
-        return False
-
-    def __can_any_piece_move(self: Board, pieces: list[Piece], coordinates: Coordinates) -> bool:
-        for piece in pieces:
-            try:
-                self.evaluate_move(piece, coordinates, False)
-
-            except ValueError:
-                pass
-
-            else:
-                return True
-
-        return False
+        return any(map(lambda piece: piece and piece.color ==
+                       enemy_color and piece.type in list_of_pieces, map(self.get_piece, list_of_squares)))
 
     def __get_king(self: Board, color: Color) -> Piece | None:
         player_pieces = self.__get_pieces_by_color(color)
@@ -192,12 +165,7 @@ class Board:
 
     def __any_possible_moves(self: Board, color: Color) -> bool:
         player_pieces = self.__get_pieces_by_color(color)
-        list_of_coordinates = [Coordinates((y, x)) for y in range(
-            self.size) for x in range(self.size)]
-
-        # TODO - change this to piece first to make more readable
-        # also should end up being that length of possible moves is zero
-        return any(self.__can_any_piece_move(player_pieces, coordinates) for coordinates in list_of_coordinates)
+        return any(map(lambda piece: len(piece.possible_moves) > 0, player_pieces))
 
     def check_mate(self: Board, color: Color) -> bool:
         return self.is_in_check(color) and not self.__any_possible_moves(color)
