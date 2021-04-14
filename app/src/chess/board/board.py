@@ -6,10 +6,11 @@ from ..coordinates import Coordinates, Direction
 from ..movement import Movement
 from ..player import Color
 from ..pieces import Piece, PieceTypes
+from ..data import board_size
 
 
 class Board:
-    size = 8  # TODO - use shared value at some point
+    size = board_size
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
@@ -75,25 +76,17 @@ class Board:
         each(lambda piece: piece.update_possible_moves(self), self.__pieces)
 
     def get_valid_moves(self: Board, piece: Piece, moves: list[list[Coordinates]]) -> list[Coordinates]:
-        valid_moves = [move for list_of_moves in moves for move in list_of_moves]
+        valid_moves = self.get_unobstructed_squares(piece.color, moves)
+        return list(filter(lambda coordinates: not self.__move_puts_king_in_check(piece, coordinates), valid_moves))
 
-        if not piece.type == PieceTypes.knight:
-            valid_moves = self.get_unobstructed_squares(piece.color, moves)
+    def __move_puts_king_in_check(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
+        piece_at_destination = self.get_piece(coordinates)
+        self.__move_piece(piece, coordinates, piece_at_destination)
 
-        for move in valid_moves:
-            piece_at_destination = self.get_piece(move)
+        in_check = self.is_in_check(piece.color)
+        self.__restore(piece, piece_at_destination)
 
-            if piece_at_destination:
-                self.__pieces.remove(piece_at_destination)
-            
-            piece.move(move)
-
-            if self.is_in_check(piece.color):
-                valid_moves.remove(move)
-
-            self.__restore(piece, piece_at_destination)
-
-        return valid_moves
+        return in_check
 
     def get_unobstructed_squares(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
         unobstructed_squares: list[Coordinates] = []
@@ -183,7 +176,8 @@ class Board:
 
     def __get_king(self: Board, color: Color) -> Piece | None:
         player_pieces = self.__get_pieces_by_color(color)
-        player_king_list = list(filter(lambda piece: piece.type == PieceTypes.king, player_pieces))
+        player_king_list = list(
+            filter(lambda piece: piece.type == PieceTypes.king, player_pieces))
 
         if len(player_king_list) > 1:
             raise RuntimeError("More than one king on %s team" % color.name)

@@ -17,7 +17,7 @@ class King(Piece):
         super().__init__(coordinates, color)
 
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
-        possible_moves: list[Coordinates] = []
+        castle_moves: list[Coordinates] = []
         adjacent_squares = Movement.get_adjacent_squares(self.coordinates)
         castle_squares = Movement.get_castle_squares(self.coordinates)
 
@@ -31,9 +31,6 @@ class King(Piece):
                 and not board.is_in_check(self.color)
                 and not any(board.square_is_attacked(square, self.color) for square in list_of_squares[0: 1])
                     and all(board.get_piece(square) is None for square in list_of_squares[0: -1])):
-                possible_moves.append(list_of_squares[1])
+                castle_moves.append(list_of_squares[1])
 
-        possible_moves += board.get_unobstructed_squares(
-            self.color, adjacent_squares)
-
-        return possible_moves
+        return castle_moves + board.get_valid_moves(self, adjacent_squares)

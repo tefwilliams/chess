@@ -19,13 +19,17 @@ class Pawn(Piece):
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         possible_moves: list[list[Coordinates]] = []
 
-        squares = Movement.get_pawn_squares(self.coordinates, self.color, self.has_moved)
-        attack_squares = Movement.get_pawn_attack_squares(self.coordinates, self.color)
+        squares = Movement.get_pawn_squares(
+            self.coordinates, self.color, self.has_moved)
+        attack_squares = Movement.get_pawn_attack_squares(
+            self.coordinates, self.color)
 
         for list_of_squares in squares:
-            possible_moves.append([square for square in list_of_squares if not board.get_piece(square)])
+            possible_moves.append(
+                [square for square in list_of_squares if not board.get_piece(square)])
 
         for list_of_squares in attack_squares:
-            possible_moves.append([square for square in list_of_squares if board.get_piece(square) or board.en_passant_valid(square, self.color)])
+            possible_moves.append([square for square in list_of_squares if board.get_piece(
+                square) or board.en_passant_valid(square, self.color)])
 
-        return board.get_unobstructed_squares(self.color, possible_moves)
+        return board.get_valid_moves(self, possible_moves)

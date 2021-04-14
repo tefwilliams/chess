@@ -18,4 +18,4 @@ class Knight(Piece):
 
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         knight_squares = Movement.get_knight_squares(self.coordinates)
-        return board.get_unobstructed_squares(self.color, knight_squares)
+        return board.get_valid_moves(self, knight_squares)
