@@ -5,7 +5,6 @@ game = Game()
 
 while not game.over():
     game.take_turn()
-    game.player.swap_color()
 
 if game.check_mate():
     opposing_player_color = Color.get_opposing_color(game.player.color)

@@ -1,5 +1,7 @@
 
 from __future__ import annotations
+
+from ..repository import each
 from ..coordinates import Coordinates, Direction
 from ..movement import Movement
 from ..player import Color
@@ -70,8 +72,15 @@ class Board:
             self.__pieces.append(removed_piece)
 
     def update_possible_moves(self: Board) -> None:
-        for piece in self.__pieces:
-            piece.update_possible_moves(self)
+        each(lambda piece: piece.update_possible_moves(self), self.__pieces)
+
+    def get_valid_moves(self: Board, piece: Piece, moves: list[list[Coordinates]]) -> list[Coordinates]:
+        valid_moves = sum(moves, [])
+
+        if not piece.type == PieceTypes.knight:
+            valid_moves = self.get_unobstructed_squares(piece.color, moves)
+
+        return valid_moves
 
     def get_unobstructed_squares(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
         unobstructed_squares: list[Coordinates] = []
@@ -134,7 +143,7 @@ class Board:
             (knight_squares, [PieceTypes.knight]),
             (adjacent_squares, [PieceTypes.king])
         ]
-
+        
         return any(self.__enemy_piece_is_at_square(list_of_squares, list_of_pieces, enemy_color) for list_of_squares, list_of_pieces in squares_to_check_for_pieces)
 
     def __enemy_piece_is_at_square(self, list_of_squares: list[Coordinates], list_of_pieces: list[PieceTypes], enemy_color: Color) -> bool:
@@ -172,7 +181,7 @@ class Board:
         return king_with_color_list.pop()
 
     def __get_pieces_by_color(self: Board, color: Color) -> list[Piece]:
-        return [piece for piece in self.__pieces if piece.color == color]
+        return list(filter(lambda piece: piece.color == color, self.pieces))
 
     def __any_possible_moves(self: Board, color: Color) -> bool:
         player_pieces = self.__get_pieces_by_color(color)

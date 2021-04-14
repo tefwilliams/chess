@@ -57,6 +57,7 @@ class Game:
             else:
                 self.__last_move = (piece_at_origin.coordinates,
                                     destination_coordinates)
+                self.player.swap_color()
                 break
 
     def __create_board_edge(self: Game) -> None:
