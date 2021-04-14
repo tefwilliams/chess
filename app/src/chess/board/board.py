@@ -35,6 +35,8 @@ class Board:
         return pieces_with_coordinates.pop()
 
     def evaluate_move(self: Board, piece_at_origin: Piece, destination_coordinates: Coordinates) -> None:
+        # TODO - this logic needs to be tidied up
+        # Look into why possible moves aren't properly updated
         piece_at_destination = self.get_piece(destination_coordinates)
 
         if destination_coordinates not in piece_at_origin.possible_moves:
@@ -165,7 +167,7 @@ class Board:
 
     def __any_possible_moves(self: Board, color: Color) -> bool:
         player_pieces = self.__get_pieces_by_color(color)
-        return any(map(lambda piece: len(piece.possible_moves) > 0, player_pieces))
+        return any(len(piece.possible_moves) > 0 for piece in player_pieces)
 
     def check_mate(self: Board, color: Color) -> bool:
         return self.is_in_check(color) and not self.__any_possible_moves(color)
