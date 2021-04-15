@@ -14,6 +14,7 @@ class Piece:
 
     def __init__(self: Piece, coordinates: Coordinates, color: Color) -> None:
         self.__color = color
+        self.__backup_coordinates = coordinates
         self.__previous_coordinates = coordinates
         self.__coordinates = coordinates
 
@@ -42,6 +43,7 @@ class Piece:
         return self.__possible_moves
 
     def move(self: Piece, coordinates: Coordinates) -> None:
+        self.__backup_coordinates = self.__previous_coordinates
         self.__previous_coordinates = self.__coordinates
         self.__coordinates = coordinates
 
@@ -52,9 +54,9 @@ class Piece:
         raise NotImplementedError
 
     def revert_last_move(self: Piece) -> None:
-        # TODO - need to revert previous_coordinates
-        # maybe this could be done with a previous moves list
+        # TODO - maybe this could be done with a previous moves list
         self.__coordinates = self.__previous_coordinates
+        self.__previous_coordinates = self.__backup_coordinates
 
 
 class PieceTypes(Enum):
