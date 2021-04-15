@@ -68,9 +68,9 @@ class Board:
     def update_possible_moves(self: Board) -> None:
         each(lambda piece: piece.update_possible_moves(self), self.__pieces)
 
-    def get_valid_moves(self: Board, piece: Piece, moves: list[list[Coordinates]]) -> list[Coordinates]:
-        valid_moves = self.get_unobstructed_squares(piece.color, moves)
-        return list(filter(lambda coordinates: not self.__move_puts_king_in_check(piece, coordinates), valid_moves))
+    def get_legal_moves(self: Board, piece: Piece, moves: list[list[Coordinates]]) -> list[Coordinates]:
+        pseudo_legal_moves = self.get_unobstructed_squares(piece.color, moves)
+        return list(filter(lambda coordinates: not self.__move_puts_king_in_check(piece, coordinates), pseudo_legal_moves))
 
     def __move_puts_king_in_check(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         piece_at_destination = self.get_piece(coordinates)

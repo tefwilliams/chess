@@ -32,4 +32,4 @@ class Pawn(Piece):
             possible_moves.append([square for square in list_of_squares if board.get_piece(
                 square) or board.en_passant_valid(square, self.color)])
 
-        return board.get_valid_moves(self, possible_moves)
+        return board.get_legal_moves(self, possible_moves)

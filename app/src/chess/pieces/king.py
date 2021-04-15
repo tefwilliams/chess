@@ -33,4 +33,4 @@ class King(Piece):
                     and all(board.get_piece(square) is None for square in list_of_squares[0: -1])):
                 castle_moves.append(list_of_squares[1])
 
-        return castle_moves + board.get_valid_moves(self, adjacent_squares)
+        return castle_moves + board.get_legal_moves(self, adjacent_squares)

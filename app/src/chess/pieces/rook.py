@@ -18,4 +18,4 @@ class Rook(Piece):
 
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         orthogonal_squares = Movement.get_orthogonal_squares(self.coordinates)
-        return board.get_valid_moves(self, orthogonal_squares)
+        return board.get_legal_moves(self, orthogonal_squares)
