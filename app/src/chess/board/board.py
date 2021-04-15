@@ -56,21 +56,18 @@ class Board:
         # self.__board_history.append(deepcopy(self.pieces))
         self.update_possible_moves()
 
-    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> int | None:
+    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
         # self.__board_history.append(deepcopy(self.__pieces))
-        index = None
 
         if piece_at_destination:
-            index = self.__pieces.index(piece_at_destination)
             self.__pieces.remove(piece_at_destination)
 
         piece.move(coordinates)
-        return index
 
-    def __restore(self: Board, moved_piece: Piece, removed_piece: Piece | None, index: int | None) -> None:
+    def __restore(self: Board, moved_piece: Piece, removed_piece: Piece | None) -> None:
         moved_piece.revert_last_move()
 
-        if removed_piece and index and removed_piece not in self.__pieces:
+        if removed_piece and removed_piece not in self.__pieces:
             self.__pieces.append(removed_piece)
 
     # def undo_last_move(self: Board) -> None:
@@ -90,10 +87,10 @@ class Board:
         # backup_pieces = self.__pieces[:]
         piece_at_destination = self.get_piece(coordinates)
 
-        index = self.__move_piece(piece, coordinates, piece_at_destination) # Think about en passent
+        self.__move_piece(piece, coordinates, piece_at_destination) # Think about en passent
 
         in_check = self.is_in_check(piece.color)
-        self.__restore(piece, piece_at_destination, index)
+        self.__restore(piece, piece_at_destination)
         # self.__pieces = backup_pieces
 
         return in_check
