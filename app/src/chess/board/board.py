@@ -22,8 +22,7 @@ class Board:
         return self.__pieces
 
     def get_piece(self: Board, coordinates: Coordinates) -> Piece | None:
-        pieces_with_coordinates = [
-            piece for piece in self.__pieces if piece.coordinates == coordinates]
+        pieces_with_coordinates = list(filter(lambda piece: piece.coordinates == coordinates, self.pieces))
 
         if len(pieces_with_coordinates) == 0:
             return None
