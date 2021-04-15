@@ -1,6 +1,5 @@
 
 from __future__ import annotations
-from copy import deepcopy
 from ..repository import each
 from ..coordinates import Coordinates, Direction
 from ..movement import Movement
@@ -14,11 +13,8 @@ class Board:
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
-        # self.__board_history = []
         self.update_possible_moves()
         self.__last_piece_to_move = None
-        # self.__list_of_moves: list[tuple[Coordinates, Coordinates]] = []
-        # self.__board_history = [deepcopy(self.pieces)]
 
     @property
     def pieces(self: Board) -> list[Piece]:
@@ -36,31 +32,27 @@ class Board:
 
         return pieces_with_coordinates.pop()
 
-    def evaluate_move(self: Board, piece_at_origin: Piece, destination_coordinates: Coordinates) -> None:
-        # TODO - this logic needs to be tidied up
-        # Look into why possible moves aren't properly updated
-        piece_at_destination = self.get_piece(destination_coordinates)
-
-        if destination_coordinates not in piece_at_origin.possible_moves:
+    def evaluate_move(self: Board, piece: Piece, coordinates: Coordinates) -> None:
+        if coordinates not in piece.possible_moves:
             raise ValueError("You cannot make this move")
 
-        if not piece_at_destination and piece_at_origin.type == PieceTypes.pawn and self.en_passant_valid(destination_coordinates, piece_at_origin.color):
-            y = -1 if piece_at_origin.color == Color.white else 1
-            piece_at_destination = self.get_piece(
-                Direction((y, 0)).step(destination_coordinates))
+        is_en_passent = piece.type == PieceTypes.pawn and self.en_passant_valid(coordinates, piece.color)
 
         self.__move_piece(
-            piece_at_origin, destination_coordinates, piece_at_destination)
+            piece, coordinates, is_en_passent)
 
-        self.__last_piece_to_move = piece_at_origin
-        # self.__board_history.append(deepcopy(self.pieces))
+        self.__last_piece_to_move = piece
         self.update_possible_moves()
 
-    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
-        # self.__board_history.append(deepcopy(self.__pieces))
+    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, is_en_passent: bool) -> None:
+        y = -1 if piece.color == Color.white else 1
 
-        if piece_at_destination:
-            self.__pieces.remove(piece_at_destination)
+        coordinates_to_take_piece_from = Direction((y, 0)).step(coordinates) if is_en_passent else coordinates
+
+        piece_to_take = self.get_piece(coordinates_to_take_piece_from)
+
+        if piece_to_take:
+            self.__pieces.remove(piece_to_take)
 
         piece.move(coordinates)
 
@@ -70,12 +62,6 @@ class Board:
         if removed_piece and removed_piece not in self.__pieces:
             self.__pieces.append(removed_piece)
 
-    # def undo_last_move(self: Board) -> None:
-    #     self.__pieces = self.__board_history.pop()
-
-    # def restore_board_last_move(self: Board) -> None:
-    #     self.__pieces = deepcopy(self.__board_history[-1])
-
     def update_possible_moves(self: Board) -> None:
         each(lambda piece: piece.update_possible_moves(self), self.__pieces[:])
 
@@ -84,14 +70,11 @@ class Board:
         return list(filter(lambda coordinates: not self.__will_be_in_check_after_move(piece, coordinates), pseudo_legal_moves))
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
-        # backup_pieces = self.__pieces[:]
         piece_at_destination = self.get_piece(coordinates)
-
-        self.__move_piece(piece, coordinates, piece_at_destination) # Think about en passent
+        self.__move_piece(piece, coordinates, False) #  TODO - think about en passent
 
         in_check = self.is_in_check(piece.color)
         self.__restore(piece, piece_at_destination)
-        # self.__pieces = backup_pieces
 
         return in_check
 
