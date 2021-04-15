@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-
+from copy import deepcopy
 from ..repository import each
 from ..coordinates import Coordinates, Direction
 from ..movement import Movement
@@ -14,8 +14,11 @@ class Board:
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
-        self.__last_piece_to_move = None
+        # self.__board_history = []
         self.update_possible_moves()
+        self.__last_piece_to_move = None
+        # self.__list_of_moves: list[tuple[Coordinates, Coordinates]] = []
+        # self.__board_history = [deepcopy(self.pieces)]
 
     @property
     def pieces(self: Board) -> list[Piece]:
@@ -50,33 +53,48 @@ class Board:
             piece_at_origin, destination_coordinates, piece_at_destination)
 
         self.__last_piece_to_move = piece_at_origin
+        # self.__board_history.append(deepcopy(self.pieces))
         self.update_possible_moves()
 
-    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> None:
+    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, piece_at_destination: Piece | None) -> int | None:
+        # self.__board_history.append(deepcopy(self.__pieces))
+        index = None
+
         if piece_at_destination:
+            index = self.__pieces.index(piece_at_destination)
             self.__pieces.remove(piece_at_destination)
 
         piece.move(coordinates)
+        return index
 
-    def __restore(self: Board, moved_piece: Piece, removed_piece: Piece | None) -> None:
+    def __restore(self: Board, moved_piece: Piece, removed_piece: Piece | None, index: int | None) -> None:
         moved_piece.revert_last_move()
 
-        if removed_piece and removed_piece not in self.__pieces:
+        if removed_piece and index and removed_piece not in self.__pieces:
             self.__pieces.append(removed_piece)
 
+    # def undo_last_move(self: Board) -> None:
+    #     self.__pieces = self.__board_history.pop()
+
+    # def restore_board_last_move(self: Board) -> None:
+    #     self.__pieces = deepcopy(self.__board_history[-1])
+
     def update_possible_moves(self: Board) -> None:
-        each(lambda piece: piece.update_possible_moves(self), self.__pieces)
+        each(lambda piece: piece.update_possible_moves(self), self.__pieces[:])
 
     def get_legal_moves(self: Board, piece: Piece, moves: list[list[Coordinates]]) -> list[Coordinates]:
         pseudo_legal_moves = self.get_unobstructed_squares(piece.color, moves)
-        return list(filter(lambda coordinates: not self.__move_puts_king_in_check(piece, coordinates), pseudo_legal_moves))
+        return list(filter(lambda coordinates: not self.__will_be_in_check_after_move(piece, coordinates), pseudo_legal_moves))
 
-    def __move_puts_king_in_check(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
+    def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
+        # backup_pieces = self.__pieces[:]
         piece_at_destination = self.get_piece(coordinates)
-        self.__move_piece(piece, coordinates, piece_at_destination)
+
+        index = self.__move_piece(piece, coordinates, piece_at_destination) # Think about en passent
 
         in_check = self.is_in_check(piece.color)
-        self.__restore(piece, piece_at_destination)
+        self.__restore(piece, piece_at_destination, index)
+        # self.__pieces = backup_pieces
 
         return in_check
 
