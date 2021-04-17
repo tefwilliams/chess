@@ -14,9 +14,10 @@ class Piece:
 
     def __init__(self: Piece, coordinates: Coordinates, color: Color) -> None:
         self.__color = color
-        self.__backup_coordinates = coordinates
-        self.__previous_coordinates = coordinates
         self.__coordinates = coordinates
+        # TODO - maybe make this a list of coordinates, since we can work out the moves from that
+        # also need to record what turn a move was made on
+        self.__moves: list[tuple[Coordinates, Coordinates]] = []
 
     @property
     def color(self: Piece) -> Color:
@@ -28,11 +29,14 @@ class Piece:
 
     @property
     def previous_coordinates(self: Piece) -> Coordinates:
-        return self.__previous_coordinates
+        if not self.has_moved:
+            return self.coordinates
+
+        return self.__moves[-1][0]
 
     @property
     def has_moved(self: Piece) -> bool:
-        return self.__previous_coordinates != self.__coordinates
+        return len(self.__moves) > 0
 
     @property
     def has_just_moved_two_squares(self: Piece) -> bool:
@@ -43,8 +47,7 @@ class Piece:
         return self.__possible_moves
 
     def move(self: Piece, coordinates: Coordinates) -> None:
-        self.__backup_coordinates = self.__previous_coordinates
-        self.__previous_coordinates = self.__coordinates
+        self.__moves.append((self.coordinates, coordinates))
         self.__coordinates = coordinates
 
     def update_possible_moves(self: Piece, board: Board) -> None:
@@ -54,10 +57,8 @@ class Piece:
         raise NotImplementedError
 
     def revert_last_move(self: Piece) -> None:
-        # TODO - maybe this could be done with a previous moves list
-        self.__coordinates = self.__previous_coordinates
-        self.__previous_coordinates = self.__backup_coordinates
-
+        self.__coordinates = self.previous_coordinates
+        self.__moves.pop()
 
 class PieceTypes(Enum):
     king = 0

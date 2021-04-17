@@ -13,8 +13,11 @@ class Board:
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
+        
+        self.__move_counter = 0
+        self.__pieces_moved: list[tuple[int, Piece]] = []
+
         self.update_possible_moves()
-        self.__last_piece_to_move = None
 
     @property
     def pieces(self: Board) -> list[Piece]:
@@ -41,14 +44,16 @@ class Board:
         self.__move_piece(
             piece, coordinates, is_en_passent)
 
-        self.__last_piece_to_move = piece
+        self.__pieces_moved.append((self.__move_counter, piece))
         self.update_possible_moves()
+
+    def increment_move_counter(self: Board) -> None:
+        self.__move_counter += 1
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, is_en_passent: bool) -> None:
         y = -1 if piece.color == Color.white else 1
 
         coordinates_to_take_piece_from = Direction((y, 0)).step(coordinates) if is_en_passent else coordinates
-
         piece_to_take = self.get_piece(coordinates_to_take_piece_from)
 
         if piece_to_take:
@@ -81,8 +86,8 @@ class Board:
     def get_unobstructed_squares(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
         unobstructed_squares: list[Coordinates] = []
 
-        for list_of_squares in squares:  # TODO - clarify what this is doing
-            for square in list_of_squares:
+        for squares_in_direction in squares:  # TODO - clarify what this is doing
+            for square in squares_in_direction:
                 piece_at_destination = self.get_piece(square)
 
                 if piece_at_destination and piece_at_destination.color != color:
@@ -105,13 +110,21 @@ class Board:
         if not piece_at_destination:
             return False
 
+        last_piece_to_move = self.__get_last_piece_to_move()
+
         piece_has_just_moved_two_squares = abs(
             piece_at_destination.coordinates.y - piece_at_destination.previous_coordinates.y) == 2
 
         return (piece_at_destination.color != color
                 and piece_at_destination.type == PieceTypes.pawn
-                and piece_at_destination == self.__last_piece_to_move
+                and piece_at_destination == last_piece_to_move
                 and piece_has_just_moved_two_squares)
+
+    def __get_last_piece_to_move(self: Board) -> Piece | None:
+        if len(self.__pieces_moved) == 0:
+            return None
+
+        return self.__pieces_moved[-1][1]
 
     # TODO - pull methods onto player?
     def is_in_check(self: Board, color: Color) -> bool:

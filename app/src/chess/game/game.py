@@ -55,6 +55,7 @@ class Game:
                 print("\n%s" % e)
 
             else:
+                self.board.increment_move_counter()
                 self.__last_move = (piece_at_origin.coordinates,
                                     destination_coordinates)
                 self.player.swap_color()
