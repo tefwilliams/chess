@@ -12,7 +12,6 @@ from ..data import display_size, gray, cream, yellow, green, light_green, brown,
 class Game:
     def __init__(self: Game) -> None:
         self.board = Board(get_starting_pieces())
-        self.__last_move: tuple[Coordinates, Coordinates]
         self.__player = Player()
         self.__intialize_display()
 
@@ -56,8 +55,6 @@ class Game:
 
             else:
                 self.board.increment_move_counter()
-                self.__last_move = (piece_at_origin.coordinates,
-                                    destination_coordinates)
                 self.player.swap_color()
                 break
 

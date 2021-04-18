@@ -54,10 +54,10 @@ class Board:
         self.__move_counter += 1
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, is_en_passent: bool) -> None:
-        y = -1 if piece.color == Color.white else 1
-
+        direction = piece.color.get_opposing_color().get_step_forward()
         coordinates_to_take_piece_from = coordinates.move_by(
-            (y, 0)) if is_en_passent else coordinates
+            direction) if is_en_passent else coordinates
+
         piece_to_take = self.get_piece(coordinates_to_take_piece_from)
 
         if piece_to_take:

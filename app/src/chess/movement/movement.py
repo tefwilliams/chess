@@ -73,9 +73,7 @@ class Movement:
 
     @staticmethod
     def get_pawn_squares(origin_coordinates: Coordinates, color: Color, has_moved: bool) -> list[list[Coordinates]]:
-        y = 1 if color == Color.white else -1
-
-        direction = (y, 0)
+        direction = color.get_step_forward()
 
         if not has_moved:
             return [Movement.__get_squares_in_direction(origin_coordinates, direction, 2)]
@@ -85,8 +83,8 @@ class Movement:
     @staticmethod
     def get_pawn_attack_squares(origin_coordinates: Coordinates, color: Color) -> list[list[Coordinates]]:
         pawn_squares: list[list[Coordinates]] = []
-        y = 1 if color == Color.white else -1
 
+        y = color.get_step_forward()[0]
         directions = [(y, x) for x in [-1, 1]]
 
         for direction in directions:

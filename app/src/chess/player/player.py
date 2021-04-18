@@ -15,7 +15,7 @@ class Player:
         self.__color = self.get_opposing_color()
 
     def get_opposing_color(self: Player) -> Color:
-        return Color.get_opposing_color(self.__color)
+        return self.__color.get_opposing_color()
 
 
 # TODO - pull class into new file
@@ -23,6 +23,8 @@ class Color(Enum):
     white = 0
     black = 1
 
-    @staticmethod
-    def get_opposing_color(color: Color) -> Color:
-        return Color.white if color == Color.black else Color.black
+    def get_opposing_color(self: Color) -> Color:
+        return Color.white if self == Color.black else Color.black
+
+    def get_step_forward(self: Color) -> tuple[int, int]:
+        return (1, 0) if self == Color.white else (-1, 0)
