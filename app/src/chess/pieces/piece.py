@@ -56,6 +56,7 @@ class Piece:
         self.__coordinates = self.previous_coordinates
         self.__moves.pop()
 
+
 class PieceTypes(Enum):
     king = 0
     queen = 1

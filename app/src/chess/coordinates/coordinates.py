@@ -16,6 +16,11 @@ class Coordinates(tuple[int, int]):
     def within_board(self: Coordinates) -> bool:
         return self.y >= 0 and self.x >= 0 and self.y < board_size and self.x < board_size
 
+    # TODO - is this going to cause the coordinates of pieces to change?
+    def move_by(self: Coordinates, step: tuple[int, int]) -> Coordinates:
+        step = Coordinates(step)
+        return Coordinates((self.y + step.y, self.x + step.x))
+
     @staticmethod
     def get_coordinates(input_text: str) -> Coordinates:
         while True:
@@ -71,20 +76,3 @@ class Coordinates(tuple[int, int]):
             return False
 
         return True
-
-
-class Direction(Coordinates):
-    @property
-    def is_vertical(self: Direction) -> bool:
-        return self.x == 0
-
-    @property
-    def is_horizontal(self: Direction) -> bool:
-        return self.y == 0
-
-    @property
-    def is_diagonal(self: Direction) -> bool:
-        return abs(self.y) == abs(self.x)
-
-    def step(self: Direction, starting_coordinates: Coordinates) -> Coordinates:
-        return Coordinates((self.y + starting_coordinates.y, self.x + starting_coordinates.x))

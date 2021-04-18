@@ -1,7 +1,8 @@
 
 from __future__ import annotations
+from typing import Callable
 from ..repository import each
-from ..coordinates import Coordinates, Direction
+from ..coordinates import Coordinates
 from ..movement import Movement
 from ..player import Color
 from ..pieces import Piece, PieceTypes
@@ -13,7 +14,7 @@ class Board:
 
     def __init__(self: Board, pieces: list[Piece]) -> None:
         self.__pieces = pieces
-        
+
         self.__move_counter = 0
         self.__pieces_moved: list[tuple[int, Piece]] = []
 
@@ -24,7 +25,8 @@ class Board:
         return self.__pieces
 
     def get_piece(self: Board, coordinates: Coordinates) -> Piece | None:
-        pieces_with_coordinates = list(filter(lambda piece: piece.coordinates == coordinates, self.pieces))
+        pieces_with_coordinates = list(
+            filter(lambda piece: piece.coordinates == coordinates, self.pieces))
 
         if len(pieces_with_coordinates) == 0:
             return None
@@ -35,11 +37,12 @@ class Board:
 
         return pieces_with_coordinates.pop()
 
+    # TODO - rename this to move piece?
     def evaluate_move(self: Board, piece: Piece, coordinates: Coordinates) -> None:
         if coordinates not in piece.possible_moves:
             raise ValueError("You cannot make this move")
 
-        is_en_passent = piece.type == PieceTypes.pawn and self.en_passant_valid(coordinates, piece.color)
+        is_en_passent = self.legal_en_passant(piece, coordinates)
 
         self.__move_piece(
             piece, coordinates, is_en_passent)
@@ -53,7 +56,8 @@ class Board:
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, is_en_passent: bool) -> None:
         y = -1 if piece.color == Color.white else 1
 
-        coordinates_to_take_piece_from = Direction((y, 0)).step(coordinates) if is_en_passent else coordinates
+        coordinates_to_take_piece_from = coordinates.move_by(
+            (y, 0)) if is_en_passent else coordinates
         piece_to_take = self.get_piece(coordinates_to_take_piece_from)
 
         if piece_to_take:
@@ -76,7 +80,8 @@ class Board:
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         piece_at_destination = self.get_piece(coordinates)
-        self.__move_piece(piece, coordinates, False) #  TODO - think about en passent
+        # TODO - think about en passent
+        self.__move_piece(piece, coordinates, False)
 
         in_check = self.is_in_check(piece.color)
         self.__restore(piece, piece_at_destination)
@@ -101,11 +106,10 @@ class Board:
 
         return unobstructed_squares
 
-    def en_passant_valid(self: Board, coordinates: Coordinates, color: Color) -> bool:
-        y = -1 if color == Color.white else 1
+    def legal_en_passant(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
+        y = -1 if piece.color == Color.white else 1
 
-        direction = Direction((y, 0))
-        piece_at_destination = self.get_piece(direction.step((coordinates)))
+        piece_at_destination = self.get_piece(coordinates.move_by((y, 0)))
 
         if not piece_at_destination:
             return False
@@ -115,7 +119,8 @@ class Board:
         piece_has_just_moved_two_squares = abs(
             piece_at_destination.coordinates.y - piece_at_destination.previous_coordinates.y) == 2
 
-        return (piece_at_destination.color != color
+        return (piece.type == PieceTypes.pawn
+                and piece_at_destination.color != piece.color
                 and piece_at_destination.type == PieceTypes.pawn
                 and piece_at_destination == last_piece_to_move
                 and piece_has_just_moved_two_squares)
@@ -132,6 +137,22 @@ class Board:
         return king is not None and self.square_is_attacked(king.coordinates, color)
 
     def square_is_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
+
+        get_squares_methods: list[Callable[[Coordinates], list[list[Coordinates]]]] = [
+            Movement.get_diagonal_squares,
+            Movement.get_orthogonal_squares,
+            Movement.get_knight_squares,
+            Movement.get_adjacent_squares
+        ]
+
+        squares_to_check = list(
+            map(lambda get_squares: get_squares(coordinates), get_squares_methods))
+        squares_to_check.append(
+            Movement.get_pawn_attack_squares(coordinates, color))
+
+        squares_to_checs = list(map(lambda squares: self.get_unobstructed_squares(
+            color, squares), squares_to_check))
+
         diagonal_squares = self.get_unobstructed_squares(
             color, Movement.get_diagonal_squares(coordinates))
         orthogonal_squares = self.get_unobstructed_squares(
