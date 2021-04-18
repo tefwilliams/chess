@@ -1,6 +1,5 @@
 
 from __future__ import annotations
-from typing import Callable
 from ..repository import each
 from ..coordinates import Coordinates
 from ..movement import Movement
@@ -137,22 +136,6 @@ class Board:
         return king is not None and self.square_is_attacked(king.coordinates, color)
 
     def square_is_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
-
-        get_squares_methods: list[Callable[[Coordinates], list[list[Coordinates]]]] = [
-            Movement.get_diagonal_squares,
-            Movement.get_orthogonal_squares,
-            Movement.get_knight_squares,
-            Movement.get_adjacent_squares
-        ]
-
-        squares_to_check = list(
-            map(lambda get_squares: get_squares(coordinates), get_squares_methods))
-        squares_to_check.append(
-            Movement.get_pawn_attack_squares(coordinates, color))
-
-        squares_to_checs = list(map(lambda squares: self.get_unobstructed_squares(
-            color, squares), squares_to_check))
-
         diagonal_squares = self.get_unobstructed_squares(
             color, Movement.get_diagonal_squares(coordinates))
         orthogonal_squares = self.get_unobstructed_squares(
