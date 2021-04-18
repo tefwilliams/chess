@@ -21,6 +21,7 @@ def get_starting_pieces() -> list[Piece]:
 
 
 def get_starting_piece(coordinates: Coordinates) -> Union[Piece, None]:
+    # TODO - update this to use color direction
     color = Color.white if coordinates.y in [0, 1] else Color.black
 
     if coordinates.y in [1, 6]:

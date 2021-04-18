@@ -41,10 +41,10 @@ class Board:
         if coordinates not in piece.possible_moves:
             raise ValueError("You cannot make this move")
 
-        is_en_passent = self.legal_en_passant(piece, coordinates)
+        is_en_passant = self.legal_en_passant(piece, coordinates)
 
         self.__move_piece(
-            piece, coordinates, is_en_passent)
+            piece, coordinates, is_en_passant)
 
         self.__pieces_moved.append((self.__move_counter, piece))
         self.update_possible_moves()
@@ -52,10 +52,10 @@ class Board:
     def increment_move_counter(self: Board) -> None:
         self.__move_counter += 1
 
-    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, is_en_passent: bool) -> None:
-        direction = piece.color.get_opposing_color().get_step_forward()
+    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates, is_en_passant: bool) -> None:
+        step_backward = piece.color.get_opposing_color().get_step_forward()
         coordinates_to_take_piece_from = coordinates.move_by(
-            direction) if is_en_passent else coordinates
+            step_backward) if is_en_passant else coordinates
 
         piece_to_take = self.get_piece(coordinates_to_take_piece_from)
 
@@ -74,12 +74,13 @@ class Board:
         each(lambda piece: piece.update_possible_moves(self), self.__pieces[:])
 
     def get_legal_moves(self: Board, piece: Piece, moves: list[list[Coordinates]]) -> list[Coordinates]:
-        pseudo_legal_moves = self.get_unobstructed_squares(piece.color, moves)
+        pseudo_legal_moves = self.__get_unobstructed_squares(
+            piece.color, moves)
         return list(filter(lambda coordinates: not self.__will_be_in_check_after_move(piece, coordinates), pseudo_legal_moves))
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         piece_at_destination = self.get_piece(coordinates)
-        # TODO - think about en passent
+        # TODO - think about en passant
         self.__move_piece(piece, coordinates, False)
 
         in_check = self.is_in_check(piece.color)
@@ -87,7 +88,7 @@ class Board:
 
         return in_check
 
-    def get_unobstructed_squares(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
+    def __get_unobstructed_squares(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
         unobstructed_squares: list[Coordinates] = []
 
         for squares_in_direction in squares:  # TODO - clarify what this is doing
@@ -106,23 +107,27 @@ class Board:
         return unobstructed_squares
 
     def legal_en_passant(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
-        y = -1 if piece.color == Color.white else 1
+        step_backward = piece.color.get_opposing_color().get_step_forward()
+        piece_to_take = self.get_piece(
+            coordinates.move_by(step_backward))
 
-        piece_at_destination = self.get_piece(coordinates.move_by((y, 0)))
-
-        if not piece_at_destination:
+        if not piece_to_take:
             return False
 
         last_piece_to_move = self.__get_last_piece_to_move()
 
         piece_has_just_moved_two_squares = abs(
-            piece_at_destination.coordinates.y - piece_at_destination.previous_coordinates.y) == 2
+            piece_to_take.coordinates.y - piece_to_take.previous_coordinates.y) == 2
 
         return (piece.type == PieceTypes.pawn
-                and piece_at_destination.color != piece.color
-                and piece_at_destination.type == PieceTypes.pawn
-                and piece_at_destination == last_piece_to_move
+                and piece_to_take.color != piece.color
+                and piece_to_take.type == PieceTypes.pawn
+                and piece_to_take == last_piece_to_move
                 and piece_has_just_moved_two_squares)
+
+    # TODO - implement logic
+    def legal_castle(self: Board) -> bool:
+        raise NotImplementedError
 
     def __get_last_piece_to_move(self: Board) -> Piece | None:
         if len(self.__pieces_moved) == 0:
@@ -136,15 +141,15 @@ class Board:
         return king is not None and self.square_is_attacked(king.coordinates, color)
 
     def square_is_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
-        diagonal_squares = self.get_unobstructed_squares(
+        diagonal_squares = self.__get_unobstructed_squares(
             color, Movement.get_diagonal_squares(coordinates))
-        orthogonal_squares = self.get_unobstructed_squares(
+        orthogonal_squares = self.__get_unobstructed_squares(
             color, Movement.get_orthogonal_squares(coordinates))
-        knight_squares = self.get_unobstructed_squares(
+        knight_squares = self.__get_unobstructed_squares(
             color, Movement.get_knight_squares(coordinates))
-        adjacent_squares = self.get_unobstructed_squares(
+        adjacent_squares = self.__get_unobstructed_squares(
             color, Movement.get_adjacent_squares(coordinates))
-        pawn_attack_squares = self.get_unobstructed_squares(
+        pawn_attack_squares = self.__get_unobstructed_squares(
             color, Movement.get_pawn_attack_squares(coordinates, color))
 
         enemy_color = Color.get_opposing_color(color)
@@ -163,6 +168,8 @@ class Board:
         return any(map(lambda piece: piece and piece.color ==
                        enemy_color and piece.type in list_of_pieces, map(self.get_piece, list_of_squares)))
 
+    # TODO - does this need to ever return None?
+    # can we mock the reponse if there is no king?
     def __get_king(self: Board, color: Color) -> Piece | None:
         player_pieces = self.__get_pieces_by_color(color)
         player_king_list = list(

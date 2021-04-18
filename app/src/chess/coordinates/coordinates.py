@@ -5,6 +5,7 @@ from math import floor
 
 
 class Coordinates(tuple[int, int]):
+    # TODO - update to use shared values
     y_grid_values = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     x_grid_values = ['8', '7', '6', '5', '4', '3', '2', '1']
 
@@ -24,16 +25,6 @@ class Coordinates(tuple[int, int]):
         return Coordinates(self.y + step.y, self.x + step.x)
 
     @staticmethod
-    def get_coordinates(input_text: str) -> Coordinates:
-        while True:
-            try:
-                coordinates_as_string = input(input_text).upper()
-                return Coordinates.convert_from_grid_value(coordinates_as_string)
-
-            except ValueError as e:
-                print("\n" + "%s" % e)
-
-    @staticmethod
     def get_coordinates_from_mouse_position(x_position: int, y_position: int) -> Coordinates:
         x_coord = Coordinates.__get_coordinate_from_position(x_position)
         y_coord = Coordinates.__get_coordinate_from_position(y_position)
@@ -44,6 +35,7 @@ class Coordinates(tuple[int, int]):
         return floor((position - board_edge_thickness -
                       board_border_thickness * 2) / square_size)
 
+    # TODO - do we need these?
     @staticmethod
     def convert_from_grid_value(coordinates: str) -> Coordinates:
         if not Coordinates.__validate_coordinates(coordinates):
