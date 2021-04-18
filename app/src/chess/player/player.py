@@ -12,10 +12,7 @@ class Player:
         return self.__color
 
     def swap_color(self: Player) -> None:
-        self.__color = self.get_opposing_color()
-
-    def get_opposing_color(self: Player) -> Color:
-        return self.__color.get_opposing_color()
+        self.__color = self.__color.get_opposing_color()
 
 
 # TODO - pull class into new file
