@@ -8,18 +8,20 @@ class Coordinates(tuple[int, int]):
     y_grid_values = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     x_grid_values = ['8', '7', '6', '5', '4', '3', '2', '1']
 
-    def __init__(self: Coordinates, coordinates: tuple[int, int]) -> None:
-        self.x = coordinates[1]
-        self.y = coordinates[0]
+    def __new__(cls: type[Coordinates], y_coordinate: int, x_coordinate: int) -> Coordinates:
+        return super().__new__(cls, (y_coordinate, x_coordinate))
+
+    def __init__(self: Coordinates, y_coordinate: int, x_coordinate: int) -> None:
+        self.x = x_coordinate
+        self.y = y_coordinate
 
     @property
     def within_board(self: Coordinates) -> bool:
         return self.y >= 0 and self.x >= 0 and self.y < board_size and self.x < board_size
 
-    # TODO - is this going to cause the coordinates of pieces to change?
     def move_by(self: Coordinates, step: tuple[int, int]) -> Coordinates:
-        step = Coordinates(step)
-        return Coordinates((self.y + step.y, self.x + step.x))
+        step = Coordinates(*step)
+        return Coordinates(self.y + step.y, self.x + step.x)
 
     @staticmethod
     def get_coordinates(input_text: str) -> Coordinates:
@@ -35,7 +37,7 @@ class Coordinates(tuple[int, int]):
     def get_coordinates_from_mouse_position(x_position: int, y_position: int) -> Coordinates:
         x_coord = Coordinates.__get_coordinate_from_position(x_position)
         y_coord = Coordinates.__get_coordinate_from_position(y_position)
-        return Coordinates((y_coord, x_coord))
+        return Coordinates(y_coord, x_coord)
 
     @staticmethod
     def __get_coordinate_from_position(position: int) -> int:
@@ -50,7 +52,7 @@ class Coordinates(tuple[int, int]):
         y_value = Coordinates.y_grid_values.index(coordinates[0])
         x_value = Coordinates.x_grid_values.index(coordinates[1])
 
-        return Coordinates((y_value, x_value))
+        return Coordinates(y_value, x_value)
 
     @staticmethod
     def convert_to_grid_value(coordinates: Coordinates) -> str:

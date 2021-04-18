@@ -160,7 +160,7 @@ class Game:
         pygame.display.update()
 
     def __create_squares(self: Game) -> None:
-        [self.__create_square(Coordinates((row_number, column_number)))
+        [self.__create_square(Coordinates(row_number, column_number))
          for row_number in range(board_size) for column_number in range(board_size)]
 
     def __create_square(self: Game, coordinates: Coordinates, highlighted: bool = False) -> None:
