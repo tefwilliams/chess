@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-
+from typing import Callable
 from ..coordinates import Coordinates
 from ..movement import Movement
 from ..player import Color
@@ -41,36 +41,44 @@ class Board:
         if coordinates not in piece.possible_moves:
             raise ValueError("You cannot make this move")
 
-        self.__move_piece(
-            piece, coordinates)
+        piece_to_take = self.__get_piece_to_take(piece, coordinates)
+
+        self.__move_piece(piece, coordinates)
 
         self.__pieces_moved[self.__move_counter] = piece
+
+        if piece_to_take:
+            self.__pieces_taken[self.__move_counter] = piece_to_take
+
         self.update_possible_moves()
 
     def increment_move_counter(self: Board) -> None:
         self.__move_counter += 1
 
-    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates) -> None:
+    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates) -> Callable[[], None]:
+        piece_to_take = self.__get_piece_to_take(piece, coordinates)
+
+        if piece_to_take:
+            self.__pieces.remove(piece_to_take)
+
+        piece.move(coordinates)
+
+        def restore() -> None:
+            piece.revert_last_move()
+
+            if piece_to_take:
+                self.__pieces.append(piece_to_take)
+
+        return restore
+
+    def __get_piece_to_take(self: Board, piece: Piece, coordinates: Coordinates) -> Piece | None:
         is_en_passant = self.legal_en_passant(piece, coordinates)
         step_backward = piece.color.get_opposing_color().get_step_forward()
 
         coordinates_to_take_piece_from = coordinates.move_by(
             step_backward) if is_en_passant else coordinates
 
-        # TODO - this causes issues where the wrong piece is restored
-        piece_to_take = self.get_piece(coordinates_to_take_piece_from)
-
-        if piece_to_take:
-            self.__pieces.remove(piece_to_take)
-            # self.__pieces_taken[self.__move_counter] = piece_to_take
-
-        piece.move(coordinates)
-
-    def __restore(self: Board, moved_piece: Piece, removed_piece: Piece | None) -> None:
-        moved_piece.revert_last_move()
-
-        if removed_piece:
-            self.__pieces.append(removed_piece)
+        return self.get_piece(coordinates_to_take_piece_from)
 
     def update_possible_moves(self: Board) -> None:
         for piece in self.__pieces[:]:
@@ -82,12 +90,10 @@ class Board:
         return [coordinates for coordinates in pseudo_legal_moves if not self.__will_be_in_check_after_move(piece, coordinates)]
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
-        piece_at_destination = self.get_piece(coordinates)
-        # TODO - think about en passant
-        self.__move_piece(piece, coordinates)
+        restore = self.__move_piece(piece, coordinates)
 
         in_check = self.is_in_check(piece.color)
-        self.__restore(piece, piece_at_destination)
+        restore()
 
         return in_check
 
@@ -111,8 +117,7 @@ class Board:
 
     def legal_en_passant(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         step_backward = piece.color.get_opposing_color().get_step_forward()
-        piece_to_take = self.get_piece(
-            coordinates.move_by(step_backward))
+        piece_to_take = self.get_piece(coordinates.move_by(step_backward))
 
         if not piece_to_take:
             return False
@@ -136,7 +141,7 @@ class Board:
         if not self.__pieces_moved:
             return None
 
-        return self.__pieces_moved[self.__move_counter]
+        return list(self.__pieces_moved.values()).pop()
 
     # TODO - pull methods onto player?
     def is_in_check(self: Board, color: Color) -> bool:
