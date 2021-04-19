@@ -17,6 +17,7 @@ class Piece:
         self.__coordinates = coordinates
         # TODO - maybe make this a list of coordinates, since we can work out the moves from that
         # also need to record what turn a move was made on
+        self.__positions: dict[int, Coordinates] = {}
         self.__moves: list[tuple[Coordinates, Coordinates]] = []
 
     @property

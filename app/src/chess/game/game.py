@@ -2,7 +2,7 @@
 from __future__ import annotations
 import pygame
 from ..coordinates import Coordinates
-from ..repository import get_starting_pieces, each
+from ..repository import get_starting_pieces
 from ..board import Board
 from ..player import Player
 from ..pieces import Piece
@@ -124,7 +124,9 @@ class Game:
                     return coordinates
 
     def __display_possible_moves(self: Game, list_of_moves: list[Coordinates]) -> None:
-        each(self.__display_possible_move, list_of_moves)
+        for move in list_of_moves:
+            self.__display_possible_move(move)
+            
         pygame.display.update()
 
     def __display_possible_move(self: Game, coordinates: Coordinates) -> None:
@@ -157,8 +159,9 @@ class Game:
         pygame.display.update()
 
     def __create_squares(self: Game) -> None:
-        [self.__create_square(Coordinates(row_number, column_number))
-         for row_number in range(board_size) for column_number in range(board_size)]
+        for row_number in range(board_size):
+            for column_number in range(board_size):
+                self.__create_square(Coordinates(row_number, column_number))
 
     def __create_square(self: Game, coordinates: Coordinates, highlighted: bool = False) -> None:
         square_color = cream if (

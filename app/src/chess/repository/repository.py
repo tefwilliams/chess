@@ -42,11 +42,3 @@ def get_starting_piece(coordinates: Coordinates) -> Union[Piece, None]:
 
         if coordinates.x == 4:
             return King(coordinates, color)
-
-
-T = TypeVar('T')
-
-
-def each(function: Callable[[T], None], iterable: Iterable[T]) -> None:
-    for item in iterable:
-        function(item)

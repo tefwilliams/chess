@@ -1,7 +1,7 @@
 
 import pytest
 from chess import PieceTypes, Coordinates, Board, Color
-from generate_piece import generate_piece
+from repository import generate_piece
 
 
 def test_get_piece_returns_piece_with_specified_coordinates() -> None:

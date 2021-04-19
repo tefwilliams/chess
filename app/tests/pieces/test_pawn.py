@@ -1,7 +1,7 @@
 
 import pytest
 from chess import Board, Coordinates, Color, PieceTypes, Piece
-from generate_piece import generate_piece
+from repository import generate_piece
 
 
 def test_pawn_can_move_one_or_two_forward_if_it_has_not_moved() -> None:
