@@ -41,33 +41,31 @@ class Board:
         if coordinates not in piece.possible_moves:
             raise ValueError("You cannot make this move")
 
-        piece_to_take = self.__get_piece_to_take(piece, coordinates)
-
         self.__move_piece(piece, coordinates)
-
-        self.__pieces_moved[self.__move_counter] = piece
-
-        if piece_to_take:
-            self.__pieces_taken[self.__move_counter] = piece_to_take
-
         self.update_possible_moves()
 
     def increment_move_counter(self: Board) -> None:
         self.__move_counter += 1
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates) -> Callable[[], None]:
+        moved_pieces = self.__pieces_moved.copy()
+        taken_pieces = self.__pieces_taken.copy()
+        current_pieces = self.__pieces[:]
+
         piece_to_take = self.__get_piece_to_take(piece, coordinates)
 
         if piece_to_take:
             self.__pieces.remove(piece_to_take)
+            self.__pieces_taken[self.__move_counter] = piece_to_take
 
         piece.move(coordinates)
+        self.__pieces_moved[self.__move_counter] = piece
 
         def restore() -> None:
             piece.revert_last_move()
-
-            if piece_to_take:
-                self.__pieces.append(piece_to_take)
+            self.__pieces = current_pieces
+            self.__pieces_moved = moved_pieces
+            self.__pieces_taken = taken_pieces
 
         return restore
 
@@ -91,7 +89,6 @@ class Board:
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         restore = self.__move_piece(piece, coordinates)
-
         in_check = self.is_in_check(piece.color)
         restore()
 
