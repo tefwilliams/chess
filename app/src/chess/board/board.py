@@ -18,14 +18,15 @@ class Board:
         self.__pieces_moved: dict[int, Piece] = {}
         self.__pieces_taken: dict[int, Piece] = {}
 
-        self.update_possible_moves()
+        self.__update_possible_moves()
 
     @property
     def pieces(self: Board) -> list[Piece]:
         return self.__pieces
 
     def get_piece(self: Board, coordinates: Coordinates) -> Piece | None:
-        pieces_with_coordinates = [piece for piece in self.__pieces if piece.coordinates == coordinates]
+        pieces_with_coordinates = [
+            piece for piece in self.__pieces if piece.coordinates == coordinates]
 
         if len(pieces_with_coordinates) == 0:
             return None
@@ -42,9 +43,7 @@ class Board:
             raise ValueError("You cannot make this move")
 
         self.__move_piece(piece, coordinates)
-        self.update_possible_moves()
-
-    def increment_move_counter(self: Board) -> None:
+        self.__update_possible_moves()
         self.__move_counter += 1
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates) -> Callable[[], None]:
@@ -61,13 +60,13 @@ class Board:
         piece.move(coordinates)
         self.__pieces_moved[self.__move_counter] = piece
 
-        def restore() -> None:
+        def undo_move() -> None:
             piece.revert_last_move()
             self.__pieces = current_pieces
             self.__pieces_moved = moved_pieces
             self.__pieces_taken = taken_pieces
 
-        return restore
+        return undo_move
 
     def __get_piece_to_take(self: Board, piece: Piece, coordinates: Coordinates) -> Piece | None:
         is_en_passant = self.legal_en_passant(piece, coordinates)
@@ -78,7 +77,7 @@ class Board:
 
         return self.get_piece(coordinates_to_take_piece_from)
 
-    def update_possible_moves(self: Board) -> None:
+    def __update_possible_moves(self: Board) -> None:
         for piece in self.__pieces[:]:
             piece.update_possible_moves(self)
 
@@ -88,9 +87,9 @@ class Board:
         return [coordinates for coordinates in pseudo_legal_moves if not self.__will_be_in_check_after_move(piece, coordinates)]
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
-        restore = self.__move_piece(piece, coordinates)
+        undo_move = self.__move_piece(piece, coordinates)
         in_check = self.is_in_check(piece.color)
-        restore()
+        undo_move()
 
         return in_check
 
@@ -176,7 +175,8 @@ class Board:
     # can we mock the reponse if there is no king?
     def __get_king(self: Board, color: Color) -> Piece | None:
         player_pieces = self.__get_pieces_by_color(color)
-        player_king_list = [piece for piece in player_pieces if piece.type == PieceTypes.king]
+        player_king_list = [
+            piece for piece in player_pieces if piece.type == PieceTypes.king]
 
         if len(player_king_list) > 1:
             raise RuntimeError("More than one king on %s team" % color.name)

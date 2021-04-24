@@ -50,11 +50,10 @@ class Game:
                 self.board.evaluate_move(
                     piece_at_origin, destination_coordinates)
 
-            except ValueError as e:
-                print("\n%s" % e)
+            except ValueError:
+                continue
 
             else:
-                self.board.increment_move_counter()
                 self.player.swap_color()
                 break
 
@@ -126,7 +125,7 @@ class Game:
     def __display_possible_moves(self: Game, list_of_moves: list[Coordinates]) -> None:
         for move in list_of_moves:
             self.__display_possible_move(move)
-            
+
         pygame.display.update()
 
     def __display_possible_move(self: Game, coordinates: Coordinates) -> None:
