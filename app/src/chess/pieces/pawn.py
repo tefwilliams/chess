@@ -16,7 +16,7 @@ class Pawn(Piece):
     def __init__(self: Pawn, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
 
-    def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
+    def get_possible_moves(self: Pawn, board: Board) -> list[Coordinates]:
         possible_moves: list[list[Coordinates]] = []
 
         squares = Movement.get_pawn_squares(

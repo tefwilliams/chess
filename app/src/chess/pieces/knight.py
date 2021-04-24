@@ -16,6 +16,6 @@ class Knight(Piece):
     def __init__(self: Knight, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
 
-    def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
+    def get_possible_moves(self: Knight, board: Board) -> list[Coordinates]:
         knight_squares = Movement.get_knight_squares(self.coordinates)
         return board.get_legal_moves(self, knight_squares)

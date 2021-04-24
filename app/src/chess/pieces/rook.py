@@ -16,6 +16,6 @@ class Rook(Piece):
     def __init__(self: Rook, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
 
-    def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
+    def get_possible_moves(self: Rook, board: Board) -> list[Coordinates]:
         orthogonal_squares = Movement.get_orthogonal_squares(self.coordinates)
         return board.get_legal_moves(self, orthogonal_squares)

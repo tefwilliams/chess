@@ -16,7 +16,7 @@ class Queen(Piece):
     def __init__(self: Queen, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
 
-    def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
+    def get_possible_moves(self: Queen, board: Board) -> list[Coordinates]:
         diagonal_squares = Movement.get_diagonal_squares(self.coordinates)
         orthogonal_squares = Movement.get_orthogonal_squares(self.coordinates)
         return board.get_legal_moves(self, diagonal_squares + orthogonal_squares)
