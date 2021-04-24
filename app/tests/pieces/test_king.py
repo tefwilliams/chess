@@ -1,7 +1,7 @@
 
 import pytest
-from chess import Board, Coordinates, Color, PieceTypes, Piece
-from repository import generate_piece
+from chess import Board, Color, PieceTypes, Piece
+from ..repository import generate_piece, get_coordinates_from_grid_value
 
 
 @pytest.mark.parametrize(
@@ -22,7 +22,7 @@ def test_king_can_only_move_to_adjacent_squares(square_to_move_to: str, should_b
 
     board = Board([king])
 
-    can_move = Coordinates.convert_from_grid_value(
+    can_move = get_coordinates_from_grid_value(
         square_to_move_to) in king.get_possible_moves(board)
     assert can_move == should_be_able_to_move
 
@@ -46,7 +46,7 @@ def test_king_cannot_move_if_obstructed(square_to_move_to: str, obstructing_piec
 
     board = Board(pieces)
 
-    assert not Coordinates.convert_from_grid_value(
+    assert not get_coordinates_from_grid_value(
         square_to_move_to) in king.get_possible_moves(board)
 
 
@@ -69,7 +69,7 @@ def test_king_can_take_opposing_piece(square_to_move_to: str, opposing_piece: Pi
 
     board = Board(pieces)
 
-    assert Coordinates.convert_from_grid_value(
+    assert get_coordinates_from_grid_value(
         square_to_move_to) in king.get_possible_moves(board)
 
 
@@ -100,7 +100,7 @@ def test_king_can_move_via_castle(square_to_move_to: str, other_pieces: list[Pie
 
     board = Board(pieces)
 
-    can_move = Coordinates.convert_from_grid_value(
+    can_move = get_coordinates_from_grid_value(
         square_to_move_to) in king.get_possible_moves(board)
 
     assert can_move == should_be_able_to_move
@@ -118,10 +118,10 @@ def test_king_cannot_move_via_castle_if_rook_has_moved() -> None:
 
     board = Board(pieces)
 
-    board.evaluate_move(rook, Coordinates.convert_from_grid_value('B1'))
-    board.evaluate_move(rook, Coordinates.convert_from_grid_value('A1'))
+    board.evaluate_move(rook, get_coordinates_from_grid_value('B1'))
+    board.evaluate_move(rook, get_coordinates_from_grid_value('A1'))
 
-    assert Coordinates.convert_from_grid_value(
+    assert get_coordinates_from_grid_value(
         'A3') not in king.get_possible_moves(board)
 
 
@@ -140,8 +140,8 @@ def test_king_cannot_move_via_castle_if_king_has_moved() -> None:
 
     board = Board(pieces)
 
-    board.evaluate_move(king, Coordinates.convert_from_grid_value('B5'))
-    board.evaluate_move(king, Coordinates.convert_from_grid_value('A5'))
+    board.evaluate_move(king, get_coordinates_from_grid_value('B5'))
+    board.evaluate_move(king, get_coordinates_from_grid_value('A5'))
 
-    assert all(Coordinates.convert_from_grid_value(square) not
+    assert all(get_coordinates_from_grid_value(square) not
                in king.get_possible_moves(board) for square in ['A3', 'A7'])

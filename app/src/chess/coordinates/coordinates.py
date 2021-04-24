@@ -5,10 +5,6 @@ from math import floor
 
 
 class Coordinates(tuple[int, int]):
-    # TODO - update to use shared values
-    y_grid_values = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    x_grid_values = ['8', '7', '6', '5', '4', '3', '2', '1']
-
     def __new__(cls: type[Coordinates], y_coordinate: int, x_coordinate: int) -> Coordinates:
         return super().__new__(cls, (y_coordinate, x_coordinate))
 
@@ -34,39 +30,3 @@ class Coordinates(tuple[int, int]):
     def __get_coordinate_from_position(position: int) -> int:
         return floor((position - board_edge_thickness -
                       board_border_thickness * 2) / square_size)
-
-    # TODO - do we need these?
-    @staticmethod
-    def convert_from_grid_value(coordinates: str) -> Coordinates:
-        if not Coordinates.__validate_coordinates(coordinates):
-            raise ValueError("Invalid coordinates")
-
-        y_value = Coordinates.y_grid_values.index(coordinates[0])
-        x_value = Coordinates.x_grid_values.index(coordinates[1])
-
-        return Coordinates(y_value, x_value)
-
-    @staticmethod
-    def convert_to_grid_value(coordinates: Coordinates) -> str:
-        y_value = Coordinates.y_grid_values[coordinates[0]]
-        x_value = Coordinates.x_grid_values[coordinates[1]]
-
-        coordinates_as_grid_value = "%s%s" % (y_value, x_value)
-
-        if not Coordinates.__validate_coordinates(coordinates_as_grid_value):
-            raise ValueError("Invalid coordinates")
-
-        return coordinates_as_grid_value
-
-    @staticmethod
-    def __validate_coordinates(coordinates: str) -> bool:
-        if len(coordinates) != 2:
-            return False
-
-        if coordinates[0] not in Coordinates.y_grid_values:
-            return False
-
-        if coordinates[1] not in Coordinates.x_grid_values:
-            return False
-
-        return True

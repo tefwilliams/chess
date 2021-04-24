@@ -32,8 +32,7 @@ class Board:
             return None
 
         if len(pieces_with_coordinates) > 1:
-            raise RuntimeError("More than one piece is at %s" %
-                               Coordinates.convert_to_grid_value(coordinates))
+            raise RuntimeError("More than one piece is at %s" % coordinates)
 
         return pieces_with_coordinates.pop()
 

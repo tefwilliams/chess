@@ -1,27 +1,29 @@
 
 import pytest
-from chess import PieceTypes, Coordinates, Board, Color
-from repository import generate_piece
+from chess import PieceTypes, Board, Color
+from ..repository import generate_piece, get_coordinates_from_grid_value
 
 
 def test_get_piece_returns_piece_with_specified_coordinates() -> None:
     piece = generate_piece(PieceTypes.pawn, 'A1', Color.white)
-    get_from_coordinates = Coordinates.convert_from_grid_value('A1') 
+    get_from_coordinates = get_coordinates_from_grid_value('A1')
 
     board = Board([piece])
 
     assert board.get_piece(get_from_coordinates) == piece
 
+
 def test_get_piece_returns_none_if_no_piece_has_specified_coordinates() -> None:
     piece = generate_piece(PieceTypes.pawn, 'A1', Color.white)
-    get_from_coordinates = Coordinates.convert_from_grid_value('B1')
+    get_from_coordinates = get_coordinates_from_grid_value('B1')
 
     board = Board([piece])
 
     assert board.get_piece(get_from_coordinates) == None
 
+
 @pytest.mark.parametrize(
-    "black_piece, piece_coordinates", 
+    "black_piece, piece_coordinates",
     [
         (PieceTypes.queen, 'A1'),
         (PieceTypes.queen, 'F4'),
@@ -40,6 +42,7 @@ def test_is_in_check_returns_true_when_king_in_check(black_piece, piece_coordina
     board = Board(pieces)
 
     assert board.is_in_check(Color.white)
+
 
 @pytest.mark.parametrize(
     "black_piece, piece_coordinates",
@@ -62,6 +65,7 @@ def test_is_in_check_returns_false_when_king_not_in_check(black_piece, piece_coo
 
     assert not board.is_in_check(Color.white)
 
+
 def test_move_via_en_passant_removes_piece() -> None:
     pawn = generate_piece(PieceTypes.pawn, 'E2', Color.white)
     enemy_pawn = generate_piece(PieceTypes.pawn, 'G1', Color.black)
@@ -72,9 +76,8 @@ def test_move_via_en_passant_removes_piece() -> None:
     ]
 
     board = Board(pieces)
-    
-    board.evaluate_move(enemy_pawn, Coordinates.convert_from_grid_value('E1'))
-    board.evaluate_move(pawn, Coordinates.convert_from_grid_value('F1'))
+
+    board.evaluate_move(enemy_pawn, get_coordinates_from_grid_value('E1'))
+    board.evaluate_move(pawn, get_coordinates_from_grid_value('F1'))
 
     assert enemy_pawn not in board.pieces
-
