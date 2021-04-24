@@ -28,7 +28,7 @@ class Board:
         pieces_with_coordinates = [
             piece for piece in self.__pieces if piece.coordinates == coordinates]
 
-        if len(pieces_with_coordinates) == 0:
+        if not pieces_with_coordinates:
             return None
 
         if len(pieces_with_coordinates) > 1:
@@ -80,9 +80,9 @@ class Board:
         for piece in self.__pieces[:]:
             piece.update_possible_moves(self)
 
-    def get_legal_moves(self: Board, piece: Piece, moves: list[list[Coordinates]]) -> list[Coordinates]:
+    def get_legal_moves(self: Board, piece: Piece, all_moves: list[list[Coordinates]]) -> list[Coordinates]:
         pseudo_legal_moves = self.__get_unobstructed_squares(
-            piece.color, moves)
+            piece.color, all_moves)
         return [coordinates for coordinates in pseudo_legal_moves if not self.__will_be_in_check_after_move(piece, coordinates)]
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
