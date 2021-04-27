@@ -42,13 +42,13 @@ class Board:
             raise ValueError("You cannot make this move")
 
         self.__move_piece(piece, coordinates)
-        self.__update_possible_moves()
+        self.__update_possible_moves(piece.color.get_opposing_color())
         self.__move_counter += 1
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates) -> Callable[[], None]:
         moved_pieces = self.__pieces_moved.copy()
         taken_pieces = self.__pieces_taken.copy()
-        current_pieces = self.__pieces[:]
+        current_pieces = self.__pieces.copy()
 
         piece_to_take = self.__get_piece_to_take(piece, coordinates)
 
@@ -76,9 +76,12 @@ class Board:
 
         return self.get_piece(coordinates_to_take_piece_from)
 
-    def __update_possible_moves(self: Board) -> None:
-        for piece in self.__pieces[:]:
-            piece.update_possible_moves(self)
+    def __update_possible_moves(self: Board, color: Color = None) -> None:
+        pieces_to_update = self.__pieces.copy(
+        ) if not color else self.__get_pieces_by_color(color)
+
+        for piece in pieces_to_update:
+            piece.update_possible_moves(self) 
 
     def get_legal_moves(self: Board, piece: Piece, all_moves: list[list[Coordinates]]) -> list[Coordinates]:
         pseudo_legal_moves = self.__get_unobstructed_squares(
@@ -111,10 +114,15 @@ class Board:
         return unobstructed_squares
 
     def legal_en_passant(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
+        if piece.type != PieceTypes.pawn:
+            return False
+
         step_backward = piece.color.get_opposing_color().get_step_forward()
         piece_to_take = self.get_piece(coordinates.move_by(step_backward))
 
-        if not piece_to_take:
+        if (not piece_to_take
+                or piece_to_take.color == piece.color
+                or piece_to_take.type != PieceTypes.pawn):
             return False
 
         last_piece_to_move = self.__get_last_piece_to_move()
@@ -122,10 +130,7 @@ class Board:
         piece_has_just_moved_two_squares = abs(
             piece_to_take.coordinates.y - piece_to_take.previous_coordinates.y) == 2
 
-        return (piece.type == PieceTypes.pawn
-                and piece_to_take.color != piece.color
-                and piece_to_take.type == PieceTypes.pawn
-                and piece_to_take == last_piece_to_move
+        return (piece_to_take == last_piece_to_move
                 and piece_has_just_moved_two_squares)
 
     # TODO - implement logic
