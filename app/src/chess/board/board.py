@@ -83,9 +83,9 @@ class Board:
         for piece in pieces_to_update:
             piece.update_possible_moves(self) 
 
-    def get_legal_moves(self: Board, piece: Piece, all_moves: list[list[Coordinates]]) -> list[Coordinates]:
-        pseudo_legal_moves = self.__get_unobstructed_squares(
-            piece.color, all_moves)
+    def get_legal_moves(self: Board, piece: Piece, base_moves: list[list[Coordinates]]) -> list[Coordinates]:
+        pseudo_legal_moves = self.__get_pseudo_legal_moves(
+            piece.color, base_moves)
         return [coordinates for coordinates in pseudo_legal_moves if not self.__will_be_in_check_after_move(piece, coordinates)]
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
@@ -95,7 +95,7 @@ class Board:
 
         return in_check
 
-    def __get_unobstructed_squares(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
+    def __get_pseudo_legal_moves(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
         unobstructed_squares: list[Coordinates] = []
 
         for squares_in_direction in squares:  # TODO - clarify what this is doing
@@ -149,15 +149,15 @@ class Board:
         return king is not None and self.square_is_attacked(king.coordinates, color)
 
     def square_is_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
-        diagonal_squares = self.__get_unobstructed_squares(
+        diagonal_squares = self.__get_pseudo_legal_moves(
             color, Movement.get_diagonal_squares(coordinates))
-        orthogonal_squares = self.__get_unobstructed_squares(
+        orthogonal_squares = self.__get_pseudo_legal_moves(
             color, Movement.get_orthogonal_squares(coordinates))
-        knight_squares = self.__get_unobstructed_squares(
+        knight_squares = self.__get_pseudo_legal_moves(
             color, Movement.get_knight_squares(coordinates))
-        adjacent_squares = self.__get_unobstructed_squares(
+        adjacent_squares = self.__get_pseudo_legal_moves(
             color, Movement.get_adjacent_squares(coordinates))
-        pawn_attack_squares = self.__get_unobstructed_squares(
+        pawn_attack_squares = self.__get_pseudo_legal_moves(
             color, Movement.get_pawn_attack_squares(coordinates, color))
 
         enemy_color = Color.get_opposing_color(color)
