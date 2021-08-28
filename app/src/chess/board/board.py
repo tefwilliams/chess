@@ -176,7 +176,7 @@ class Board:
         return any(piece and piece.color == enemy_color and piece.type in list_of_pieces for piece in map(self.get_piece, list_of_squares))
 
     # TODO - does this need to ever return None?
-    # can we mock the reponse if there is no king?
+    # can we mock the response if there is no king?
     def __get_king(self: Board, color: Color) -> Piece | None:
         player_pieces = self.__get_pieces_by_color(color)
         player_king_list = [
