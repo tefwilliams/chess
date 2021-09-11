@@ -53,6 +53,16 @@ class Board:
             self.__pieces.remove(piece_to_take)
             self.__pieces_taken[self.__move_counter] = piece_to_take
 
+        if self.legal_castle(piece, coordinates):
+            horizontal_squares = Movement.get_castle_squares(piece.coordinates)
+
+            castle_squares = [
+                square for squares_in_direction in horizontal_squares for square in squares_in_direction if coordinates in squares_in_direction]
+            castle_to_move = self.get_piece(castle_squares[-1])
+            assert castle_to_move
+
+            castle_to_move.move(castle_squares[0])
+
         piece.move(coordinates)
         self.__pieces_moved[self.__move_counter] = piece
 
@@ -130,9 +140,26 @@ class Board:
         return (piece_to_take == last_piece_to_move
                 and piece_has_just_moved_two_squares)
 
-    # TODO - implement logic
-    def legal_castle(self: Board) -> bool:
-        raise NotImplementedError
+    def legal_castle(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
+        horizontal_squares = Movement.get_castle_squares(piece.coordinates)
+
+        castle_squares = [
+            square for squares_in_direction in horizontal_squares for square in squares_in_direction if coordinates in squares_in_direction]
+
+        if len(castle_squares) == 0:
+            return False
+
+        piece_at_castle_position = self.get_piece(castle_squares[-1])
+
+        return (piece.type == PieceTypes.king
+                and piece_at_castle_position is not None
+                and piece_at_castle_position.type == PieceTypes.rook
+                and not piece.has_moved
+                and not piece_at_castle_position.has_moved
+                and coordinates == castle_squares[1]
+                and not self.is_in_check(piece.color)
+                and not any(self.square_is_attacked(square, piece.color) for square in castle_squares[0: 1])
+                and all(self.get_piece(square) is None for square in castle_squares[0: -1]))
 
     def __get_last_piece_to_move(self: Board) -> Piece | None:
         if not self.__pieces_moved:
