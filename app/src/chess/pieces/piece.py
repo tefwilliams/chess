@@ -39,19 +39,16 @@ class Piece:
     def has_moved(self: Piece) -> bool:
         return len(self.__moves) > 0
 
-    @property
-    def possible_moves(self: Piece) -> list[Coordinates]:
-        return self.__possible_moves
-
     def move(self: Piece, coordinates: Coordinates) -> None:
         self.__moves.append((self.coordinates, coordinates))
         self.__coordinates = coordinates
 
-    def update_possible_moves(self: Piece, board: Board) -> None:
-        self.__possible_moves = self.get_possible_moves(board)
+    def get_base_moves(self: Piece, board: Board) -> list[list[Coordinates]]:
+        raise NotImplementedError
 
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
-        raise NotImplementedError
+        base_moves = self.get_base_moves(board)
+        return board.get_legal_moves(self, base_moves)
 
     def revert_last_move(self: Piece) -> None:
         self.__coordinates = self.previous_coordinates

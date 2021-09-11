@@ -82,7 +82,8 @@ class Game:
             return self.__get_move_selection()
 
         self.__highlight_square(origin_coordinates)
-        self.__display_possible_moves(piece_at_origin.possible_moves)
+        self.__display_possible_moves(
+            piece_at_origin.get_possible_moves(self.board))
 
         destination_coordinates = self.__wait_for_coordinate_selection()
 

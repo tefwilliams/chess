@@ -18,8 +18,6 @@ class Board:
         self.__pieces_moved: dict[int, Piece] = {}
         self.__pieces_taken: dict[int, Piece] = {}
 
-        self.__update_possible_moves()
-
     @property
     def pieces(self: Board) -> list[Piece]:
         return self.__pieces
@@ -38,11 +36,10 @@ class Board:
 
     # TODO - rename this to move piece?
     def evaluate_move(self: Board, piece: Piece, coordinates: Coordinates) -> None:
-        if coordinates not in piece.possible_moves:
+        if coordinates not in piece.get_possible_moves(self):
             raise ValueError("You cannot make this move")
 
         self.__move_piece(piece, coordinates)
-        self.__update_possible_moves(piece.color.get_opposing_color())
         self.__move_counter += 1
 
     def __move_piece(self: Board, piece: Piece, coordinates: Coordinates) -> Callable[[], None]:
@@ -76,13 +73,6 @@ class Board:
 
         return self.get_piece(coordinates_to_take_piece_from)
 
-    def __update_possible_moves(self: Board, color: Color = None) -> None:
-        pieces_to_update = self.__pieces.copy(
-        ) if not color else self.__get_pieces_by_color(color)
-
-        for piece in pieces_to_update:
-            piece.update_possible_moves(self) 
-
     def get_legal_moves(self: Board, piece: Piece, base_moves: list[list[Coordinates]]) -> list[Coordinates]:
         pseudo_legal_moves = self.__get_pseudo_legal_moves(
             piece.color, base_moves)
@@ -96,22 +86,29 @@ class Board:
         return in_check
 
     def __get_pseudo_legal_moves(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
-        unobstructed_squares: list[Coordinates] = []
+        pseudo_legal_moves = [self.__get_unobstructed_moves_in_direction(
+            color, moves_in_direction) for moves_in_direction in squares]
 
-        for squares_in_direction in squares:  # TODO - clarify what this is doing
-            for square in squares_in_direction:
-                piece_at_destination = self.get_piece(square)
+        return [pseudo_legal_move for pseudo_legal_moves_in_direction in pseudo_legal_moves for pseudo_legal_move in pseudo_legal_moves_in_direction]
 
-                if piece_at_destination and piece_at_destination.color != color:
-                    unobstructed_squares.append(square)
-                    break
+    def __get_unobstructed_moves_in_direction(self: Board, color: Color, moves_in_direction: list[Coordinates]) -> list[Coordinates]:
+        unobstructed_moves_in_direction: list[Coordinates] = []
 
-                elif piece_at_destination:
-                    break
+        for square in moves_in_direction:
+            piece_at_destination = self.get_piece(square)
 
-                unobstructed_squares.append(square)
+            if piece_at_destination and piece_at_destination.color != color:
+                # Can move to square since enemy piece is there - can't move further
+                unobstructed_moves_in_direction.append(square)
+                break
 
-        return unobstructed_squares
+            elif piece_at_destination:
+                # Can't move to square because friendly piece is there
+                break
+
+            unobstructed_moves_in_direction.append(square)
+
+        return unobstructed_moves_in_direction
 
     def legal_en_passant(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         if piece.type != PieceTypes.pawn:
@@ -195,7 +192,7 @@ class Board:
 
     def __any_possible_moves(self: Board, color: Color) -> bool:
         player_pieces = self.__get_pieces_by_color(color)
-        return any(piece.possible_moves for piece in player_pieces)
+        return any(piece.get_possible_moves(self) for piece in player_pieces)
 
     def check_mate(self: Board, color: Color) -> bool:
         return self.is_in_check(color) and not self.__any_possible_moves(color)

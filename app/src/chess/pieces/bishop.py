@@ -16,6 +16,5 @@ class Bishop(Piece):
     def __init__(self: Bishop, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
 
-    def get_possible_moves(self: Bishop, board: Board) -> list[Coordinates]:
-        diagonal_squares = Movement.get_diagonal_squares(self.coordinates)
-        return board.get_legal_moves(self, diagonal_squares)
+    def get_base_moves(self: Bishop, board: Board) -> list[list[Coordinates]]:
+        return Movement.get_diagonal_squares(self.coordinates)

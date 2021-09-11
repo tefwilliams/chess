@@ -16,7 +16,7 @@ class King(Piece):
     def __init__(self: King, coordinates: Coordinates, color: Color) -> None:
         super().__init__(coordinates, color)
 
-    def get_possible_moves(self: King, board: Board) -> list[Coordinates]:
+    def get_base_moves(self: King, board: Board) -> list[list[Coordinates]]:
         castle_moves: list[Coordinates] = []
         adjacent_squares = Movement.get_adjacent_squares(self.coordinates)
         castle_squares = Movement.get_castle_squares(self.coordinates)
@@ -33,4 +33,4 @@ class King(Piece):
                     and all(board.get_piece(square) is None for square in list_of_squares[0: -1])):
                 castle_moves.append(list_of_squares[1])
 
-        return castle_moves + board.get_legal_moves(self, adjacent_squares)
+        return adjacent_squares + [castle_moves]
