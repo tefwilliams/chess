@@ -43,18 +43,12 @@ class Piece:
         self.__moves.append((self.coordinates, new_coordinates))
         self.__coordinates = new_coordinates
 
-    def get_base_moves(self: Piece, board: Board) -> list[list[Coordinates]]:
-        raise NotImplementedError
-
     def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
         base_moves = self.get_base_moves(board)
         return board.get_legal_moves(self, base_moves)
 
-    def revert_last_move(self: Piece) -> None:
-        assert self.previous_coordinates
-
-        self.__coordinates = self.previous_coordinates
-        self.__moves.pop()
+    def get_base_moves(self: Piece, board: Board) -> list[list[Coordinates]]:
+        raise NotImplementedError
 
 
 class PieceTypes(Enum):
