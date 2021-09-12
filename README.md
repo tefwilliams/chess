@@ -8,4 +8,4 @@
 
 ## Outstanding issues
 
-
+- Update strings to use new formatting

@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from typing import Callable
+from ..repository import only
 from ..coordinates import Coordinates
 from ..movement import Movement
 from ..player import Color
@@ -24,16 +24,7 @@ class Board:
         return self.__pieces
 
     def get_piece(self: Board, coordinates: Coordinates) -> Piece | None:
-        pieces_with_coordinates = [
-            piece for piece in self.__pieces if piece.coordinates == coordinates]
-
-        if not pieces_with_coordinates:
-            return None
-
-        if len(pieces_with_coordinates) > 1:
-            raise RuntimeError("More than one piece is at %s" % coordinates)
-
-        return pieces_with_coordinates.pop()
+        return only((piece for piece in self.__pieces if piece.coordinates == coordinates), f"More than one piece is at {coordinates}")
 
     # TODO - rename this to move piece?
     def evaluate_move(self: Board, piece: Piece, coordinates: Coordinates) -> None:
@@ -79,9 +70,7 @@ class Board:
         assert current_piece
 
         current_board.__move_piece(current_piece, coordinates)
-        in_check = current_board.is_in_check(piece.color)
-
-        return in_check
+        return current_board.is_in_check(piece.color)
 
     def __get_pseudo_legal_moves(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
         pseudo_legal_moves = [self.__get_unobstructed_moves_in_direction(
@@ -185,20 +174,10 @@ class Board:
     def __enemy_piece_is_at_square(self, list_of_squares: list[Coordinates], list_of_pieces: list[PieceTypes], enemy_color: Color) -> bool:
         return any(piece and piece.color == enemy_color and piece.type in list_of_pieces for piece in map(self.get_piece, list_of_squares))
 
-    # TODO - does this need to ever return None?
-    # can we mock the response if there is no king?
     def __get_king(self: Board, color: Color) -> Piece | None:
         player_pieces = self.__get_pieces_by_color(color)
-        player_king_list = [
-            piece for piece in player_pieces if piece.type == PieceTypes.king]
-
-        if len(player_king_list) > 1:
-            raise RuntimeError("More than one king on %s team" % color.name)
-
-        if not player_king_list:
-            return None
-
-        return player_king_list.pop()
+        message = "More than one king on %s team" % color.name
+        return only((piece for piece in player_pieces if piece.type == PieceTypes.king), f"More than one king on {color.name} team")
 
     def __get_pieces_by_color(self: Board, color: Color) -> list[Piece]:
         return [piece for piece in self.__pieces if piece.color == color]

@@ -5,9 +5,6 @@ from math import floor
 
 
 class Coordinates(tuple[int, int]):
-    def __new__(cls: type[Coordinates], coordinates: tuple[int, int]) -> Coordinates:
-        return super().__new__(cls, coordinates)
-
     def __init__(self: Coordinates, coordinates: tuple[int, int]) -> None:
         y_coordinate, x_coordinate = coordinates
 
