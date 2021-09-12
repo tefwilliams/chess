@@ -6,6 +6,7 @@ from ..movement import Movement
 from ..player import Color
 from ..pieces import Piece, PieceTypes
 from ..data import board_size
+from copy import deepcopy
 
 
 class Board:
@@ -42,11 +43,7 @@ class Board:
         self.__move_piece(piece, coordinates)
         self.__move_counter += 1
 
-    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates) -> Callable[[], None]:
-        moved_pieces = self.__pieces_moved.copy()
-        taken_pieces = self.__pieces_taken.copy()
-        current_pieces = self.__pieces.copy()
-
+    def __move_piece(self: Board, piece: Piece, coordinates: Coordinates) -> None:
         piece_to_take = self.__get_piece_to_take(piece, coordinates)
 
         if piece_to_take:
@@ -54,25 +51,14 @@ class Board:
             self.__pieces_taken[self.__move_counter] = piece_to_take
 
         if self.legal_castle(piece, coordinates):
-            horizontal_squares = Movement.get_castle_squares(piece.coordinates)
-
             castle_squares = [
-                square for squares_in_direction in horizontal_squares for square in squares_in_direction if coordinates in squares_in_direction]
+                square for squares_in_direction in Movement.get_castle_squares(piece.coordinates) for square in squares_in_direction if coordinates in squares_in_direction]
             castle_to_move = self.get_piece(castle_squares[-1])
             assert castle_to_move
-
             castle_to_move.move(castle_squares[0])
 
         piece.move(coordinates)
         self.__pieces_moved[self.__move_counter] = piece
-
-        def undo_move() -> None:
-            piece.revert_last_move()
-            self.__pieces = current_pieces
-            self.__pieces_moved = moved_pieces
-            self.__pieces_taken = taken_pieces
-
-        return undo_move
 
     def __get_piece_to_take(self: Board, piece: Piece, coordinates: Coordinates) -> Piece | None:
         is_en_passant = self.legal_en_passant(piece, coordinates)
@@ -84,14 +70,16 @@ class Board:
         return self.get_piece(coordinates_to_take_piece_from)
 
     def get_legal_moves(self: Board, piece: Piece, base_moves: list[list[Coordinates]]) -> list[Coordinates]:
-        pseudo_legal_moves = self.__get_pseudo_legal_moves(
-            piece.color, base_moves)
-        return [coordinates for coordinates in pseudo_legal_moves if not self.__will_be_in_check_after_move(piece, coordinates)]
+        return [pseudo_legal_move for pseudo_legal_move in self.__get_pseudo_legal_moves(piece.color, base_moves) if not self.__will_be_in_check_after_move(piece, pseudo_legal_move)]
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
-        undo_move = self.__move_piece(piece, coordinates)
-        in_check = self.is_in_check(piece.color)
-        undo_move()
+        current_board = deepcopy(self)
+        current_piece = current_board.get_piece(piece.coordinates)
+
+        assert current_piece
+
+        current_board.__move_piece(current_piece, coordinates)
+        in_check = current_board.is_in_check(piece.color)
 
         return in_check
 
@@ -134,17 +122,15 @@ class Board:
 
         last_piece_to_move = self.__get_last_piece_to_move()
 
-        piece_has_just_moved_two_squares = abs(
-            piece_to_take.coordinates.y - piece_to_take.previous_coordinates.y) == 2
+        piece_has_just_moved_two_squares = (piece_to_take.previous_coordinates is not None
+                                            and abs(piece_to_take.coordinates.y - piece_to_take.previous_coordinates.y) == 2)
 
         return (piece_to_take == last_piece_to_move
                 and piece_has_just_moved_two_squares)
 
     def legal_castle(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
-        horizontal_squares = Movement.get_castle_squares(piece.coordinates)
-
         castle_squares = [
-            square for squares_in_direction in horizontal_squares for square in squares_in_direction if coordinates in squares_in_direction]
+            square for squares_in_direction in Movement.get_castle_squares(piece.coordinates) for square in squares_in_direction if coordinates in squares_in_direction]
 
         if len(castle_squares) == 0:
             return False

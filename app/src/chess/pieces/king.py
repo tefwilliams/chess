@@ -17,12 +17,8 @@ class King(Piece):
         super().__init__(coordinates, color)
 
     def get_base_moves(self: King, board: Board) -> list[list[Coordinates]]:
-        castle_moves: list[Coordinates] = []
         adjacent_squares = Movement.get_adjacent_squares(self.coordinates)
-        castle_squares = Movement.get_castle_squares(self.coordinates)
 
-        for list_of_squares in castle_squares:
-            if board.legal_castle(self, list_of_squares[1]):
-                castle_moves.append(list_of_squares[1])
+        castle_moves = [squares_in_direction[1] for squares_in_direction in Movement.get_castle_squares(self.coordinates) if board.legal_castle(self, squares_in_direction[1])]
 
         return adjacent_squares + [castle_moves]

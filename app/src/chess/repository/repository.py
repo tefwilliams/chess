@@ -11,7 +11,7 @@ def get_starting_pieces() -> list[Piece]:
 
     for i in range(board_size):
         for j in range(board_size):
-            coordinates = Coordinates(i, j)
+            coordinates = Coordinates((i, j))
             starting_piece = get_starting_piece(coordinates)
 
             if starting_piece:

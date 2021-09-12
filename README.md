@@ -8,7 +8,4 @@
 
 ## Outstanding issues
 
-- Castling occurs when re-clicking on king
-- Castling does not correctly move king
-- Take piece icon shows incorrectly when castling
-- Expand castling test coverage
+

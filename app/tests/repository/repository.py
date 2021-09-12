@@ -31,4 +31,4 @@ def generate_piece(piece_type: PieceTypes, coordinates_as_string: str, color: Co
 def get_coordinates_from_grid_value(coordinates: str) -> Coordinates:
     y_value = y_grid_values.index(coordinates[0])
     x_value = x_grid_values.index(coordinates[1])
-    return Coordinates(y_value, x_value)
+    return Coordinates((y_value, x_value))

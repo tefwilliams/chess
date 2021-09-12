@@ -29,9 +29,9 @@ class Piece:
         return self.__coordinates
 
     @property
-    def previous_coordinates(self: Piece) -> Coordinates:
+    def previous_coordinates(self: Piece) -> Coordinates | None:
         if not self.has_moved:
-            return self.coordinates
+            return None
 
         return self.__moves[-1][0]
 
@@ -39,9 +39,9 @@ class Piece:
     def has_moved(self: Piece) -> bool:
         return len(self.__moves) > 0
 
-    def move(self: Piece, coordinates: Coordinates) -> None:
-        self.__moves.append((self.coordinates, coordinates))
-        self.__coordinates = coordinates
+    def move(self: Piece, new_coordinates: Coordinates) -> None:
+        self.__moves.append((self.coordinates, new_coordinates))
+        self.__coordinates = new_coordinates
 
     def get_base_moves(self: Piece, board: Board) -> list[list[Coordinates]]:
         raise NotImplementedError
@@ -51,6 +51,8 @@ class Piece:
         return board.get_legal_moves(self, base_moves)
 
     def revert_last_move(self: Piece) -> None:
+        assert self.previous_coordinates
+
         self.__coordinates = self.previous_coordinates
         self.__moves.pop()
 

@@ -161,7 +161,7 @@ class Game:
     def __create_squares(self: Game) -> None:
         for row_number in range(board_size):
             for column_number in range(board_size):
-                self.__create_square(Coordinates(row_number, column_number))
+                self.__create_square(Coordinates((row_number, column_number)))
 
     def __create_square(self: Game, coordinates: Coordinates, highlighted: bool = False) -> None:
         square_color = cream if (
