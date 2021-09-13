@@ -1,5 +1,5 @@
 
-from typing import Iterator, TypeVar, Union
+from typing import Union
 from ..data import board_size
 from ..pieces import Piece, Pawn, Rook, Knight, Bishop, Queen, King
 from ..player import Color
@@ -42,16 +42,3 @@ def get_starting_piece(coordinates: Coordinates) -> Union[Piece, None]:
 
         if coordinates.x == 4:
             return King(coordinates, color)
-
-
-T = TypeVar('T')
-
-
-# TODO - move this into helper file
-def only(iterator: Iterator[T], error_message: str = "") -> Union[T, None]:
-    results = [iterator]
-
-    if len(results) > 1:
-        raise RuntimeError(error_message)
-
-    return next(iterator, None)

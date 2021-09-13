@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from ..repository import only
+from ..helpers import only
 from ..coordinates import Coordinates
 from ..movement import Movement
 from ..player import Color
@@ -176,7 +176,6 @@ class Board:
 
     def __get_king(self: Board, color: Color) -> Piece | None:
         player_pieces = self.__get_pieces_by_color(color)
-        message = "More than one king on %s team" % color.name
         return only((piece for piece in player_pieces if piece.type == PieceTypes.king), f"More than one king on {color.name} team")
 
     def __get_pieces_by_color(self: Board, color: Color) -> list[Piece]:

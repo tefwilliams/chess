@@ -8,11 +8,15 @@ while not game.over():
 
 if game.check_mate():
     opposing_player_color = Color.get_opposing_color(game.player.color)
-    print("%s in check mate. %s wins!" % (str(game.player.color.name).capitalize(
-    ), str(opposing_player_color.name).capitalize()) + "\n")
+
+    losing_player = game.player.color.name.capitalize()
+    winning_player = opposing_player_color.name.capitalize()
+
+    print(f"{losing_player} in check mate. {winning_player} wins!" + "\n")
 
 elif game.stale_mate():
-    print("%s in stale mate. It's a draw!" %
-          str(game.player.color.name).capitalize() + "\n")
+    current_player = game.player.color.name.capitalize()
+
+    print(f"{current_player} in stale mate. It's a draw!" + "\n")
 
 Game.quit()
