@@ -1,11 +1,11 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from ..player import Color
 from ..movement import Movement
 from .piece import Piece, PieceTypes
 
 if TYPE_CHECKING:
+    from ..player import Color
     from ..coordinates import Coordinates
     from ..board import Board
 

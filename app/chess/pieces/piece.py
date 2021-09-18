@@ -2,11 +2,10 @@
 from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING
-
 from ..helpers import last
-from ..player import Color
 
 if TYPE_CHECKING:
+    from ..player import Color
     from ..coordinates import Coordinates
     from ..board import Board
 

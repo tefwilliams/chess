@@ -1,13 +1,13 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from ..player import Color
 from ..movement import Movement
 from ..coordinates import Coordinates
 from .piece import Piece, PieceTypes
 
 if TYPE_CHECKING:
     from ..board import Board
+    from ..player import Color
 
 
 class Pawn(Piece):
