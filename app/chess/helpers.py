@@ -24,3 +24,7 @@ def last(list: list[T]) -> Union[T, None]:
     Returns None if the list is empty. 
     """
     return next(reversed(list), None)
+
+# TODO - can we get rid of this and use a library?
+def flatten(list_of_lists: list[list[T]]) -> list[T]:
+    return [val for sublist in list_of_lists for val in sublist]
