@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from .helpers import only
+from .helpers import only, flatten
 from .coordinates import Coordinates
 from .movement import Movement
 from .player import Color
@@ -73,12 +73,7 @@ class Board:
         return current_board.is_in_check(piece.color)
 
     def __get_pseudo_legal_moves(self: Board, piece: Piece) -> list[Coordinates]:
-        base_moves = piece.get_base_moves(self)
-
-        pseudo_legal_moves = [self.__get_unobstructed_moves_in_direction(
-            piece.color, moves_in_direction) for moves_in_direction in base_moves]
-
-        return [pseudo_legal_move for pseudo_legal_moves_in_direction in pseudo_legal_moves for pseudo_legal_move in pseudo_legal_moves_in_direction]
+        return flatten([self.__get_unobstructed_moves_in_direction(piece.color, moves_in_direction) for moves_in_direction in piece.get_base_moves(self)])
 
     def __get_unobstructed_moves_in_direction(self: Board, color: Color, moves_in_direction: list[Coordinates]) -> list[Coordinates]:
         unobstructed_moves_in_direction: list[Coordinates] = []
