@@ -141,12 +141,18 @@ class Board:
                 and all(self.get_piece(square) is None for square in castle_squares[0: -1]))
 
     def __get_last_piece_to_move(self: Board) -> Piece | None:
-        if not self.__pieces_moved:
+        return list(self.__pieces_moved.values()).pop() if self.__pieces_moved else None
+
+    def get_last_move(self: Board) -> tuple[Coordinates, Coordinates] | None:
+        last_piece_to_move = self.__get_last_piece_to_move()
+
+        if not last_piece_to_move:
             return None
 
-        return list(self.__pieces_moved.values()).pop()
+        assert last_piece_to_move.previous_coordinates
 
-    # TODO - pull methods onto player?
+        return last_piece_to_move.previous_coordinates, last_piece_to_move.coordinates
+
     def is_in_check(self: Board, color: Color) -> bool:
         king = self.__get_king(color)
         return king is not None and self.square_is_attacked(king.coordinates, color)

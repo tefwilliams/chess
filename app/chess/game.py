@@ -106,14 +106,12 @@ class Game:
     def __refresh_display(self: Game) -> None:
         self.__create_squares()
 
-        # TODO - add highlighting for last move
-        # if self.__last_move:
-        #     [self.__highlight_square(coordinates)
-        #      for coordinates in self.__last_move]
+        last_move = self.board.get_last_move()
+        if last_move:
+            [self.__highlight_square(coordinates) for coordinates in last_move] # TODO - change highlight colour to not match selection colour
 
         pygame.display.update()
 
-    # TODO - maybe put on Coordinates
     def __wait_for_coordinate_selection(self: Game) -> Coordinates:
         while True:
             coordinates = Coordinates.get_coordinates_from_mouse_position(
