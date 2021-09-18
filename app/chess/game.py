@@ -1,12 +1,17 @@
 
 from __future__ import annotations
+import os
 import pygame
-from ..coordinates import Coordinates
-from ..repository import get_starting_pieces
-from ..board import Board
-from ..player import Player
-from ..pieces import Piece
-from ..data import display_size, gray, cream, yellow, green, light_green, brown, light_brown, board_size, board_edge_thickness, board_border_thickness, square_size
+from .coordinates import Coordinates
+from .repository import get_starting_pieces
+from .board import Board
+from .player import Player
+from .pieces import Piece
+from .data import display_size, gray, cream, yellow, green, light_green, brown, light_brown, board_size, board_edge_thickness, board_border_thickness, square_size
+
+
+script_dir = os.path.dirname(__file__)
+icons_folder_path = os.path.join(script_dir, "../icons")
 
 
 class Game:
@@ -24,7 +29,7 @@ class Game:
 
         pygame.display.set_caption("Chess")
 
-        icon = pygame.image.load("icons/game_favicon.png")
+        icon = pygame.image.load(f"{icons_folder_path}/game_favicon.png")
         pygame.display.set_icon(icon)
 
         self.__create_board_edge()
@@ -194,7 +199,7 @@ class Game:
 
     def __display_piece(self: Game, piece: Piece) -> None:
         piece_icon = pygame.image.load(
-            f'icons/{piece.color.name}_{piece.type.name}.png')
+            f'{icons_folder_path}/{piece.color.name}_{piece.type.name}.png')
         left_margin, top_margin = self.__get_square_location(
             piece.coordinates)
 

@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from ..data import board_size, board_edge_thickness, board_border_thickness, square_size
+from .data import board_size, board_edge_thickness, board_border_thickness, square_size
 from math import floor
 
 

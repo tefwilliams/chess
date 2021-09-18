@@ -7,8 +7,8 @@ from ..helpers import last
 from ..player import Color
 
 if TYPE_CHECKING:
-    from ...chess.coordinates import Coordinates
-    from ...chess.board import Board
+    from ..coordinates import Coordinates
+    from ..board import Board
 
 
 class Piece:

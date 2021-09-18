@@ -7,7 +7,7 @@ from ..coordinates import Coordinates
 from .piece import Piece, PieceTypes
 
 if TYPE_CHECKING:
-    from ...chess.board import Board
+    from ..board import Board
 
 
 class Pawn(Piece):

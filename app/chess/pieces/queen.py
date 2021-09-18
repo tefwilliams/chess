@@ -6,8 +6,8 @@ from ..movement import Movement
 from .piece import Piece, PieceTypes
 
 if TYPE_CHECKING:
-    from ...chess.coordinates import Coordinates
-    from ...chess.board import Board
+    from ..coordinates import Coordinates
+    from ..board import Board
 
 
 class Queen(Piece):

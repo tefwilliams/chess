@@ -6,8 +6,8 @@ from ..movement import Movement
 from .piece import Piece, PieceTypes
 
 if TYPE_CHECKING:
-    from ...chess.coordinates import Coordinates
-    from ...chess.board import Board
+    from ..coordinates import Coordinates
+    from ..board import Board
 
 
 class King(Piece):
@@ -17,6 +17,7 @@ class King(Piece):
         super().__init__(coordinates, color)
 
     def get_base_moves(self: King, board: Board) -> list[list[Coordinates]]:
-        castle_moves = [squares_in_direction[1] for squares_in_direction in Movement.get_castle_squares(self.coordinates) if board.legal_castle(self, squares_in_direction[1])]
+        castle_moves = [squares_in_direction[1] for squares_in_direction in Movement.get_castle_squares(
+            self.coordinates) if board.legal_castle(self, squares_in_direction[1])]
 
         return Movement.get_adjacent_squares(self.coordinates) + [castle_moves]

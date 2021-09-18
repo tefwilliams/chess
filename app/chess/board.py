@@ -1,11 +1,11 @@
 
 from __future__ import annotations
-from ..helpers import only
-from ..coordinates import Coordinates
-from ..movement import Movement
-from ..player import Color
-from ..pieces import Piece, PieceTypes
-from ..data import board_size
+from .helpers import only
+from .coordinates import Coordinates
+from .movement import Movement
+from .player import Color
+from .pieces import Piece, PieceTypes
+from .data import board_size
 from copy import deepcopy
 
 

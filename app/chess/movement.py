@@ -1,6 +1,6 @@
 
-from ..player import Color
-from ..coordinates import Coordinates
+from .player import Color
+from .coordinates import Coordinates
 
 
 class Movement:

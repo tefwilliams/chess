@@ -1,9 +1,9 @@
 
 from typing import Union
-from ..data import board_size
-from ..pieces import Piece, Pawn, Rook, Knight, Bishop, Queen, King
-from ..player import Color
-from ..coordinates import Coordinates
+from .data import board_size
+from .pieces import Piece, Pawn, Rook, Knight, Bishop, Queen, King
+from .player import Color
+from .coordinates import Coordinates
 
 
 def get_starting_pieces() -> list[Piece]:
