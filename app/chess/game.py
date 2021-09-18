@@ -108,7 +108,8 @@ class Game:
 
         last_move = self.board.get_last_move()
         if last_move:
-            [self.__highlight_square(coordinates) for coordinates in last_move] # TODO - change highlight colour to not match selection colour
+            # TODO - change highlight colour to not match selection colour
+            [self.__highlight_square(coordinates) for coordinates in last_move]
 
         pygame.display.update()
 
@@ -121,7 +122,7 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    Game.quit()  # if put on coordinates maybe move this out of game?
+                    Game.quit()
 
                 if event.type == pygame.MOUSEBUTTONUP and coordinates.within_board:
                     return coordinates
