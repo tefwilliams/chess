@@ -22,7 +22,7 @@ def test_rook_can_only_move_diagonally_or_orthogonally(square_to_move_to: str, s
     board = Board([rook])
 
     can_move = get_coordinates_from_grid_value(
-        square_to_move_to) in rook.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(rook)
     assert can_move == should_be_able_to_move
 
 
@@ -50,7 +50,7 @@ def test_rook_cannot_move_if_obstructed(square_to_move_to: str, obstructing_piec
     board = Board(pieces)
 
     assert not get_coordinates_from_grid_value(
-        square_to_move_to) in rook.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(rook)
 
 
 @pytest.mark.parametrize(
@@ -74,4 +74,4 @@ def test_rook_can_take_opposing_piece(square_to_move_to: str, opposing_piece: Pi
     board = Board(pieces)
 
     assert get_coordinates_from_grid_value(
-        square_to_move_to) in rook.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(rook)

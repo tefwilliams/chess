@@ -28,7 +28,7 @@ class Board:
 
     # TODO - rename this to move piece?
     def evaluate_move(self: Board, piece: Piece, coordinates: Coordinates) -> None:
-        if coordinates not in piece.get_possible_moves(self):
+        if coordinates not in self.get_legal_moves(piece):
             raise ValueError("You cannot make this move")
 
         self.__move_piece(piece, coordinates)
@@ -60,8 +60,12 @@ class Board:
 
         return self.get_piece(coordinates_to_take_piece_from)
 
-    def get_legal_moves(self: Board, piece: Piece, base_moves: list[list[Coordinates]]) -> list[Coordinates]:
-        return [pseudo_legal_move for pseudo_legal_move in self.__get_pseudo_legal_moves(piece.color, base_moves) if not self.__will_be_in_check_after_move(piece, pseudo_legal_move)]
+    def get_legal_moves(self: Board, piece: Piece) -> list[Coordinates]:
+        base_moves = piece.get_base_moves(self)
+        pseudo_legal_moves = self.__get_pseudo_legal_moves(
+            piece.color, base_moves)
+
+        return [pseudo_legal_move for pseudo_legal_move in pseudo_legal_moves if not self.__will_be_in_check_after_move(piece, pseudo_legal_move)]
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         current_board = deepcopy(self)
@@ -183,7 +187,7 @@ class Board:
 
     def __any_possible_moves(self: Board, color: Color) -> bool:
         player_pieces = self.__get_pieces_by_color(color)
-        return any(piece.get_possible_moves(self) for piece in player_pieces)
+        return any(self.get_legal_moves(piece) for piece in player_pieces)
 
     def check_mate(self: Board, color: Color) -> bool:
         return self.is_in_check(color) and not self.__any_possible_moves(color)

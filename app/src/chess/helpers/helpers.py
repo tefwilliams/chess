@@ -4,8 +4,12 @@ from typing import Iterator, TypeVar, Union
 T = TypeVar('T')
 
 
-# TODO - move these into helper file
 def only(iterator: Iterator[T], error_message: str = "") -> Union[T, None]:
+    """
+    Return the only item from the iterator. 
+    Returns None the iterator is exhausted. 
+    Raise RuntimeError with optional error message if more than item in iterator.
+    """
     results = [iterator]
 
     if len(results) > 1:
@@ -15,4 +19,8 @@ def only(iterator: Iterator[T], error_message: str = "") -> Union[T, None]:
 
 
 def last(list: list[T]) -> Union[T, None]:
+    """
+    Return the last item in the list.
+    Returns None if the list is empty. 
+    """
     return next(reversed(list), None)

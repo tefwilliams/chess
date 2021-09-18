@@ -24,7 +24,7 @@ def test_knight_can_only_move_to_knight_squares(square_to_move_to: str, should_b
     board = Board([knight])
 
     can_move = get_coordinates_from_grid_value(
-        square_to_move_to) in knight.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(knight)
     assert can_move == should_be_able_to_move
 
 
@@ -48,7 +48,7 @@ def test_knight_cannot_move_if_obstructed(square_to_move_to: str, obstructing_pi
     board = Board(pieces)
 
     assert not get_coordinates_from_grid_value(
-        square_to_move_to) in knight.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(knight)
 
 
 @pytest.mark.parametrize(
@@ -71,4 +71,4 @@ def test_knight_can_take_opposing_piece(square_to_move_to: str, opposing_piece: 
     board = Board(pieces)
 
     assert get_coordinates_from_grid_value(
-        square_to_move_to) in knight.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(knight)

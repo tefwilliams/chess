@@ -41,10 +41,6 @@ class Piece:
         self.__positions.append(self.coordinates)
         self.__coordinates = new_coordinates
 
-    def get_possible_moves(self: Piece, board: Board) -> list[Coordinates]:
-        base_moves = self.get_base_moves(board)
-        return board.get_legal_moves(self, base_moves)
-
     def get_base_moves(self: Piece, board: Board) -> list[list[Coordinates]]:
         raise NotImplementedError
 

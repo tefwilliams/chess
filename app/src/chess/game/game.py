@@ -83,7 +83,7 @@ class Game:
 
         self.__highlight_square(origin_coordinates)
         self.__display_possible_moves(
-            piece_at_origin.get_possible_moves(self.board))
+            self.board.get_legal_moves(piece_at_origin))
 
         destination_coordinates = self.__wait_for_coordinate_selection()
 
@@ -194,7 +194,7 @@ class Game:
 
     def __display_piece(self: Game, piece: Piece) -> None:
         piece_icon = pygame.image.load(
-            'icons/%s_%s.png' % (piece.color.name, piece.type.name))
+            f'icons/{piece.color.name}_{piece.type.name}.png')
         left_margin, top_margin = self.__get_square_location(
             piece.coordinates)
 

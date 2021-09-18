@@ -23,7 +23,7 @@ def test_king_can_only_move_to_adjacent_squares(square_to_move_to: str, should_b
     board = Board([king])
 
     can_move = get_coordinates_from_grid_value(
-        square_to_move_to) in king.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(king)
     assert can_move == should_be_able_to_move
 
 
@@ -47,7 +47,7 @@ def test_king_cannot_move_if_obstructed(square_to_move_to: str, obstructing_piec
     board = Board(pieces)
 
     assert not get_coordinates_from_grid_value(
-        square_to_move_to) in king.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(king)
 
 
 @pytest.mark.parametrize(
@@ -70,7 +70,7 @@ def test_king_can_take_opposing_piece(square_to_move_to: str, opposing_piece: Pi
     board = Board(pieces)
 
     assert get_coordinates_from_grid_value(
-        square_to_move_to) in king.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(king)
 
 
 @pytest.mark.parametrize(
@@ -101,7 +101,7 @@ def test_king_can_move_via_castle(square_to_move_to: str, other_pieces: list[Pie
     board = Board(pieces)
 
     can_move = get_coordinates_from_grid_value(
-        square_to_move_to) in king.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(king)
 
     assert can_move == should_be_able_to_move
 
@@ -122,7 +122,7 @@ def test_king_cannot_move_via_castle_if_rook_has_moved() -> None:
     board.evaluate_move(rook, get_coordinates_from_grid_value('A1'))
 
     assert get_coordinates_from_grid_value(
-        'A3') not in king.get_possible_moves(board)
+        'A3') not in board.get_legal_moves(king)
 
 
 def test_king_cannot_move_via_castle_if_king_has_moved() -> None:
@@ -144,4 +144,4 @@ def test_king_cannot_move_via_castle_if_king_has_moved() -> None:
     board.evaluate_move(king, get_coordinates_from_grid_value('A5'))
 
     assert all(get_coordinates_from_grid_value(square) not
-               in king.get_possible_moves(board) for square in ['A3', 'A7'])
+               in board.get_legal_moves(king) for square in ['A3', 'A7'])

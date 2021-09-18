@@ -22,7 +22,7 @@ def test_bishop_can_only_move_diagonally(square_to_move_to: str, should_be_able_
     board = Board([bishop])
 
     can_move = get_coordinates_from_grid_value(
-        square_to_move_to) in bishop.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(bishop)
     assert can_move == should_be_able_to_move
 
 
@@ -48,7 +48,7 @@ def test_bishop_cannot_move_if_obstructed(square_to_move_to: str, obstructing_pi
     board = Board(pieces)
 
     assert not get_coordinates_from_grid_value(
-        square_to_move_to) in bishop.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(bishop)
 
 
 @pytest.mark.parametrize(
@@ -72,4 +72,4 @@ def test_bishop_can_take_opposing_piece(square_to_move_to: str, opposing_piece: 
     board = Board(pieces)
 
     assert get_coordinates_from_grid_value(
-        square_to_move_to) in bishop.get_possible_moves(board)
+        square_to_move_to) in board.get_legal_moves(bishop)
