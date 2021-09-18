@@ -9,3 +9,4 @@
 ## Outstanding issues
 
 - Potential bug with \_\_get_move_selection() in Game where a recursion error can occur if the user makes an invalid selection (clicks something other than their piece) ~1000 times (max recursion depth depending). In practice this isn't an issue and probably isn't worth fixing.
+- Add test coverage over king moving into check

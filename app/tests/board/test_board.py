@@ -52,7 +52,8 @@ def test_is_in_check_returns_true_when_king_in_check(black_piece, piece_coordina
         (PieceTypes.bishop, 'F8'),
         (PieceTypes.rook, 'E2'),
         (PieceTypes.knight, 'B2'),
-        (PieceTypes.pawn, 'E1')
+        (PieceTypes.pawn, 'E1'),
+        (PieceTypes.pawn, 'E4')
     ]
 )
 def test_is_in_check_returns_false_when_king_not_in_check(black_piece, piece_coordinates) -> None:
@@ -82,6 +83,7 @@ def test_move_via_en_passant_removes_piece() -> None:
 
     assert enemy_pawn not in board.pieces
 
+
 def test_move_via_queenside_castle_moves_king_and_rook() -> None:
     king = generate_piece(PieceTypes.king, 'A5', Color.white)
     rook = generate_piece(PieceTypes.rook, 'A1', Color.white)
@@ -96,7 +98,7 @@ def test_move_via_queenside_castle_moves_king_and_rook() -> None:
     board.evaluate_move(king, get_coordinates_from_grid_value('A3'))
 
     assert (king.coordinates == get_coordinates_from_grid_value('A3')
-        and rook.coordinates == get_coordinates_from_grid_value('A4'))
+            and rook.coordinates == get_coordinates_from_grid_value('A4'))
 
 
 def test_move_via_kingside_castle_moves_king_and_rook() -> None:
@@ -113,4 +115,4 @@ def test_move_via_kingside_castle_moves_king_and_rook() -> None:
     board.evaluate_move(king, get_coordinates_from_grid_value('A7'))
 
     assert (king.coordinates == get_coordinates_from_grid_value('A7')
-        and rook.coordinates == get_coordinates_from_grid_value('A6'))
+            and rook.coordinates == get_coordinates_from_grid_value('A6'))

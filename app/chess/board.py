@@ -4,7 +4,7 @@ from .helpers import only
 from .coordinates import Coordinates
 from .movement import Movement
 from .player import Color
-from .pieces import Piece, PieceTypes
+from .pieces import Piece, PieceTypes, Pawn, Rook, Knight, Bishop, Queen, King
 from .data import board_size
 from copy import deepcopy
 
@@ -61,11 +61,7 @@ class Board:
         return self.get_piece(coordinates_to_take_piece_from)
 
     def get_legal_moves(self: Board, piece: Piece) -> list[Coordinates]:
-        base_moves = piece.get_base_moves(self)
-        pseudo_legal_moves = self.__get_pseudo_legal_moves(
-            piece.color, base_moves)
-
-        return [pseudo_legal_move for pseudo_legal_move in pseudo_legal_moves if not self.__will_be_in_check_after_move(piece, pseudo_legal_move)]
+        return [pseudo_legal_move for pseudo_legal_move in self.__get_pseudo_legal_moves(piece) if not self.__will_be_in_check_after_move(piece, pseudo_legal_move)]
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         current_board = deepcopy(self)
@@ -76,9 +72,11 @@ class Board:
         current_board.__move_piece(current_piece, coordinates)
         return current_board.is_in_check(piece.color)
 
-    def __get_pseudo_legal_moves(self: Board, color: Color, squares: list[list[Coordinates]]) -> list[Coordinates]:
+    def __get_pseudo_legal_moves(self: Board, piece: Piece) -> list[Coordinates]:
+        base_moves = piece.get_base_moves(self)
+
         pseudo_legal_moves = [self.__get_unobstructed_moves_in_direction(
-            color, moves_in_direction) for moves_in_direction in squares]
+            piece.color, moves_in_direction) for moves_in_direction in base_moves]
 
         return [pseudo_legal_move for pseudo_legal_moves_in_direction in pseudo_legal_moves for pseudo_legal_move in pseudo_legal_moves_in_direction]
 
@@ -101,6 +99,7 @@ class Board:
 
         return unobstructed_moves_in_direction
 
+    # TODO - change to get_legal_en_passant_moves
     def legal_en_passant(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         if piece.type != PieceTypes.pawn:
             return False
@@ -121,6 +120,7 @@ class Board:
         return (piece_to_take == last_piece_to_move
                 and piece_has_just_moved_two_squares)
 
+    # TODO - change to get_legal_castle_moves
     def legal_castle(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         castle_squares = [
             square for squares_in_direction in Movement.get_castle_squares(piece.coordinates) for square in squares_in_direction if coordinates in squares_in_direction]
@@ -137,7 +137,7 @@ class Board:
                 and not piece_at_castle_position.has_moved
                 and coordinates == castle_squares[1]
                 and not self.is_in_check(piece.color)
-                and not any(self.square_is_attacked(square, piece.color) for square in castle_squares[0: 1])
+                and not any(self.__square_is_attacked(square, piece.color) for square in castle_squares[0: 1])
                 and all(self.get_piece(square) is None for square in castle_squares[0: -1]))
 
     def __get_last_piece_to_move(self: Board) -> Piece | None:
@@ -146,43 +146,20 @@ class Board:
     def get_last_move(self: Board) -> tuple[Coordinates, Coordinates] | None:
         last_piece_to_move = self.__get_last_piece_to_move()
 
-        if not last_piece_to_move:
-            return None
-
-        assert last_piece_to_move.previous_coordinates
-
-        return last_piece_to_move.previous_coordinates, last_piece_to_move.coordinates
+        return (last_piece_to_move.previous_coordinates, last_piece_to_move.coordinates) if last_piece_to_move and last_piece_to_move.previous_coordinates else None
 
     def is_in_check(self: Board, color: Color) -> bool:
         king = self.__get_king(color)
-        return king is not None and self.square_is_attacked(king.coordinates, color)
+        return king is not None and self.__square_is_attacked(king.coordinates, color)
 
-    def square_is_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
-        diagonal_squares = self.__get_pseudo_legal_moves(
-            color, Movement.get_diagonal_squares(coordinates))
-        orthogonal_squares = self.__get_pseudo_legal_moves(
-            color, Movement.get_orthogonal_squares(coordinates))
-        knight_squares = self.__get_pseudo_legal_moves(
-            color, Movement.get_knight_squares(coordinates))
-        adjacent_squares = self.__get_pseudo_legal_moves(
-            color, Movement.get_adjacent_squares(coordinates))
-        pawn_attack_squares = self.__get_pseudo_legal_moves(
-            color, Movement.get_pawn_attack_squares(coordinates, color))
+    def __square_is_attacked(self: Board, coordinates: Coordinates, color: Color) -> bool:
+        pieces: list[Piece] = [piece(coordinates, color) for piece in [
+            Pawn, Rook, Knight, Bishop, Queen, King]]
 
-        enemy_color = Color.get_opposing_color(color)
+        return any(self.__sqaure_is_attacked_by_piece(piece) for piece in pieces)
 
-        squares_to_check_for_pieces = [
-            (diagonal_squares, [PieceTypes.bishop, PieceTypes.queen]),
-            (orthogonal_squares, [PieceTypes.rook, PieceTypes.queen]),
-            (pawn_attack_squares, [PieceTypes.pawn]),
-            (knight_squares, [PieceTypes.knight]),
-            (adjacent_squares, [PieceTypes.king])
-        ]
-
-        return any(self.__enemy_piece_is_at_square(*squares_and_pieces, enemy_color) for squares_and_pieces in squares_to_check_for_pieces)
-
-    def __enemy_piece_is_at_square(self, list_of_squares: list[Coordinates], list_of_pieces: list[PieceTypes], enemy_color: Color) -> bool:
-        return any(piece and piece.color == enemy_color and piece.type in list_of_pieces for piece in map(self.get_piece, list_of_squares))
+    def __sqaure_is_attacked_by_piece(self: Board, piece: Piece) -> bool:
+        return any(piece_at_square and piece_at_square.color != piece.color and piece_at_square.type == piece.type for piece_at_square in map(self.get_piece, self.__get_pseudo_legal_moves(piece)))
 
     def __get_king(self: Board, color: Color) -> Piece | None:
         player_pieces = self.__get_pieces_by_color(color)
