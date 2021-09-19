@@ -41,7 +41,7 @@ class Board:
             self.__pieces.remove(piece_to_take)
             self.__pieces_taken[self.__move_counter] = piece_to_take
 
-        if self.legal_castle(piece, coordinates):
+        if coordinates in self.get_legal_castle_moves(piece):
             castle_squares = [
                 square for squares_in_direction in Movement.get_castle_squares(piece.coordinates) for square in squares_in_direction if coordinates in squares_in_direction]
             castle_to_move = self.get_piece(castle_squares[-1])
@@ -115,8 +115,14 @@ class Board:
         return (piece_to_take == last_piece_to_move
                 and piece_has_just_moved_two_squares)
 
-    # TODO - change to get_legal_castle_moves
-    def legal_castle(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
+    def get_legal_castle_moves(self: Board, piece: Piece) -> list[Coordinates]:
+        if piece.type != PieceTypes.king or piece.has_moved:
+            return []
+
+        return [squares_in_direction[1] for squares_in_direction in Movement.get_castle_squares(
+            piece.coordinates) if self.__legal_castle(piece, squares_in_direction[1])]
+
+    def __legal_castle(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         castle_squares = [
             square for squares_in_direction in Movement.get_castle_squares(piece.coordinates) for square in squares_in_direction if coordinates in squares_in_direction]
 
