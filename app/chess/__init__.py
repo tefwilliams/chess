@@ -1,5 +1,5 @@
 from .board import *
-from .coordinates import *
+from .grid import *
 from .game import *
 from .movement import *
 from .pieces import *

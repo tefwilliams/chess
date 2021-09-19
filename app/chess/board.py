@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 from .helpers import only, flatten
-from .coordinates import Coordinates
+from .grid import Coordinates
 from .movement import Movement
 from .player import Color
 from .pieces import Piece, PieceTypes, Pawn, Rook, Knight, Bishop, Queen, King
@@ -61,7 +61,7 @@ class Board:
         return self.get_piece(coordinates_to_take_piece_from)
 
     def get_legal_moves(self: Board, piece: Piece) -> list[Coordinates]:
-        return [pseudo_legal_move for pseudo_legal_move in self.__get_pseudo_legal_moves(piece) if not self.__will_be_in_check_after_move(piece, pseudo_legal_move)]
+        return [pseudo_legal_move for pseudo_legal_move in self.__get_pseudo_legal_moves(piece) if not self.__will_be_in_check_after_move(piece, pseudo_legal_move)] + self.get_legal_castle_moves(piece)
 
     def __will_be_in_check_after_move(self: Board, piece: Piece, coordinates: Coordinates) -> bool:
         current_board = deepcopy(self)

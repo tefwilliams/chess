@@ -2,7 +2,7 @@
 from __future__ import annotations
 import os
 import pygame
-from .coordinates import Coordinates
+from .grid import Coordinates
 from .repository import get_starting_pieces
 from .board import Board
 from .player import Player

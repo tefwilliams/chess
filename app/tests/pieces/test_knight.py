@@ -12,6 +12,8 @@ from ..repository import generate_piece, get_coordinates_from_grid_value
         ('B4', False),
         ('F6', False),
         ('B2', False),
+        ('F5', False),
+        ('E4', False),
         ('H3', True),
         ('E6', True),
         ('D3', True),

@@ -1,71 +1,50 @@
 
+from __future__ import annotations
 from .player import Color
-from .coordinates import Coordinates
+from .grid import Coordinates, Step, horizontal_unit_steps, orthogonal_unit_steps, diagonal_unit_steps, all_unit_steps, unit_step_left, unit_step_right
+from .data import board_size
 
 
 class Movement:
     @staticmethod
     def get_diagonal_squares(origin_coordinates: Coordinates) -> list[list[Coordinates]]:
-        directions = [(y, x) for y in [-1, 1] for x in [-1, 1]]
-
-        return [Movement.__get_squares_in_direction(origin_coordinates, direction) for direction in directions]
+        return [Movement.__get_squares_in_direction(origin_coordinates, step_in_direction) for step_in_direction in diagonal_unit_steps]
 
     @staticmethod
     def get_orthogonal_squares(origin_coordinates: Coordinates) -> list[list[Coordinates]]:
-        directions = [(y, x) for y in [-1, 0, 1]
-                      for x in [-1, 0, 1] if abs(y + x) == 1]
-
-        return [Movement.__get_squares_in_direction(origin_coordinates, direction) for direction in directions]
+        return [Movement.__get_squares_in_direction(origin_coordinates, step_in_direction) for step_in_direction in orthogonal_unit_steps]
 
     @staticmethod
     def get_adjacent_squares(origin_coordinates: Coordinates) -> list[list[Coordinates]]:
-        directions = [(y, x) for y in [-1, 0, 1]
-                      for x in [-1, 0, 1] if not y == x == 0]
-
-        return [Movement.__get_squares_in_direction(origin_coordinates, direction, 1) for direction in directions]
+        return [Movement.__get_squares_in_direction(origin_coordinates, step_in_direction, 1) for step_in_direction in all_unit_steps]
 
     @staticmethod
     def get_knight_squares(origin_coordinates: Coordinates) -> list[list[Coordinates]]:
-        directions = [(y, x) for y in [-2, -1, 1, 2]
-                      for x in [-2, -1, 1, 2] if not abs(y) == abs(x)]
+        steps = [orthogonal_step + diagonal_step 
+            for orthogonal_step in orthogonal_unit_steps
+            for diagonal_step in diagonal_unit_steps
+            if not (orthogonal_step + diagonal_step).has_magnitude_one]
 
-        return [Movement.__get_squares_in_direction(origin_coordinates, direction, 1) for direction in directions]
+        return [Movement.__get_squares_in_direction(origin_coordinates, step_in_direction, 1) for step_in_direction in steps]
 
     @staticmethod
     def get_castle_squares(origin_coordinates: Coordinates) -> list[list[Coordinates]]:
-        directions = [(0, x) for x in [-1, 1]]
-
-        return [Movement.__get_squares_in_direction(origin_coordinates, direction) for direction in directions]
+        return [Movement.__get_squares_in_direction(origin_coordinates, step_in_direction) for step_in_direction in horizontal_unit_steps]
 
     @staticmethod
     def get_pawn_squares(origin_coordinates: Coordinates, color: Color, has_moved: bool) -> list[list[Coordinates]]:
-        direction = color.get_step_forward()
         maximum_number_of_steps = 1 if has_moved else 2
 
-        return [Movement.__get_squares_in_direction(origin_coordinates, direction, maximum_number_of_steps)]
+        return [Movement.__get_squares_in_direction(origin_coordinates, color.get_step_forward(), maximum_number_of_steps)]
 
     @staticmethod
     def get_pawn_attack_squares(origin_coordinates: Coordinates, color: Color) -> list[list[Coordinates]]:
-        y = color.get_step_forward()[0]
-        directions = [(y, x) for x in [-1, 1]]
+        step_forward = color.get_step_forward()
+        steps = [step_forward + unit_step_left, step_forward + unit_step_right]
 
-        return [Movement.__get_squares_in_direction(origin_coordinates, direction, 1) for direction in directions]
+        return [Movement.__get_squares_in_direction(origin_coordinates, step_in_direction, 1) for step_in_direction in steps]
 
     @staticmethod
-    def __get_squares_in_direction(coordinates: Coordinates, step_in_direction: tuple[int, int], number_of_steps: int = None) -> list[Coordinates]:
-        squares_in_direction: list[Coordinates] = []
-        square_in_direction = coordinates
-
-        if number_of_steps:
-            for i in range(number_of_steps):
-                square_in_direction = square_in_direction.move_by(
-                    step_in_direction)
-                squares_in_direction.append(square_in_direction)
-
-        else:
-            while square_in_direction.within_board:
-                square_in_direction = square_in_direction.move_by(
-                    step_in_direction)
-                squares_in_direction.append(square_in_direction)
-
+    def __get_squares_in_direction(coordinates: Coordinates, step_in_direction: Step, number_of_steps: int = board_size) -> list[Coordinates]:
+        squares_in_direction = [coordinates.move_by(step_in_direction * (i + 1)) for i in range(number_of_steps)]
         return [square for square in squares_in_direction if square.within_board]

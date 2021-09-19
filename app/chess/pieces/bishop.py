@@ -6,7 +6,7 @@ from .piece import Piece, PieceTypes
 
 if TYPE_CHECKING:
     from ..board import Board
-    from ..coordinates import Coordinates
+    from ..grid import Coordinates
     from ..player import Color
 
 
