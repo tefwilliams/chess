@@ -1,10 +1,10 @@
-from typing import Iterator, TypeVar, Union
+from typing import Iterator, TypeVar
 
 
 T = TypeVar('T')
 
 
-def only(iterator: Iterator[T], error_message: str = "") -> Union[T, None]:
+def only(iterator: Iterator[T], error_message: str = "") -> T | None:
     """
     Return the only item from the iterator. 
     Returns None the iterator is exhausted. 
@@ -18,7 +18,7 @@ def only(iterator: Iterator[T], error_message: str = "") -> Union[T, None]:
     return next(iterator, None)
 
 
-def last(list: list[T]) -> Union[T, None]:
+def last(list: list[T]) -> T | None:
     """
     Return the last item in the list.
     Returns None if the list is empty. 

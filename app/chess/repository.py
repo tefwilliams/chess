@@ -1,5 +1,4 @@
 
-from typing import Union
 from .data import board_size
 from .pieces import Piece, Pawn, Rook, Knight, Bishop, Queen, King
 from .color import Color
@@ -20,7 +19,7 @@ def get_starting_pieces() -> list[Piece]:
     return pieces
 
 
-def get_starting_piece(coordinates: Coordinates) -> Union[Piece, None]:
+def get_starting_piece(coordinates: Coordinates) -> Piece | None:
     color = Color.white if coordinates.y in [0, 1] else Color.black
 
     if coordinates.y in [1, 6]:
