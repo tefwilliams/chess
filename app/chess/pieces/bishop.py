@@ -7,7 +7,7 @@ from .piece import Piece, PieceTypes
 if TYPE_CHECKING:
     from ..board import Board
     from ..grid import Coordinates
-    from ..player import Color
+    from ..color import Color
 
 
 class Bishop(Piece):

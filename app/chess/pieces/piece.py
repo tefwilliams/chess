@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from ..helpers import last
 
 if TYPE_CHECKING:
-    from ..player import Color
+    from ..color import Color
     from ..grid import Coordinates
     from ..board import Board
 
