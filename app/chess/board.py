@@ -3,7 +3,7 @@ from __future__ import annotations
 from .helpers import only, flatten
 from .grid import Coordinates
 from .movement import Movement
-from .player import Color
+from .color import Color
 from .pieces import Piece, PieceTypes, Pawn, Rook, Knight, Bishop, Queen, King
 from .data import board_size
 from copy import deepcopy

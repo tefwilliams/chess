@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from .player import Color
+from .color import Color
 from .grid import Coordinates, Step, horizontal_unit_steps, orthogonal_unit_steps, diagonal_unit_steps, all_unit_steps, unit_step_left, unit_step_right
 from .data import board_size
 

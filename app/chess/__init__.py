@@ -3,7 +3,7 @@ from .grid import *
 from .game import *
 from .movement import *
 from .pieces import *
-from .player import *
+from .color import *
 from .repository import *
 from .data import *
 from .helpers import *

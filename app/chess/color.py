@@ -4,19 +4,6 @@ from enum import Enum
 from .grid import Step, unit_step_down, unit_step_up
 
 
-class Player:
-    def __init__(self: Player):
-        self.__color = Color.white
-
-    @property
-    def color(self: Player) -> Color:
-        return self.__color
-
-    def swap_color(self: Player) -> None:
-        self.__color = self.__color.get_opposing_color()
-
-
-# TODO - pull class into new file
 class Color(Enum):
     white = 0
     black = 1

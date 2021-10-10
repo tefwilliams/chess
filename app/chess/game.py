@@ -5,7 +5,7 @@ import pygame
 from .grid import Coordinates
 from .repository import get_starting_pieces
 from .board import Board
-from .player import Player
+from .color import Color
 from .pieces import Piece
 from .data import display_size, gray, cream, yellow, green, light_green, brown, light_brown, board_size, board_edge_thickness, board_border_thickness, square_size
 
@@ -17,7 +17,7 @@ icons_folder_path = os.path.join(script_dir, "../icons")
 class Game:
     def __init__(self: Game) -> None:
         self.board = Board(get_starting_pieces())
-        self.__player = Player()
+        self.__current_color = Color.white
         self.__intialize_display()
 
     def __intialize_display(self: Game) -> None:
@@ -35,17 +35,17 @@ class Game:
         self.__create_board_edge()
 
     @property
-    def player(self: Game) -> Player:
-        return self.__player
+    def player_color(self: Game) -> Color:
+        return self.__current_color
 
     def over(self: Game) -> bool:
         return self.check_mate() or self.stale_mate()
 
     def check_mate(self: Game) -> bool:
-        return self.board.check_mate(self.player.color)
+        return self.board.check_mate(self.player_color)
 
     def stale_mate(self: Game) -> bool:
-        return self.board.stale_mate(self.player.color)
+        return self.board.stale_mate(self.player_color)
 
     def take_turn(self: Game) -> None:
         while True:
@@ -59,8 +59,11 @@ class Game:
                 continue
 
             else:
-                self.player.swap_color()
+                self.swap_player()
                 break
+
+    def swap_player(self: Game) -> None:
+        self.__current_color = self.player_color.get_opposing_color()
 
     def __create_board_edge(self: Game) -> None:
         outer_margin = board_border_thickness
@@ -83,7 +86,7 @@ class Game:
 
         piece_at_origin = self.board.get_piece(origin_coordinates)
 
-        if not piece_at_origin or piece_at_origin.color != self.__player.color:
+        if not piece_at_origin or piece_at_origin.color != self.__current_color:
             return self.__get_move_selection()
 
         self.__highlight_square(origin_coordinates)
@@ -98,7 +101,7 @@ class Game:
         piece_at_destination = self.board.get_piece(
             destination_coordinates)
 
-        if piece_at_destination and piece_at_destination.color == self.player.color:
+        if piece_at_destination and piece_at_destination.color == self.player_color:
             return self.__get_move_selection(destination_coordinates)
 
         return piece_at_origin, destination_coordinates
@@ -152,7 +155,7 @@ class Game:
     def __set_cursor(self: Game, coordinates: Coordinates) -> None:
         piece_at_coordinates = self.board.get_piece(coordinates)
 
-        if piece_at_coordinates and piece_at_coordinates.color == self.player.color:
+        if piece_at_coordinates and piece_at_coordinates.color == self.player_color:
             pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_HAND)
 
         else:
