@@ -1,42 +1,44 @@
-
 from .data import board_size
-from .pieces import Piece, Pawn, Rook, Knight, Bishop, Queen, King
+from .piece import Piece, PieceType
 from .color import Color
-from .grid import Coordinates
+from .vector import Vector
 
 
-def get_starting_pieces() -> list[Piece]:
-    pieces: list[Piece] = []
-
-    for i in range(board_size):
-        for j in range(board_size):
-            coordinates = Coordinates((i, j))
-            starting_piece = get_starting_piece(coordinates)
-
-            if starting_piece:
-                pieces.append(starting_piece)
-
-    return pieces
+def get_starting_pieces():
+    return set(
+        piece
+        for coordinates in (
+            Vector(row, col) for row in range(board_size) for col in range(board_size)
+        )
+        if ((piece := get_starting_piece(coordinates)) is not None)
+    )
 
 
-def get_starting_piece(coordinates: Coordinates) -> Piece | None:
-    color = Color.white if coordinates.y in [0, 1] else Color.black
+def get_starting_piece(coordinates: Vector) -> Piece | None:
+    row, col = coordinates
 
-    if coordinates.y in [1, 6]:
-        return Pawn(coordinates, color)
+    color = Color.White if row in [0, 1] else Color.Black
 
-    if coordinates.y in [0, 7]:
-        if coordinates.x in [0, 7]:
-            return Rook(coordinates, color)
+    match row:
+        case 1 | 6:
+            return Piece(PieceType.Pawn, color, coordinates)
 
-        if coordinates.x in [1, 6]:
-            return Knight(coordinates, color)
+        case 0 | 7:
+            match col:
+                case 0 | 7:
+                    return Piece(PieceType.Rook, color, coordinates)
 
-        if coordinates.x in [2, 5]:
-            return Bishop(coordinates, color)
+                case 1 | 6:
+                    return Piece(PieceType.Knight, color, coordinates)
 
-        if coordinates.x == 3:
-            return Queen(coordinates, color)
+                case 2 | 5:
+                    return Piece(PieceType.Bishop, color, coordinates)
 
-        if coordinates.x == 4:
-            return King(coordinates, color)
+                case 3:
+                    return Piece(PieceType.Queen, color, coordinates)
+
+                case 4:
+                    return Piece(PieceType.King, color, coordinates)
+
+        case _:
+            return None
