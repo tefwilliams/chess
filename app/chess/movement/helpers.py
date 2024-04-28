@@ -1,5 +1,6 @@
-from .color import Color
-from .helpers import (
+from ..color import Color
+from ..data import board_size
+from .unit_steps import (
     horizontal_unit_steps,
     orthogonal_unit_steps,
     diagonal_unit_steps,
@@ -8,8 +9,7 @@ from .helpers import (
     unit_step_right,
     get_unit_step_forward,
 )
-from .data import board_size
-from .vector import Vector
+from ..vector import Vector
 
 
 def get_diagonal_squares(origin_coordinates: Vector) -> list[list[Vector]]:

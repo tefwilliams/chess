@@ -17,5 +17,3 @@ elif game.stale_mate():
     current_player = game.player_color.name.capitalize()
 
     print(f"{current_player} in stale mate. It's a draw!" + "\n")
-
-Game.quit()

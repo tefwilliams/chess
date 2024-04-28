@@ -23,6 +23,10 @@ class Piece:
         self.coordinates_history.append(self.coordinates)
         self.coordinates = new_coordinates
 
+    def revert_last_move(self):
+        old_coordinates = self.coordinates_history.pop()
+        self.coordinates = old_coordinates
+
     @property
     def has_moved(self):
         return len(self.coordinates_history) > 0

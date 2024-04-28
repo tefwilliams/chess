@@ -1,4 +1,4 @@
-import os
+from .helpers import within_board
 from .board_renderer import BoardRenderer, BoardSquare
 from .vector import Vector
 from .repository import get_starting_pieces
@@ -7,16 +7,12 @@ from .move import Move
 from .color import Color
 
 
-script_dir = os.path.dirname(__file__)
-icons_folder_path = os.path.join(script_dir, "../icons")
-
-
 class Game:
     def __init__(self) -> None:
         self.board = Board(get_starting_pieces())
         self.__current_color = Color.White
-        self.__renderer = BoardRenderer()
-        self.__renderer.render_squares(self.board.pieces)
+        self.__display = BoardRenderer()
+        self.__display.render_squares(self.board.pieces)
 
     @property
     def player_color(self) -> Color:
@@ -33,6 +29,9 @@ class Game:
 
     def take_turn(self) -> None:
         while True:
+            self.__display.render_squares(
+                self.board.pieces, self.board.get_last_move() or []
+            )
             move = self.__get_move_selection()
 
             try:
@@ -49,35 +48,42 @@ class Game:
         self.__current_color = self.player_color.get_opposing_color()
 
     def __get_move_selection(self) -> Move:
-        origin = self.__renderer.get_coordinate_selection(self.__is_valid_origin)
-
-        if origin == "quit":
-            raise NotImplementedError()
+        origin = self.__display.get_coordinate_selection(
+            self.__is_valid_origin, handle_quit
+        )
 
         selected_piece = self.board.get_piece(origin)
 
-        self.__renderer.highlight(BoardSquare(origin, selected_piece))
-        self.__renderer.display_possible_moves(
+        self.__display.highlight(BoardSquare(origin, selected_piece))
+        self.__display.display_possible_moves(
             BoardSquare(coordinates, self.board.try_get_piece(coordinates))
             for coordinates in self.board.get_possible_moves(selected_piece)
         )
 
-        destination = self.__renderer.get_coordinate_selection(
-            lambda coordinate: self.__is_valid_destination(coordinate, origin)
+        destination = self.__display.get_coordinate_selection(
+            lambda coordinate: self.__is_valid_destination(coordinate, origin),
+            handle_quit,
         )
-
-        if destination == "quit":
-            raise NotImplementedError()
 
         return Move(selected_piece, destination)
 
-    def __is_valid_origin(self, coordinate: Vector):
+    def __is_valid_origin(self, coordinates: Vector):
         return (
-            piece := self.board.get_piece(coordinate)
-        ) is not None and piece.color == self.player_color
-
-    def __is_valid_destination(self, coordinate: Vector, origin: Vector):
-        return coordinate != origin and (
-            (piece := self.board.try_get_piece(coordinate)) is None
-            or piece.color != self.__current_color
+            within_board(coordinates)
+            and (piece := self.board.try_get_piece(coordinates)) is not None
+            and piece.color == self.player_color
         )
+
+    def __is_valid_destination(self, coordinates: Vector, origin: Vector):
+        return (
+            within_board(coordinates)
+            and coordinates != origin
+            and (
+                (piece := self.board.try_get_piece(coordinates)) is None
+                or piece.color != self.__current_color
+            )
+        )
+
+
+def handle_quit():
+    quit()

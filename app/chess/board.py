@@ -1,12 +1,11 @@
 from .vector import Vector
-from .helpers import get_unit_step_backward, only, last
+from .helpers import only, last
 from .errors import InvalidMove
 from .move import Move
 from .color import Color
 from .piece import Piece, PieceType
-from .movement import get_adjacent_squares
+from .movement import get_adjacent_squares, get_unit_step_backward
 from .data import board_size
-from copy import deepcopy
 
 
 class Board:
@@ -14,7 +13,7 @@ class Board:
 
     def __init__(self, pieces: set[Piece]) -> None:
         self.pieces = pieces
-        self.__pieces_moved: list[Piece] = []
+        self.__moved_pieces: list[Piece] = []
 
     def try_get_piece(self, coordinates: Vector) -> Piece | None:
         return next(
@@ -38,7 +37,6 @@ class Board:
         self.__move_piece(move)
 
     def __move_piece(self, move: Move):
-
         if move.destination in self.get_legal_castle_moves(move.piece.coordinates):
             castle_squares = [
                 square
@@ -57,23 +55,22 @@ class Board:
             self.pieces.remove(piece_to_take)
 
         move.piece.move(move.destination)
-        self.__pieces_moved.append(move.piece)
+        self.__moved_pieces.append(move.piece)
 
     # TODO - something like destinations (to avoid confusion with Move)
     def get_possible_moves(self, piece: Piece) -> list[Vector]:
         return [
             pseudo_legal_move
             for pseudo_legal_move in self.__get_pseudo_legal_moves(piece)
-            if not self.__will_be_in_check_after_move(
-                piece.color, Move(piece, pseudo_legal_move)
-            )
+            if not self.__will_be_in_check_after_move(Move(piece, pseudo_legal_move))
         ] + self.get_legal_castle_moves(piece.coordinates)
 
-    def __will_be_in_check_after_move(self, color: Color, move: Move) -> bool:
-        pieces = set(deepcopy(piece) for piece in self.pieces)
-        board = Board(pieces)
-        board.__move_piece(move)
-        return board.is_in_check(color)
+    def __will_be_in_check_after_move(self, move: Move) -> bool:
+        move.piece.move(move.destination)
+        is_in_check = self.is_in_check(move.piece.color)
+        move.piece.revert_last_move()
+
+        return is_in_check
 
     def __get_pseudo_legal_moves(self, piece: Piece) -> list[Vector]:
         return [
@@ -121,13 +118,14 @@ class Board:
         ):
             return False
 
-        last_piece_to_move = last(self.__pieces_moved)
-
         piece_has_just_moved_two_squares = (
             previous_coords := last(piece_to_take.coordinates_history)
         ) is not None and abs(piece_to_take.coordinates.row - previous_coords.row) == 2
 
-        return piece_to_take == last_piece_to_move and piece_has_just_moved_two_squares
+        return (
+            piece_to_take == self.last_piece_to_move
+            and piece_has_just_moved_two_squares
+        )
 
     def get_legal_castle_moves(self, coordinates: Vector) -> list[Vector]:
         piece = self.try_get_piece(coordinates)
@@ -150,17 +148,13 @@ class Board:
             if coordinates in squares_in_direction
         ]
 
-        if len(castle_squares) == 0:
-            return False
-
-        piece_at_castle_position = self.try_get_piece(castle_squares[-1])
-
         return (
             piece.type == PieceType.King
-            and piece_at_castle_position is not None
-            and piece_at_castle_position.type == PieceType.Rook
+            and len(castle_squares) > 0
+            and (possible_rook := self.try_get_piece(castle_squares[-1])) is not None
+            and possible_rook.type == PieceType.Rook
             and not piece.has_moved
-            and not piece_at_castle_position.has_moved
+            and not possible_rook.has_moved
             and coordinates == castle_squares[1]
             and not self.is_in_check(piece.color)
             and not any(
@@ -174,36 +168,40 @@ class Board:
 
     # TODO - Maybe init Move with start as well
     def get_last_move(self) -> tuple[Vector, Vector] | None:
-        last_piece_to_move = last(self.__pieces_moved)
-
         return (
             (previous_coordinates, last_piece_to_move.coordinates)
-            if last_piece_to_move
+            if (last_piece_to_move := self.last_piece_to_move)
             and (previous_coordinates := last(last_piece_to_move.coordinates_history))
             else None
         )
 
     def is_in_check(self, color: Color) -> bool:
-        king = self.__get_king(color)
-        return king is not None and self.__square_is_attacked(king.coordinates, color)
+        return (
+            king := self.__get_king(color)
+        ) is not None and self.__square_is_attacked(king.coordinates, color)
 
     def __square_is_attacked(self, coordinates: Vector, color: Color) -> bool:
-        return False
-        # Any enemy piece can attack the square
-        pieces = [
-            Piece(coordinates, color)
-            for piece in [Pawn, Rook, Knight, Bishop, Queen, King]
-        ]
-
-        return any(self.__square_is_attacked_by_piece(piece) for piece in pieces)
-
-    def __square_is_attacked_by_piece(self, piece: Piece) -> bool:
         return any(
-            piece_at_square
-            and piece_at_square.color != piece.color
-            and piece_at_square.type == piece.type
-            for piece_at_square in map(
-                self.try_get_piece, self.__get_pseudo_legal_moves(piece)
+            # Square attacked by piece
+            any(
+                piece_at_square
+                and piece_at_square.color != piece.color
+                and piece_at_square.type == piece.type
+                for piece_at_square in (
+                    self.try_get_piece(square)
+                    for square in self.__get_pseudo_legal_moves(piece)
+                )
+            )
+            for piece in (
+                Piece(type, color, coordinates)
+                for type in [
+                    PieceType.Pawn,
+                    PieceType.Rook,
+                    PieceType.Knight,
+                    PieceType.Bishop,
+                    PieceType.Queen,
+                    PieceType.King,
+                ]
             )
         )
 
@@ -231,3 +229,7 @@ class Board:
 
     def stale_mate(self, color: Color) -> bool:
         return not self.is_in_check(color) and not self.__any_possible_moves(color)
+
+    @property
+    def last_piece_to_move(self):
+        return last(self.__moved_pieces)

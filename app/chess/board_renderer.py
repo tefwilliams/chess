@@ -1,10 +1,10 @@
 from math import floor
 import os
-from typing import Callable, Iterable, Literal
+from typing import Callable, Iterable
 import pygame
 from .vector import Vector
 from .piece import Piece
-from .helpers import only, within_board
+from .helpers import only
 from .data import (
     display_size,
     gray,
@@ -51,8 +51,8 @@ class BoardRenderer:
         self.__render_board_edge()
 
     def get_coordinate_selection(
-        self, can_select: Callable[[Vector], bool]
-    ) -> Vector | Literal["quit"]:
+        self, can_select: Callable[[Vector], bool], handle_quit: Callable[[], None]
+    ) -> Vector:
         while True:
             coordinates = self.__get_coordinates_from_mouse_position()
 
@@ -65,13 +65,9 @@ class BoardRenderer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    return "quit"
+                    handle_quit()
 
-                if (
-                    event.type == pygame.MOUSEBUTTONUP
-                    and within_board(coordinates)
-                    and can_select(coordinates)
-                ):
+                if event.type == pygame.MOUSEBUTTONUP and can_select(coordinates):
                     return coordinates
 
     def __get_coordinates_from_mouse_position(self):
@@ -105,7 +101,7 @@ class BoardRenderer:
         pygame.display.update()
 
     def render_squares(
-        self, pieces: set[Piece], squares_to_highlight: list[Vector] = []
+        self, pieces: set[Piece], squares_to_highlight: Iterable[Vector] = []
     ) -> None:
         for row_number in range(board_size):
             for column_number in range(board_size):
@@ -169,8 +165,8 @@ class BoardRenderer:
                 self.screen,
                 gray,
                 center=get_square_location(coordinates, True),
-                radius=round(square_size * 0.1 if has_piece else 0),
-                width=round(square_size * 0.4 if has_piece else square_size * 0.2),
+                radius=round(square_size * 0.4 if has_piece else square_size * 0.2),
+                width=round(square_size * 0.1 if has_piece else 0),
             )
 
         pygame.display.update()
