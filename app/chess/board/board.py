@@ -1,11 +1,10 @@
-from .vector import Vector
-from .helpers import only, last
-from .errors import InvalidMove
-from .move import Move
-from .color import Color
-from .piece import Piece, PieceType
-from .movement import get_adjacent_squares, get_unit_step_backward
-from .data import board_size
+from .variables import board_size
+from ..vector import Vector
+from ..shared import only, last
+from ..errors import InvalidMove
+from ..color import Color
+from ..piece import Piece, PieceType
+from ..movement import Move, get_adjacent_squares, get_unit_step_backward
 
 
 class Board:

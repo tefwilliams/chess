@@ -1,7 +1,7 @@
-from .data import board_size
-from .piece import Piece, PieceType
-from .color import Color
-from .vector import Vector
+from .variables import board_size
+from ..piece import Piece, PieceType
+from ..color import Color
+from ..vector import Vector
 
 
 def get_starting_pieces():
@@ -42,3 +42,7 @@ def get_starting_piece(coordinates: Vector) -> Piece | None:
 
         case _:
             return None
+
+
+def within_board(coordinates: Vector):
+    return 0 <= coordinates.row < board_size and 0 <= coordinates.col < board_size

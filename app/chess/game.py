@@ -1,9 +1,7 @@
-from .helpers import within_board
-from .board_renderer import BoardRenderer, BoardSquare
+from .display import BoardRenderer, BoardSquare
 from .vector import Vector
-from .repository import get_starting_pieces
-from .board import Board
-from .move import Move
+from .board import Board, get_starting_pieces, within_board
+from .movement import Move
 from .color import Color
 
 

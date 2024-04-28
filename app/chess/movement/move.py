@@ -1,5 +1,5 @@
-from .piece import Piece
-from .vector import Vector
+from ..piece import Piece
+from ..vector import Vector
 
 
 class Move:

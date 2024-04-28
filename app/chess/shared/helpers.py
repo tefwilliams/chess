@@ -1,10 +1,4 @@
 from typing import Iterator, TypeVar
-from .data import board_size
-from .vector import Vector
-
-
-def within_board(coordinates: Vector):
-    return 0 <= coordinates.row < board_size and 0 <= coordinates.col < board_size
 
 
 T = TypeVar("T")

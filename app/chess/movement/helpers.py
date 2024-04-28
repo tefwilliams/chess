@@ -1,5 +1,5 @@
 from ..color import Color
-from ..data import board_size
+from ..board import board_size
 from .unit_steps import (
     horizontal_unit_steps,
     orthogonal_unit_steps,

@@ -1,11 +1,9 @@
-from math import floor
 import os
-from typing import Callable, Iterable
 import pygame
-from .vector import Vector
-from .piece import Piece
-from .helpers import only
-from .data import (
+from math import floor
+from typing import Callable, Iterable
+from .board_square import BoardSquare
+from .variables import (
     display_size,
     gray,
     cream,
@@ -14,25 +12,18 @@ from .data import (
     light_green,
     brown,
     light_brown,
-    board_size,
     board_edge_thickness,
     board_border_thickness,
     square_size,
 )
+from ..board import board_size
+from ..piece import Piece
+from ..shared import only
+from ..vector import Vector
 
 
 script_dir = os.path.dirname(__file__)
 icons_folder_path = os.path.join(script_dir, "../icons")
-
-
-class BoardSquare(Vector):
-    def __init__(self, coordinates: Vector, piece: Piece | None):
-        super().__init__(*coordinates)
-
-        self.piece = piece
-
-    def __new__(cls, coordinates: Vector, _):
-        return super().__new__(cls, *coordinates)
 
 
 class BoardRenderer:
