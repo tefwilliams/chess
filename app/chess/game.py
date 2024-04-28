@@ -27,9 +27,6 @@ class Game:
 
     def take_turn(self) -> None:
         while True:
-            self.__display.render_squares(
-                self.board.pieces, self.board.get_last_move() or []
-            )
             move = self.__get_move_selection()
 
             try:
@@ -46,24 +43,44 @@ class Game:
         self.__current_color = self.player_color.get_opposing_color()
 
     def __get_move_selection(self) -> Move:
-        origin = self.__display.get_coordinate_selection(
-            self.__is_valid_origin, handle_quit
-        )
+        first_selection = None
 
-        selected_piece = self.board.get_piece(origin)
+        while True:
+            self.__display.render_squares(
+                self.board.pieces, self.board.get_last_move() or []
+            )
 
-        self.__display.highlight(BoardSquare(origin, selected_piece))
-        self.__display.display_possible_moves(
-            BoardSquare(coordinates, self.board.try_get_piece(coordinates))
-            for coordinates in self.board.get_possible_moves(selected_piece)
-        )
+            first_selection = (
+                first_selection
+                or self.__display.get_coordinate_selection(self.__is_valid_origin)
+            )
 
-        destination = self.__display.get_coordinate_selection(
-            lambda coordinate: self.__is_valid_destination(coordinate, origin),
-            handle_quit,
-        )
+            selected_piece = self.board.get_piece(first_selection)
+            possible_moves = self.board.get_possible_moves(selected_piece)
 
-        return Move(selected_piece, destination)
+            self.__display.highlight(BoardSquare(first_selection, selected_piece))
+            self.__display.display_possible_moves(
+                BoardSquare(coordinates, self.board.try_get_piece(coordinates))
+                for coordinates in possible_moves
+            )
+
+            second_selection = self.__display.get_coordinate_selection()
+
+            if second_selection == first_selection:
+                # Deselect piece
+                first_selection = None
+                continue
+
+            if second_selection not in possible_moves:
+                # Select new piece or deselect
+                first_selection = (
+                    second_selection
+                    if self.__is_valid_origin(second_selection)
+                    else None
+                )
+                continue
+
+            return Move(selected_piece, second_selection)
 
     def __is_valid_origin(self, coordinates: Vector):
         return (
@@ -71,18 +88,3 @@ class Game:
             and (piece := self.board.try_get_piece(coordinates)) is not None
             and piece.color == self.player_color
         )
-
-    def __is_valid_destination(self, coordinates: Vector, origin: Vector):
-        return (
-            within_board(coordinates)
-            and coordinates != origin
-            and (
-                (piece := self.board.try_get_piece(coordinates)) is None
-                or piece.color != self.__current_color
-            )
-        )
-
-
-# TODO - I don't think this is necessary
-def handle_quit():
-    quit()

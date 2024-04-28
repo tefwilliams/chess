@@ -42,7 +42,7 @@ class BoardRenderer:
         self.__render_board_edge()
 
     def get_coordinate_selection(
-        self, can_select: Callable[[Vector], bool], handle_quit: Callable[[], None]
+        self, can_select: Callable[[Vector], bool] = lambda _: True
     ) -> Vector:
         while True:
             coordinates = self.__get_coordinates_from_mouse_position()
@@ -56,7 +56,7 @@ class BoardRenderer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    handle_quit()
+                    quit()
 
                 if event.type == pygame.MOUSEBUTTONUP and can_select(coordinates):
                     return coordinates
@@ -91,6 +91,7 @@ class BoardRenderer:
 
         pygame.display.update()
 
+    # TODO - maybe make highlight a separate method
     def render_squares(
         self, pieces: set[Piece], squares_to_highlight: Iterable[Vector] = []
     ) -> None:
