@@ -83,5 +83,6 @@ class Game:
         )
 
 
+# TODO - I don't think this is necessary
 def handle_quit():
     quit()

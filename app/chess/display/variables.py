@@ -1,4 +1,4 @@
-from ..board import board_size
+from ..movement import board_size
 
 board_edge_thickness = 20  # px
 board_border_thickness = 5  # px

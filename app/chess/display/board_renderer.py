@@ -16,14 +16,14 @@ from .variables import (
     board_border_thickness,
     square_size,
 )
-from ..board import board_size
+from ..movement import board_size
 from ..piece import Piece
 from ..shared import only
 from ..vector import Vector
 
 
 script_dir = os.path.dirname(__file__)
-icons_folder_path = os.path.join(script_dir, "../icons")
+icons_folder_path = os.path.join(script_dir, "../../icons")
 
 
 class BoardRenderer:

@@ -1,4 +1,4 @@
-from .variables import board_size
+from ..movement import board_size
 from ..piece import Piece, PieceType
 from ..color import Color
 from ..vector import Vector

@@ -1,4 +1,3 @@
-from .variables import board_size
 from ..vector import Vector
 from ..shared import only, last
 from ..errors import InvalidMove
@@ -8,8 +7,6 @@ from ..movement import Move, get_adjacent_squares, get_unit_step_backward
 
 
 class Board:
-    size = board_size
-
     def __init__(self, pieces: set[Piece]) -> None:
         self.pieces = pieces
         self.__moved_pieces: list[Piece] = []

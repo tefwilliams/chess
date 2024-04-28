@@ -1,5 +1,4 @@
-from ..color import Color
-from ..board import board_size
+from .variables import board_size
 from .unit_steps import (
     horizontal_unit_steps,
     orthogonal_unit_steps,
@@ -9,6 +8,7 @@ from .unit_steps import (
     unit_step_right,
     get_unit_step_forward,
 )
+from ..color import Color
 from ..vector import Vector
 
 
