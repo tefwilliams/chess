@@ -5,7 +5,7 @@ game = Game()
 while not game.over():
     game.take_turn()
 
-if game.check_mate():
+if game.in_check_mate():
     opposing_player_color = game.player_color.get_opposing_color()
 
     losing_player = game.player_color.name
@@ -13,7 +13,7 @@ if game.check_mate():
 
     print(f"{losing_player} in check mate. {winning_player} wins!" + "\n")
 
-elif game.stale_mate():
-    current_player = game.player_color.name.capitalize()
+elif game.in_stale_mate():
+    current_player = game.player_color.name
 
     print(f"{current_player} in stale mate. It's a draw!" + "\n")

@@ -1,46 +1,41 @@
 from .display import BoardRenderer, BoardSquare
 from .vector import Vector
 from .board import Board, get_starting_pieces, within_board
-from .movement import Move
+from .movement import Move, Movement
 from .color import Color
 
 
 class Game:
     def __init__(self) -> None:
         self.board = Board(get_starting_pieces())
-        self.__current_color = Color.White
+        self.__movement = Movement(self.board)
+        self.player_color = Color.White
         self.__display = BoardRenderer()
         self.__display.render_squares(self.board.pieces)
 
-    @property
-    def player_color(self) -> Color:
-        return self.__current_color
-
     def over(self) -> bool:
-        return self.check_mate() or self.stale_mate()
+        return self.in_check_mate() or self.in_stale_mate()
 
-    def check_mate(self) -> bool:
-        return self.board.check_mate(self.player_color)
+    def in_check_mate(self) -> bool:
+        return self.__movement.in_check(
+            self.player_color
+        ) and not self.__movement.any_possible_moves(self.player_color)
 
-    def stale_mate(self) -> bool:
-        return self.board.stale_mate(self.player_color)
+    def in_stale_mate(self) -> bool:
+        return not self.__movement.in_check(
+            self.player_color
+        ) and not self.__movement.any_possible_moves(self.player_color)
 
     def take_turn(self) -> None:
         while True:
             move = self.__get_move_selection()
 
-            try:
-                self.board.move(move)
+            self.board.move(move)
 
-            except ValueError:
-                continue
-
-            else:
-                self.swap_player()
-                break
+            self.swap_player()
 
     def swap_player(self) -> None:
-        self.__current_color = self.player_color.get_opposing_color()
+        self.player_color = self.player_color.get_opposing_color()
 
     def __get_move_selection(self) -> Move:
         first_selection = None
@@ -56,7 +51,7 @@ class Game:
             )
 
             selected_piece = self.board.get_piece(first_selection)
-            possible_moves = self.board.get_possible_moves(selected_piece)
+            possible_moves = self.__movement.get_possible_moves(selected_piece)
 
             self.__display.highlight(BoardSquare(first_selection, selected_piece))
             self.__display.display_possible_moves(

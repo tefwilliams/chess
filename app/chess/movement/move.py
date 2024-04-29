@@ -6,3 +6,4 @@ class Move:
     def __init__(self, piece: Piece, destination: Vector) -> None:
         self.piece = piece
         self.destination = destination
+        # self.attack_target ??
