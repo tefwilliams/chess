@@ -1,8 +1,9 @@
-from ..vector import Vector
-from ..shared import only, last
 from ..color import Color
 from ..piece import Piece, PieceType
-from ..movement import Move
+from ..shared import only, last
+from ..vector import Vector
+
+from ..movement import get_unit_step_backward
 
 
 class Board:
@@ -24,16 +25,40 @@ class Board:
 
         return piece
 
-    def move(self, move: Move) -> None:
+    def move(self, piece: Piece, destination: Vector) -> None:
         # TODO - handle special moves
         # (castle, promotion, en passant)
-        piece_to_take = self.try_get_piece(move.destination)
+        piece_to_take = self.try_get_piece(destination)
 
         if piece_to_take:
             self.pieces.remove(piece_to_take)
 
-        move.piece.move(move.destination)
-        self.__moved_pieces.append(move.piece)
+        piece.move(destination)
+        self.__moved_pieces.append(piece)
+
+    def castle(self, king: Piece, destination: Vector) -> None:
+        moving_left = king.coordinates.col > destination.col
+
+        rook_coordinates = Vector(king.coordinates.row, 0 if moving_left else 7)
+        rook = self.get_piece(rook_coordinates)
+        rook_destination = Vector(
+            destination.row, destination.col + (1 if moving_left else -1)
+        )
+
+        king.move(destination)
+        rook.move(rook_destination)
+        # TODO - should record this in some way
+
+    def en_passant(self, pawn: Piece, destination: Vector) -> None:
+        piece_to_take = self.get_piece(destination + get_unit_step_backward(pawn.color))
+        self.pieces.remove(piece_to_take)
+
+        pawn.move(destination)
+        # TODO - how do we tell this is en passant?
+        self.__moved_pieces.append(pawn)
+
+    def promote(self, pawn: Piece, new_type: PieceType) -> None:
+        pawn.type = new_type
 
     def revert_last_move(self):
         raise NotImplementedError()

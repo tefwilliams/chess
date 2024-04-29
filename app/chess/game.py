@@ -30,7 +30,8 @@ class Game:
         while True:
             move = self.__get_move_selection()
 
-            self.board.move(move)
+            # for each movement in move:
+            self.board.move(move.piece, move.destination)
 
             self.swap_player()
 
