@@ -1,7 +1,8 @@
-from ..movement import board_size
 from ..piece import Piece, PieceType
 from ..color import Color
 from ..vector import Vector
+
+board_size = 8
 
 
 def get_starting_pieces():

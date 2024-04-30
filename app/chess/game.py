@@ -1,14 +1,16 @@
-from .display import BoardRenderer, BoardSquare
-from .vector import Vector
-from .board import Board, get_starting_pieces, within_board
-from .movement import Move, Movement
+from .board import Board, Move, get_starting_pieces, within_board
 from .color import Color
+from .display import BoardRenderer, BoardSquare
+from .movement import MoveGenerator
+from .piece import Piece, PieceType
+from .shared import only
+from .vector import Vector
 
 
 class Game:
     def __init__(self) -> None:
         self.board = Board(get_starting_pieces())
-        self.__movement = Movement(self.board)
+        self.__movement = MoveGenerator(self.board)
         self.player_color = Color.White
         self.__display = BoardRenderer()
         self.__display.render_squares(self.board.pieces)
@@ -30,8 +32,13 @@ class Game:
         while True:
             move = self.__get_move_selection()
 
-            # for each movement in move:
-            self.board.move(move.piece, move.destination)
+            self.board.move(move)
+
+            # Could use piece from move
+            if (
+                last_piece_to_move := self.board.last_piece_to_move
+            ) is not None and should_promote(last_piece_to_move):
+                self.board.promote(last_piece_to_move, PieceType.Queen)
 
             self.swap_player()
 
@@ -56,8 +63,11 @@ class Game:
 
             self.__display.highlight(BoardSquare(first_selection, selected_piece))
             self.__display.display_possible_moves(
-                BoardSquare(coordinates, self.board.try_get_piece(coordinates))
-                for coordinates in possible_moves
+                BoardSquare(
+                    (coordinates := move.primary_movement.destination),
+                    self.board.try_get_piece(coordinates),
+                )
+                for move in possible_moves
             )
 
             second_selection = self.__display.get_coordinate_selection()
@@ -67,7 +77,13 @@ class Game:
                 first_selection = None
                 continue
 
-            if second_selection not in possible_moves:
+            move = only(
+                move
+                for move in possible_moves
+                if move.primary_movement.destination == second_selection
+            )
+
+            if not move:
                 # Select new piece or deselect
                 first_selection = (
                     second_selection
@@ -76,7 +92,7 @@ class Game:
                 )
                 continue
 
-            return Move(selected_piece, second_selection)
+            return move
 
     def __is_valid_origin(self, coordinates: Vector):
         return (
@@ -84,3 +100,9 @@ class Game:
             and (piece := self.board.try_get_piece(coordinates)) is not None
             and piece.color == self.player_color
         )
+
+
+def should_promote(piece: Piece):
+    return piece.type == PieceType.Pawn and piece.coordinates.row == (
+        7 if piece.color == Color.White else 0
+    )

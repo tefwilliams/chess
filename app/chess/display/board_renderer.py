@@ -16,7 +16,7 @@ from .variables import (
     board_border_thickness,
     square_size,
 )
-from ..movement import board_size
+from ..board import board_size
 from ..piece import Piece
 from ..shared import only
 from ..vector import Vector

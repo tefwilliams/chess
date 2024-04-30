@@ -1,15 +1,17 @@
+from copy import deepcopy
+from typing import Callable
+
+from .move import Move
 from ..color import Color
 from ..piece import Piece, PieceType
 from ..shared import only, last
 from ..vector import Vector
 
-from ..movement import get_unit_step_backward
-
 
 class Board:
     def __init__(self, pieces: set[Piece]) -> None:
         self.pieces = pieces
-        self.__moved_pieces: list[Piece] = []
+        self.last_piece_to_move: Piece | None = None
 
     def try_get_piece(self, coordinates: Vector) -> Piece | None:
         return only(
@@ -25,48 +27,32 @@ class Board:
 
         return piece
 
-    def move(self, piece: Piece, destination: Vector) -> None:
-        # TODO - handle special moves
-        # (castle, promotion, en passant)
-        piece_to_take = self.try_get_piece(destination)
+    def move(self, move: Move) -> Callable[[], None]:
+        current_pieces = deepcopy(self.pieces)
+        last_piece_to_move = deepcopy(self.last_piece_to_move)
 
-        if piece_to_take:
-            self.pieces.remove(piece_to_take)
+        def revert_move():
+            self.pieces = current_pieces
+            self.last_piece_to_move = last_piece_to_move
 
-        piece.move(destination)
-        self.__moved_pieces.append(piece)
+        for movement in move:
+            piece_to_take = self.try_get_piece(movement.attack_location)
 
-    def castle(self, king: Piece, destination: Vector) -> None:
-        moving_left = king.coordinates.col > destination.col
+            if piece_to_take:
+                self.pieces.remove(piece_to_take)
 
-        rook_coordinates = Vector(king.coordinates.row, 0 if moving_left else 7)
-        rook = self.get_piece(rook_coordinates)
-        rook_destination = Vector(
-            destination.row, destination.col + (1 if moving_left else -1)
-        )
+            movement.piece.move(movement.destination)
 
-        king.move(destination)
-        rook.move(rook_destination)
-        # TODO - should record this in some way
-
-    def en_passant(self, pawn: Piece, destination: Vector) -> None:
-        piece_to_take = self.get_piece(destination + get_unit_step_backward(pawn.color))
-        self.pieces.remove(piece_to_take)
-
-        pawn.move(destination)
-        # TODO - how do we tell this is en passant?
-        self.__moved_pieces.append(pawn)
+        self.last_piece_to_move = move.primary_movement.piece
+        return revert_move
 
     def promote(self, pawn: Piece, new_type: PieceType) -> None:
         pawn.type = new_type
 
-    def revert_last_move(self):
-        raise NotImplementedError()
-
     # TODO - maybe get_pieces with condition passed
     # although pieces is accessible, so might not be useful
-    def get_king(self, color: Color) -> Piece | None:
-        return only(
+    def get_king(self, color: Color) -> Piece:
+        king = only(
             (
                 piece
                 for piece in self.pieces
@@ -75,9 +61,10 @@ class Board:
             f"More than one king on {color.name} team",
         )
 
-    @property
-    def last_piece_to_move(self):
-        return last(self.__moved_pieces)
+        if king is None:
+            raise ValueError(f"No king found for {color} team")
+
+        return king
 
     def get_last_move(self) -> tuple[Vector, Vector] | None:
         return (
