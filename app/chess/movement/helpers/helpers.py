@@ -1,7 +1,7 @@
 from typing import Callable
 
-from ...board import Board, within_board
 from ...color import Color
+from ...board import Board, within_board
 from ...vector import Vector
 
 
@@ -24,6 +24,7 @@ def get_squares_until_blocked(
         and not (max_number_steps is not None and len(squares) >= max_number_steps)
     ):
         squares.append(current_square)
+        last_square = current_square
         current_square += step
 
     return squares
@@ -50,12 +51,8 @@ def non_attacking_square_blocked_callback(
 
 
 def friendly_piece_at_square(square: Vector, color: Color, board: Board):
-    return (
-        current_piece := board.try_get_piece(square)
-    ) is not None and current_piece.color == color
+    return (piece := board.try_get_piece(square)) is not None and piece.color == color
 
 
 def enemy_piece_at_square(square: Vector, color: Color, board: Board):
-    return (
-        current_piece := board.try_get_piece(square)
-    ) is not None and current_piece.color == color
+    return (piece := board.try_get_piece(square)) is not None and piece.color != color

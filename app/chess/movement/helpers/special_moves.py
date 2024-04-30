@@ -1,5 +1,5 @@
+from .base_moves import get_pawn_attacking_moves
 from .unit_steps import get_unit_step_backward
-from .piece_moves import get_pawn_attacking_moves
 from ...board import Board, Move, Movement
 from ...piece import Piece, PieceType
 from ...shared import last
@@ -47,9 +47,8 @@ def valid_castle(king: Piece, rook: Piece | None, board: Board):
         and row_clear_between_cols(
             board,
             king.coordinates.row,
-            king.coordinates.col,
-            # TODO - need to get min and max col correct
-            rook.coordinates.col,
+            min(king.coordinates.col, rook.coordinates.col),
+            max(king.coordinates.col, rook.coordinates.col),
         )
         # TODO - king can't pass through attacked square (including current square)
     )
@@ -66,7 +65,7 @@ def row_clear_between_cols(board: Board, row: int, col_start: int, col_end: int)
 def get_en_passant_moves(pawn: Piece, board: Board) -> list[Move]:
     return [
         Move(Movement(pawn, destination, attack_location))
-        for move in get_pawn_attacking_moves(pawn, board)
+        for move in get_pawn_attacking_moves(pawn, board, True)
         if valid_en_passant(
             pawn,
             board.try_get_piece(
@@ -89,6 +88,7 @@ def valid_en_passant(attacker: Piece, defender: Piece | None, board: Board):
 
 
 def has_just_moved_two_rows(piece: Piece):
+    # TODO - must be on previous turn
     return (previous_coordinates := last(piece.coordinates_history)) and abs(
         piece.coordinates.row - previous_coordinates.row
     ) == 2

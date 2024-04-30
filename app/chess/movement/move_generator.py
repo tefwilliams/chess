@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from .helpers import get_attacking_moves, get_non_attacking_moves
 from ..board import Board, Move
 from ..color import Color
@@ -26,11 +28,18 @@ class MoveGenerator:
         return get_non_attacking_moves(piece, self.board)
 
     def __will_be_in_check_after_move(self, move: Move) -> bool:
-        revert_move = self.board.move(move)
+        original_board = self.board
 
+        # We want to copy the board
+        # but keep the same instances of pieces
+        # after the check has finished
+        test_board = deepcopy(self.board)
+        self.board = test_board
+
+        self.board.move(move)
         in_check = self.in_check(move.primary_movement.piece.color)
-        revert_move()
 
+        self.board = original_board
         return in_check
 
     def in_check(self, color: Color):

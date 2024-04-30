@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 
 
 class Vector(tuple[int, int]):
@@ -20,3 +21,11 @@ class Vector(tuple[int, int]):
 
     def __mul__(self, mutiple: int) -> Vector:
         return Vector(self.row * mutiple, self.col * mutiple)
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls, self.row, self.col)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result

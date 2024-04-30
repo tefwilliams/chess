@@ -9,6 +9,7 @@ from .helpers import (
     get_squares_until_blocked,
     attacking_square_blocked_callback,
     non_attacking_square_blocked_callback,
+    enemy_piece_at_square,
 )
 from ...board.move import Move
 from ...board.movement import Movement
@@ -19,13 +20,21 @@ from ...board import Board
 # ------------- PAWN -------------
 
 
-def get_pawn_attacking_moves(pawn: Piece, board: Board) -> list[Move]:
+def get_pawn_attacking_moves(pawn: Piece, board: Board, en_passant=False) -> list[Move]:
     assert pawn.type == PieceType.Pawn
     return [
         Move(Movement(pawn, destination))
         for step in (unit_step_left, unit_step_right)
         for destination in get_squares_until_blocked(
-            attacking_square_blocked_callback(board, pawn.color),
+            lambda current_square, last_square: (
+                attacking_square_blocked_callback(board, pawn.color)(
+                    current_square, last_square
+                )
+                or not (
+                    en_passant
+                    or enemy_piece_at_square(current_square, pawn.color, board)
+                )
+            ),
             pawn.coordinates,
             get_unit_step_forward(pawn.color) + step,
             1,
@@ -74,11 +83,12 @@ def get_knight_attacking_moves(knight: Piece, board: Board) -> list[Move]:
             for orthogonal_step in orthogonal_unit_steps
             for diagonal_step in diagonal_unit_steps
         )
-        if step.row + step.col == 3
+        if abs(step.row) + abs(step.col) == 3
         for destination in get_squares_until_blocked(
             attacking_square_blocked_callback(board, knight.color),
             knight.coordinates,
             step,
+            1,
         )
     ]
 

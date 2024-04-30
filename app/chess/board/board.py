@@ -1,52 +1,53 @@
-from copy import deepcopy
-from typing import Callable
-
 from .move import Move
 from ..color import Color
-from ..piece import Piece, PieceType
+from ..piece import Piece, PieceType, MovablePiece
 from ..shared import only, last
 from ..vector import Vector
 
 
 class Board:
-    def __init__(self, pieces: set[Piece]) -> None:
-        self.pieces = pieces
+    def __init__(self, pieces: set[MovablePiece]) -> None:
+        self.__pieces = pieces
         self.last_piece_to_move: Piece | None = None
 
+    @property
+    def pieces(self) -> set[Piece]:
+        return self.__pieces
+
     def try_get_piece(self, coordinates: Vector) -> Piece | None:
+        return self.__try_get_piece(coordinates)
+
+    def __try_get_piece(self, coordinates: Vector) -> MovablePiece | None:
         return only(
-            (piece for piece in self.pieces if piece.coordinates == coordinates),
+            (piece for piece in self.__pieces if piece.coordinates == coordinates),
             f"More than one piece with coordinates: {coordinates}",
         )
 
     def get_piece(self, coordinates: Vector) -> Piece:
-        piece = self.try_get_piece(coordinates)
+        return self.__get_piece(coordinates)
+
+    def __get_piece(self, coordinates: Vector) -> MovablePiece:
+        piece = self.__try_get_piece(coordinates)
 
         if piece is None:
             raise ValueError(f"No piece found for coordinates: {coordinates}")
 
         return piece
 
-    def move(self, move: Move) -> Callable[[], None]:
-        current_pieces = deepcopy(self.pieces)
-        last_piece_to_move = deepcopy(self.last_piece_to_move)
-
-        def revert_move():
-            self.pieces = current_pieces
-            self.last_piece_to_move = last_piece_to_move
-
+    def move(self, move: Move):
         for movement in move:
-            piece_to_take = self.try_get_piece(movement.attack_location)
+            piece_to_take = self.__try_get_piece(movement.attack_location)
 
             if piece_to_take:
                 self.pieces.remove(piece_to_take)
 
-            movement.piece.move(movement.destination)
+            piece = self.__get_piece(movement.piece.coordinates)
+            piece.move(movement.destination)
 
         self.last_piece_to_move = move.primary_movement.piece
-        return revert_move
 
     def promote(self, pawn: Piece, new_type: PieceType) -> None:
+        pawn = self.__get_piece(pawn.coordinates)
         pawn.type = new_type
 
     # TODO - maybe get_pieces with condition passed

@@ -1,5 +1,5 @@
-from ..piece import Piece, PieceType
 from ..color import Color
+from ..piece import PieceType, MovablePiece
 from ..vector import Vector
 
 board_size = 8
@@ -15,31 +15,31 @@ def get_starting_pieces():
     )
 
 
-def get_starting_piece(coordinates: Vector) -> Piece | None:
+def get_starting_piece(coordinates: Vector) -> MovablePiece | None:
     row, col = coordinates
 
     color = Color.White if row in [0, 1] else Color.Black
 
     match row:
         case 1 | 6:
-            return Piece(PieceType.Pawn, color, coordinates)
+            return MovablePiece(PieceType.Pawn, color, coordinates)
 
         case 0 | 7:
             match col:
                 case 0 | 7:
-                    return Piece(PieceType.Rook, color, coordinates)
+                    return MovablePiece(PieceType.Rook, color, coordinates)
 
                 case 1 | 6:
-                    return Piece(PieceType.Knight, color, coordinates)
+                    return MovablePiece(PieceType.Knight, color, coordinates)
 
                 case 2 | 5:
-                    return Piece(PieceType.Bishop, color, coordinates)
+                    return MovablePiece(PieceType.Bishop, color, coordinates)
 
                 case 3:
-                    return Piece(PieceType.Queen, color, coordinates)
+                    return MovablePiece(PieceType.Queen, color, coordinates)
 
                 case 4:
-                    return Piece(PieceType.King, color, coordinates)
+                    return MovablePiece(PieceType.King, color, coordinates)
 
         case _:
             return None
