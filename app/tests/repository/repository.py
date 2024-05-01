@@ -1,47 +1,27 @@
-from chess import (
-    Piece,
-    PieceType,
-    Color,
-    Coordinates,
-    Bishop,
-    King,
-    Knight,
-    Pawn,
-    Queen,
-    Rook,
-)
+from chess import Color, Move, Movement, MovablePiece, PieceType, Vector
 
-y_grid_values = ["A", "B", "C", "D", "E", "F", "G", "H"]
-x_grid_values = ["8", "7", "6", "5", "4", "3", "2", "1"]
+row_strings = ["A", "B", "C", "D", "E", "F", "G", "H"]
+col_strings = ["8", "7", "6", "5", "4", "3", "2", "1"]
 
 
-def generate_piece(
-    piece_type: PieceType, coordinates_as_string: str, color: Color
-) -> Piece:
-    coordinates = get_coordinates_from_grid_value(coordinates_as_string)
-
-    if piece_type == PieceType.Bishop:
-        return Bishop(coordinates, color)
-
-    if piece_type == PieceType.King:
-        return King(coordinates, color)
-
-    if piece_type == PieceType.Knight:
-        return Knight(coordinates, color)
-
-    if piece_type == PieceType.Pawn:
-        return Pawn(coordinates, color)
-
-    if piece_type == PieceType.Queen:
-        return Queen(coordinates, color)
-
-    if piece_type == PieceType.Rook:
-        return Rook(coordinates, color)
-
-    raise ValueError("Invalid piece type")
+def create_piece(
+    type: PieceType, coordinates_as_string: str, color: Color
+) -> MovablePiece:
+    return MovablePiece(type, color, to_coordinates(coordinates_as_string))
 
 
-def get_coordinates_from_grid_value(coordinates: str) -> Coordinates:
-    y_value = y_grid_values.index(coordinates[0])
-    x_value = x_grid_values.index(coordinates[1])
-    return Coordinates((y_value, x_value))
+def create_move(*movements: tuple[MovablePiece, str]):
+    return Move(
+        *(
+            Movement(piece, to_coordinates(coordinates_as_string))
+            for piece, coordinates_as_string in movements
+        )
+    )
+
+
+def to_coordinates(coordinates_as_string: str) -> Vector:
+    assert len(coordinates_as_string) == 2
+
+    row, col = coordinates_as_string
+
+    return Vector(row_strings.index(row), col_strings.index(col))

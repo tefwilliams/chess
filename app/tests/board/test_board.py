@@ -1,22 +1,22 @@
 import pytest
-from chess import PieceType, Board, Color, coordinates
-from ..repository import generate_piece, get_coordinates_from_grid_value
+from chess import PieceType, Board, Color
+from ..repository import create_piece, create_move, to_coordinates
 
 
 def test_get_piece_returns_piece_with_specified_coordinates() -> None:
-    piece = generate_piece(PieceType.Pawn, "A1", Color.White)
-    get_from_coordinates = get_coordinates_from_grid_value("A1")
+    piece = create_piece(PieceType.Pawn, "A1", Color.White)
+    get_from_coordinates = to_coordinates("A1")
 
-    board = Board([piece])
+    board = Board({piece})
 
     assert board.try_get_piece(get_from_coordinates) == piece
 
 
 def test_get_piece_returns_none_if_no_piece_has_specified_coordinates() -> None:
-    piece = generate_piece(PieceType.Pawn, "A1", Color.White)
-    get_from_coordinates = get_coordinates_from_grid_value("B1")
+    piece = create_piece(PieceType.Pawn, "A1", Color.White)
+    get_from_coordinates = to_coordinates("B1")
 
-    board = Board([piece])
+    board = Board({piece})
 
     assert board.try_get_piece(get_from_coordinates) == None
 
@@ -35,10 +35,10 @@ def test_get_piece_returns_none_if_no_piece_has_specified_coordinates() -> None:
 def test_is_in_check_returns_true_when_king_in_check(
     black_piece, piece_coordinates
 ) -> None:
-    pieces = [
-        generate_piece(PieceType.King, "D4", Color.White),
-        generate_piece(black_piece, piece_coordinates, Color.Black),
-    ]
+    pieces = {
+        create_piece(PieceType.King, "D4", Color.White),
+        create_piece(black_piece, piece_coordinates, Color.Black),
+    }
 
     board = Board(pieces)
 
@@ -60,10 +60,10 @@ def test_is_in_check_returns_true_when_king_in_check(
 def test_is_in_check_returns_false_when_king_not_in_check(
     black_piece, piece_coordinates
 ) -> None:
-    pieces = [
-        generate_piece(PieceType.King, "D4", Color.White),
-        generate_piece(black_piece, piece_coordinates, Color.Black),
-    ]
+    pieces = {
+        create_piece(PieceType.King, "D4", Color.White),
+        create_piece(black_piece, piece_coordinates, Color.Black),
+    }
 
     board = Board(pieces)
 
@@ -71,44 +71,49 @@ def test_is_in_check_returns_false_when_king_not_in_check(
 
 
 def test_move_via_en_passant_removes_piece() -> None:
-    pawn = generate_piece(PieceType.Pawn, "E2", Color.White)
-    enemy_pawn = generate_piece(PieceType.Pawn, "G1", Color.Black)
+    pawn = create_piece(PieceType.Pawn, "E2", Color.White)
+    enemy_pawn = create_piece(PieceType.Pawn, "G1", Color.Black)
 
-    pieces = [pawn, enemy_pawn]
+    pieces = {pawn, enemy_pawn}
 
     board = Board(pieces)
 
-    board.move(enemy_pawn, get_coordinates_from_grid_value("E1"))
-    board.move(pawn, get_coordinates_from_grid_value("F1"))
+    enemy_pawn_to_E1 = create_move((enemy_pawn, "E1"))
+    board.move(enemy_pawn_to_E1)
+
+    pawn_to_F1 = create_move((pawn, "F1"))
+    board.move(pawn_to_F1)
 
     assert enemy_pawn not in board.pieces
 
 
 def test_move_via_queenside_castle_moves_king_and_rook() -> None:
-    king = generate_piece(PieceType.King, "A5", Color.White)
-    rook = generate_piece(PieceType.Rook, "A1", Color.White)
+    king = create_piece(PieceType.King, "A5", Color.White)
+    rook = create_piece(PieceType.Rook, "A1", Color.White)
 
-    pieces = [king, rook]
+    pieces = {king, rook}
 
     board = Board(pieces)
 
-    board.move(king, get_coordinates_from_grid_value("A3"))
+    king_to_A3 = create_move((king, "A3"))
+    board.move(king_to_A3)
 
-    assert king.coordinates == get_coordinates_from_grid_value(
+    assert king.coordinates == to_coordinates(
         "A3"
-    ) and rook.coordinates == get_coordinates_from_grid_value("A4")
+    ) and rook.coordinates == to_coordinates("A4")
 
 
 def test_move_via_kingside_castle_moves_king_and_rook() -> None:
-    king = generate_piece(PieceType.King, "A5", Color.White)
-    rook = generate_piece(PieceType.Rook, "A8", Color.White)
+    king = create_piece(PieceType.King, "A5", Color.White)
+    rook = create_piece(PieceType.Rook, "A8", Color.White)
 
-    pieces = [king, rook]
+    pieces = {king, rook}
 
     board = Board(pieces)
 
-    board.move(king, get_coordinates_from_grid_value("A7"))
+    king_to_A7 = create_move((king, "A7"))
+    board.move(king_to_A7)
 
-    assert king.coordinates == get_coordinates_from_grid_value(
+    assert king.coordinates == to_coordinates(
         "A7"
-    ) and rook.coordinates == get_coordinates_from_grid_value("A6")
+    ) and rook.coordinates == to_coordinates("A6")
