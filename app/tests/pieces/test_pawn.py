@@ -1,137 +1,105 @@
-
 import pytest
-from chess import Board, Color, PieceTypes, Piece
-from ..repository import generate_piece, get_coordinates_from_grid_value
+from chess import Board, Color, PieceType, MovablePiece
+from ..repository import (
+    create_piece,
+    to_coordinates,
+    get_possible_destinations,
+    create_move,
+)
 
 
 def test_pawn_can_move_one_or_two_forward_if_it_has_not_moved() -> None:
-    pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
+    pawn = create_piece(PieceType.Pawn, "A2", Color.White)
 
-    board = Board([pawn])
-
-    assert board.get_legal_moves(pawn).sort() == [get_coordinates_from_grid_value(
-        'C2'), get_coordinates_from_grid_value('B2')].sort()
-
-
-def test_pawn_can_move_two_forward_if_it_has_not_moved() -> None:
-    pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
-
-    board = Board([pawn])
-
-    assert get_coordinates_from_grid_value(
-        'C2') in board.get_legal_moves(pawn)
+    assert get_possible_destinations(pawn, Board({pawn})) == {
+        to_coordinates("A3"),
+        to_coordinates("A4"),
+    }
 
 
-def test_pawn_cannot_move_two_forward_if_it_has_moved() -> None:
-    pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
+def test_pawn_can_only_move_one_forward_if_it_has_moved() -> None:
+    pawn = create_piece(PieceType.Pawn, "A2", Color.White)
 
-    board = Board([pawn])
+    board = Board({pawn})
 
-    board.evaluate_move(pawn, get_coordinates_from_grid_value('B2'))
+    pawn_to_A3 = create_move((pawn, "A3"))
+    board.move(pawn_to_A3)
 
-    assert get_coordinates_from_grid_value(
-        'D2') not in board.get_legal_moves(pawn)
+    assert get_possible_destinations(pawn, Board({pawn})) == {
+        to_coordinates("A4"),
+    }
 
 
 def test_pawn_can_move_forward_diagonally_if_enemy_piece_there() -> None:
-    pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
+    pawn = create_piece(PieceType.Pawn, "A2", Color.White)
 
-    pieces = [
-        pawn,
-        generate_piece(PieceTypes.rook, 'B1', Color.black)
-    ]
-
-    board = Board(pieces)
-
-    assert get_coordinates_from_grid_value(
-        'B1') in board.get_legal_moves(pawn)
+    assert to_coordinates("B3") in get_possible_destinations(
+        pawn, Board({pawn, create_piece(PieceType.Rook, "B3", Color.Black)})
+    )
 
 
-def test_pawn_can_move_via_en_passant_if_enemy_pawn_has_just_moved_two_squares() -> None:
-    pawn = generate_piece(PieceTypes.pawn, 'E2', Color.white)
-    enemy_pawn = generate_piece(PieceTypes.pawn, 'G1', Color.black)
+def test_pawn_can_move_via_en_passant_if_enemy_pawn_has_just_moved_two_squares() -> (
+    None
+):
+    pawn = create_piece(PieceType.Pawn, "E2", Color.White)
+    enemy_pawn = create_piece(PieceType.Pawn, "G1", Color.Black)
 
-    pieces = [
-        pawn,
-        enemy_pawn
-    ]
+    board = Board({pawn, enemy_pawn})
 
-    board = Board(pieces)
+    pawn_to_E1 = create_move((pawn, "E1"))
+    board.move(pawn_to_E1)
 
-    board.evaluate_move(enemy_pawn, get_coordinates_from_grid_value('E1'))
-
-    assert get_coordinates_from_grid_value(
-        'F1') in board.get_legal_moves(pawn)
+    assert to_coordinates("F1") in get_possible_destinations(pawn, board)
 
 
 def test_pawn_cannot_move_via_en_passant_if_another_piece_has_moved() -> None:
-    pawn = generate_piece(PieceTypes.pawn, 'E2', Color.white)
-    enemy_pawn = generate_piece(PieceTypes.pawn, 'G1', Color.black)
-    other_enempy_piece = generate_piece(PieceTypes.bishop, 'H5', Color.black)
+    pawn = create_piece(PieceType.Pawn, "E2", Color.White)
+    enemy_pawn = create_piece(PieceType.Pawn, "G1", Color.Black)
+    other_enempy_piece = create_piece(PieceType.Bishop, "H5", Color.Black)
 
-    pieces = [
-        pawn,
-        enemy_pawn,
-        other_enempy_piece
-    ]
+    board = Board({pawn, enemy_pawn, other_enempy_piece})
 
-    board = Board(pieces)
+    enemy_pawn_to_E1 = create_move((enemy_pawn, "E1"))
+    board.move(enemy_pawn_to_E1)
 
-    board.evaluate_move(enemy_pawn, get_coordinates_from_grid_value('E1'))
-    board.evaluate_move(other_enempy_piece,
-                        get_coordinates_from_grid_value('G4'))
+    other_enemy_piece_to_G4 = create_move((other_enempy_piece, "G4"))
+    board.move(other_enemy_piece_to_G4)
 
-    assert get_coordinates_from_grid_value(
-        'F1') not in board.get_legal_moves(pawn)
+    assert to_coordinates("F1") not in get_possible_destinations(pawn, board)
 
 
 def test_pawn_cannot_move_forward_diagonally_if_fiendly_piece_there() -> None:
-    pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
+    pawn = create_piece(PieceType.Pawn, "A2", Color.White)
 
-    pieces = [
-        pawn,
-        generate_piece(PieceTypes.rook, 'B1', Color.white)
-    ]
-
-    board = Board(pieces)
-
-    assert get_coordinates_from_grid_value(
-        'B1') not in board.get_legal_moves(pawn)
+    assert to_coordinates("B1") not in get_possible_destinations(
+        pawn, Board({pawn, create_piece(PieceType.Rook, "B1", Color.White)})
+    )
 
 
 @pytest.mark.parametrize(
     "square_to_move_to, piece_at_destination",
     [
-        ('C4', generate_piece(PieceTypes.queen, 'C4', Color.black)),
-        ('C3', generate_piece(PieceTypes.rook, 'C3', Color.black))
-    ]
+        ("C4", create_piece(PieceType.Queen, "C4", Color.Black)),
+        ("B4", create_piece(PieceType.Rook, "C3", Color.Black)),
+    ],
 )
-def test_pawn_cannot_move_two_forward_diagonally(square_to_move_to: str, piece_at_destination: Piece) -> None:
-    pawn = generate_piece(PieceTypes.pawn, 'A2', Color.white)
+def test_pawn_cannot_move_two_forward_diagonally(
+    square_to_move_to: str, piece_at_destination: MovablePiece
+) -> None:
+    pawn = create_piece(PieceType.Pawn, "A2", Color.White)
 
-    pieces = [
-        pawn,
-        piece_at_destination
-    ]
-
-    board = Board(pieces)
-
-    assert not get_coordinates_from_grid_value(
-        square_to_move_to) in board.get_legal_moves(pawn)
+    assert not to_coordinates(square_to_move_to) in get_possible_destinations(
+        pawn, Board({pawn, piece_at_destination})
+    )
 
 
 def test_pawn_cannot_move_backward() -> None:
-    pawn = generate_piece(PieceTypes.pawn, 'B1', Color.white)
+    pawn = create_piece(PieceType.Pawn, "A2", Color.White)
 
-    board = Board([pawn])
-
-    assert not get_coordinates_from_grid_value(
-        'A1') in board.get_legal_moves(pawn)
+    assert not to_coordinates("A1") in get_possible_destinations(pawn, Board({pawn}))
 
 
 def test_pawn_cannot_move_out_of_board() -> None:
-    pawn = generate_piece(PieceTypes.pawn, 'H2', Color.white)
+    pawn = create_piece(PieceType.Pawn, "A8", Color.White)
 
-    board = Board([pawn])
-
-    assert len(board.get_legal_moves(pawn)) == 0
+    assert len(get_possible_destinations(pawn, Board({pawn}))) == 0

@@ -1,34 +1,43 @@
-from chess import Piece, PieceTypes, Color, Coordinates, Bishop, King, Knight, Pawn, Queen, Rook
+from chess import (
+    Board,
+    Color,
+    Move,
+    Movement,
+    MoveGenerator,
+    MovablePiece,
+    PieceType,
+    Vector,
+)
 
-y_grid_values = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-x_grid_values = ['8', '7', '6', '5', '4', '3', '2', '1']
-
-
-def generate_piece(piece_type: PieceTypes, coordinates_as_string: str, color: Color) -> Piece:
-    coordinates = get_coordinates_from_grid_value(coordinates_as_string)
-
-    if piece_type == PieceTypes.bishop:
-        return Bishop(coordinates, color)
-
-    if piece_type == PieceTypes.king:
-        return King(coordinates, color)
-
-    if piece_type == PieceTypes.knight:
-        return Knight(coordinates, color)
-
-    if piece_type == PieceTypes.pawn:
-        return Pawn(coordinates, color)
-
-    if piece_type == PieceTypes.queen:
-        return Queen(coordinates, color)
-
-    if piece_type == PieceTypes.rook:
-        return Rook(coordinates, color)
-
-    raise ValueError("Invalid piece type")
+col_strings = ["A", "B", "C", "D", "E", "F", "G", "H"]
+row_strings = ["8", "7", "6", "5", "4", "3", "2", "1"]
 
 
-def get_coordinates_from_grid_value(coordinates: str) -> Coordinates:
-    y_value = y_grid_values.index(coordinates[0])
-    x_value = x_grid_values.index(coordinates[1])
-    return Coordinates((y_value, x_value))
+def create_piece(
+    type: PieceType, coordinates_as_string: str, color: Color
+) -> MovablePiece:
+    return MovablePiece(type, color, to_coordinates(coordinates_as_string))
+
+
+def create_move(*movements: tuple[MovablePiece, str]):
+    return Move(
+        *(
+            Movement(piece, to_coordinates(coordinates_as_string))
+            for piece, coordinates_as_string in movements
+        )
+    )
+
+
+def to_coordinates(coordinates_as_string: str) -> Vector:
+    assert len(coordinates_as_string) == 2
+
+    col, row = coordinates_as_string
+
+    return Vector(col_strings.index(col), row_strings.index(row))
+
+
+def get_possible_destinations(piece: MovablePiece, board: Board):
+    return {
+        move.primary_movement.destination
+        for move in MoveGenerator(board).get_possible_moves(piece)
+    }
