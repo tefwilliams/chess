@@ -68,6 +68,7 @@ class BoardRenderer:
                     (coord - board_edge_thickness - board_border_thickness * 2)
                     / square_size
                 )
+                # get_pos returns (x, y)
                 for coord in pygame.mouse.get_pos()
             )
         )
@@ -97,7 +98,7 @@ class BoardRenderer:
     ) -> None:
         for row_number in range(board_size):
             for column_number in range(board_size):
-                square = Vector(row_number, column_number)
+                square = Vector(column_number, row_number)
                 piece = only(piece for piece in pieces if piece.coordinates == square)
 
                 self.__render_square(
@@ -141,7 +142,7 @@ class BoardRenderer:
         icon_width = round(aspect_ratio * icon_height)
 
         top_left = get_square_location(piece.coordinates) + Vector(
-            (square_size - icon_height) // 2, (square_size - icon_width) // 2
+            (square_size - icon_width) // 2, (square_size - icon_height) // 2
         )
 
         scaled_piece_icon = pygame.transform.scale(

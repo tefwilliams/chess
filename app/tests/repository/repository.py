@@ -1,7 +1,7 @@
 from chess import Color, Move, Movement, MovablePiece, PieceType, Vector
 
-row_strings = ["A", "B", "C", "D", "E", "F", "G", "H"]
-col_strings = ["8", "7", "6", "5", "4", "3", "2", "1"]
+col_strings = ["A", "B", "C", "D", "E", "F", "G", "H"]
+row_strings = ["8", "7", "6", "5", "4", "3", "2", "1"]
 
 
 def create_piece(
@@ -22,6 +22,6 @@ def create_move(*movements: tuple[MovablePiece, str]):
 def to_coordinates(coordinates_as_string: str) -> Vector:
     assert len(coordinates_as_string) == 2
 
-    row, col = coordinates_as_string
+    col, row = coordinates_as_string
 
-    return Vector(row_strings.index(row), col_strings.index(col))
+    return Vector(col_strings.index(col), row_strings.index(row))

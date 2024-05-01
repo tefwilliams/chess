@@ -13,25 +13,25 @@ def get_castle_moves(king: Piece, board: Board) -> list[Move]:
     if king.has_moved:
         return moves
 
-    left_rook = board.try_get_piece(Vector(king.coordinates.row, 0))
+    left_rook = board.try_get_piece(Vector(0, king.coordinates.row))
 
     if valid_castle(king, left_rook, board):
         assert left_rook
         moves.append(
             Move(
-                Movement(king, Vector(king.coordinates.row, 2)),
-                Movement(left_rook, Vector(king.coordinates.row, 3)),
+                Movement(king, Vector(2, king.coordinates.row)),
+                Movement(left_rook, Vector(3, king.coordinates.row)),
             )
         )
 
-    right_rook = board.try_get_piece(Vector(king.coordinates.row, 7))
+    right_rook = board.try_get_piece(Vector(7, king.coordinates.row))
 
     if valid_castle(king, right_rook, board):
         assert right_rook
         moves.append(
             Move(
-                Movement(king, Vector(king.coordinates.row, 6)),
-                Movement(right_rook, Vector(king.coordinates.row, 5)),
+                Movement(king, Vector(6, king.coordinates.row)),
+                Movement(right_rook, Vector(5, king.coordinates.row)),
             )
         )
 
@@ -58,7 +58,7 @@ def valid_castle(king: Piece, rook: Piece | None, board: Board):
 def row_clear_between_cols(board: Board, row: int, col_start: int, col_end: int):
     return not any(
         board.try_get_piece(coordinates)
-        for coordinates in (Vector(row, col) for col in range(col_start + 1, col_end))
+        for coordinates in (Vector(col, row) for col in range(col_start + 1, col_end))
     )
 
 

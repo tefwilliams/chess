@@ -43,7 +43,9 @@ class MoveGenerator:
         return in_check
 
     def in_check(self, color: Color):
-        return self.__square_attacked(self.board.get_king(color).coordinates, color)
+        return (
+            king := self.board.get_king(color)
+        ) is not None and self.__square_attacked(king.coordinates, color)
 
     def __square_attacked(self, square: Vector, color: Color) -> bool:
         return any(

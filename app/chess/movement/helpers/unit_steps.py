@@ -2,10 +2,10 @@ from ...color import Color
 from ...vector import Vector
 
 
-unit_step_up = Vector(-1, 0)
-unit_step_right = Vector(0, 1)
-unit_step_down = Vector(1, 0)
-unit_step_left = Vector(0, -1)
+unit_step_up = Vector(0, -1)
+unit_step_right = Vector(1, 0)
+unit_step_down = Vector(0, 1)
+unit_step_left = Vector(-1, 0)
 
 horizontal_unit_steps = (unit_step_right, unit_step_left)
 
@@ -21,7 +21,7 @@ diagonal_unit_steps = tuple(
 
 
 def get_unit_step_forward(color: Color):
-    return unit_step_down if color == Color.White else unit_step_up
+    return unit_step_up if color == Color.White else unit_step_down
 
 
 def get_unit_step_backward(color: Color):

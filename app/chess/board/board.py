@@ -52,7 +52,7 @@ class Board:
 
     # TODO - maybe get_pieces with condition passed
     # although pieces is accessible, so might not be useful
-    def get_king(self, color: Color) -> Piece:
+    def get_king(self, color: Color) -> Piece | None:
         king = only(
             (
                 piece
@@ -62,8 +62,8 @@ class Board:
             f"More than one king on {color.name} team",
         )
 
-        if king is None:
-            raise ValueError(f"No king found for {color} team")
+        # if king is None:
+        #     raise ValueError(f"No king found for {color} team")
 
         return king
 

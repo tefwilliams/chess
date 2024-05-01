@@ -9,23 +9,22 @@ def get_starting_pieces():
     return set(
         piece
         for coordinates in (
-            Vector(row, col) for row in range(board_size) for col in range(board_size)
+            Vector(col, row) for row in range(board_size) for col in range(board_size)
         )
         if ((piece := get_starting_piece(coordinates)) is not None)
     )
 
 
 def get_starting_piece(coordinates: Vector) -> MovablePiece | None:
-    row, col = coordinates
+    # White starts at the bottom of the board
+    color = Color.White if coordinates.row in [6, 7] else Color.Black
 
-    color = Color.White if row in [0, 1] else Color.Black
-
-    match row:
+    match coordinates.row:
         case 1 | 6:
             return MovablePiece(PieceType.Pawn, color, coordinates)
 
         case 0 | 7:
-            match col:
+            match coordinates.col:
                 case 0 | 7:
                     return MovablePiece(PieceType.Rook, color, coordinates)
 
