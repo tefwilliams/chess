@@ -1,4 +1,13 @@
-from chess import Color, Move, Movement, MovablePiece, PieceType, Vector
+from chess import (
+    Board,
+    Color,
+    Move,
+    Movement,
+    MoveGenerator,
+    MovablePiece,
+    PieceType,
+    Vector,
+)
 
 col_strings = ["A", "B", "C", "D", "E", "F", "G", "H"]
 row_strings = ["8", "7", "6", "5", "4", "3", "2", "1"]
@@ -25,3 +34,10 @@ def to_coordinates(coordinates_as_string: str) -> Vector:
     col, row = coordinates_as_string
 
     return Vector(col_strings.index(col), row_strings.index(row))
+
+
+def get_possible_destinations(piece: MovablePiece, board: Board):
+    return {
+        move.primary_movement.destination
+        for move in MoveGenerator(board).get_possible_moves(piece)
+    }

@@ -1,6 +1,6 @@
 import pytest
-from chess import Board, Color, PieceType, Piece
-from ..repository import create_piece, to_coordinates
+from chess import Board, Color, PieceType, MovablePiece
+from ..repository import create_piece, to_coordinates, get_possible_destinations
 
 
 @pytest.mark.parametrize(
@@ -20,9 +20,10 @@ def test_queen_can_only_move_diagonally_or_orthogonally(
 ) -> None:
     queen = create_piece(PieceType.Queen, "F4", Color.White)
 
-    board = Board([queen])
+    can_move = to_coordinates(square_to_move_to) in get_possible_destinations(
+        queen, Board({queen})
+    )
 
-    can_move = to_coordinates(square_to_move_to) in board.get_possible_moves(queen)
     assert can_move == should_be_able_to_move
 
 
@@ -40,15 +41,13 @@ def test_queen_can_only_move_diagonally_or_orthogonally(
     ],
 )
 def test_queen_cannot_move_if_obstructed(
-    square_to_move_to: str, obstructing_piece: Piece
+    square_to_move_to: str, obstructing_piece: MovablePiece
 ) -> None:
     queen = create_piece(PieceType.Queen, "F4", Color.White)
 
-    pieces = [queen, obstructing_piece]
-
-    board = Board(pieces)
-
-    assert not to_coordinates(square_to_move_to) in board.get_possible_moves(queen)
+    assert not to_coordinates(square_to_move_to) in get_possible_destinations(
+        queen, Board({queen, obstructing_piece})
+    )
 
 
 @pytest.mark.parametrize(
@@ -64,12 +63,10 @@ def test_queen_cannot_move_if_obstructed(
     ],
 )
 def test_queen_can_take_opposing_piece(
-    square_to_move_to: str, opposing_piece: Piece
+    square_to_move_to: str, opposing_piece: MovablePiece
 ) -> None:
     queen = create_piece(PieceType.Queen, "F4", Color.White)
 
-    pieces = [queen, opposing_piece]
-
-    board = Board(pieces)
-
-    assert to_coordinates(square_to_move_to) in board.get_possible_moves(queen)
+    assert to_coordinates(square_to_move_to) in get_possible_destinations(
+        queen, Board({queen, opposing_piece})
+    )

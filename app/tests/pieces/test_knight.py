@@ -1,6 +1,6 @@
 import pytest
-from chess import Board, Color, PieceType, Piece
-from ..repository import create_piece, to_coordinates
+from chess import Board, Color, PieceType, MovablePiece
+from ..repository import create_piece, to_coordinates, get_possible_destinations
 
 
 @pytest.mark.parametrize(
@@ -24,9 +24,10 @@ def test_knight_can_only_move_to_knight_squares(
 ) -> None:
     knight = create_piece(PieceType.Knight, "F4", Color.White)
 
-    board = Board([knight])
+    can_move = to_coordinates(square_to_move_to) in get_possible_destinations(
+        knight, Board({knight})
+    )
 
-    can_move = to_coordinates(square_to_move_to) in board.get_possible_moves(knight)
     assert can_move == should_be_able_to_move
 
 
@@ -40,15 +41,13 @@ def test_knight_can_only_move_to_knight_squares(
     ],
 )
 def test_knight_cannot_move_if_obstructed(
-    square_to_move_to: str, obstructing_piece: Piece
+    square_to_move_to: str, obstructing_piece: MovablePiece
 ) -> None:
     knight = create_piece(PieceType.Knight, "F4", Color.White)
 
-    pieces = [knight, obstructing_piece]
-
-    board = Board(pieces)
-
-    assert not to_coordinates(square_to_move_to) in board.get_possible_moves(knight)
+    assert not to_coordinates(square_to_move_to) in get_possible_destinations(
+        knight, Board({knight, obstructing_piece})
+    )
 
 
 @pytest.mark.parametrize(
@@ -61,12 +60,10 @@ def test_knight_cannot_move_if_obstructed(
     ],
 )
 def test_knight_can_take_opposing_piece(
-    square_to_move_to: str, opposing_piece: Piece
+    square_to_move_to: str, opposing_piece: MovablePiece
 ) -> None:
     knight = create_piece(PieceType.Knight, "F4", Color.White)
 
-    pieces = [knight, opposing_piece]
-
-    board = Board(pieces)
-
-    assert to_coordinates(square_to_move_to) in board.get_possible_moves(knight)
+    assert to_coordinates(square_to_move_to) in get_possible_destinations(
+        knight, Board({knight, opposing_piece})
+    )

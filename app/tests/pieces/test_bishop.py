@@ -1,6 +1,6 @@
 import pytest
-from chess import Board, Color, PieceType, Piece, MoveGenerator
-from ..repository import create_piece, to_coordinates
+from chess import Board, Color, PieceType, MovablePiece
+from ..repository import create_piece, to_coordinates, get_possible_destinations
 
 
 @pytest.mark.parametrize(
@@ -20,12 +20,10 @@ def test_bishop_can_only_move_diagonally(
 ) -> None:
     bishop = create_piece(PieceType.Bishop, "F4", Color.White)
 
-    board = Board({bishop})
-    move_generator = MoveGenerator(board)
-
-    can_move = to_coordinates(square_to_move_to) in move_generator.get_possible_moves(
-        bishop
+    can_move = to_coordinates(square_to_move_to) in get_possible_destinations(
+        bishop, Board({bishop})
     )
+
     assert can_move == should_be_able_to_move
 
 
@@ -41,17 +39,12 @@ def test_bishop_can_only_move_diagonally(
     ],
 )
 def test_bishop_cannot_move_if_obstructed(
-    square_to_move_to: str, obstructing_piece: Piece
+    square_to_move_to: str, obstructing_piece: MovablePiece
 ) -> None:
     bishop = create_piece(PieceType.Bishop, "F4", Color.White)
 
-    pieces = {bishop, obstructing_piece}
-
-    board = Board(pieces)
-    move_generator = MoveGenerator(board)
-
-    assert not to_coordinates(square_to_move_to) in move_generator.get_possible_moves(
-        bishop
+    assert not to_coordinates(square_to_move_to) in get_possible_destinations(
+        bishop, Board({bishop, obstructing_piece})
     )
 
 
@@ -66,15 +59,10 @@ def test_bishop_cannot_move_if_obstructed(
     ],
 )
 def test_bishop_can_take_opposing_piece(
-    square_to_move_to: str, opposing_piece: Piece
+    square_to_move_to: str, opposing_piece: MovablePiece
 ) -> None:
     bishop = create_piece(PieceType.Bishop, "F4", Color.White)
 
-    pieces = {bishop, opposing_piece}
-
-    board = Board(pieces)
-    move_generator = MoveGenerator(board)
-
-    assert to_coordinates(square_to_move_to) in move_generator.get_possible_moves(
-        bishop
+    assert to_coordinates(square_to_move_to) in get_possible_destinations(
+        bishop, Board({bishop, opposing_piece})
     )
