@@ -29,18 +29,17 @@ class Game:
         ) and not self.__movement.any_possible_moves(self.player_color)
 
     def take_turn(self) -> None:
-        while True:
-            move = self.__get_move_selection()
+        move = self.__get_move_selection()
 
-            self.board.move(move)
+        self.board.move(move)
 
-            # Could use piece from move
-            if (
-                last_piece_to_move := self.board.last_piece_to_move
-            ) is not None and should_promote(last_piece_to_move):
-                self.board.promote(last_piece_to_move, PieceType.Queen)
+        # Could use piece from move
+        if (
+            last_piece_to_move := self.board.last_piece_to_move
+        ) is not None and should_promote(last_piece_to_move):
+            self.board.promote(last_piece_to_move, PieceType.Queen)
 
-            self.swap_player()
+        self.swap_player()
 
     def swap_player(self) -> None:
         self.player_color = self.player_color.get_opposing_color()

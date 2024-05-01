@@ -57,7 +57,7 @@ def valid_castle(king: Piece, rook: Piece | None, board: Board):
 # TODO - maybe adapt to get square for row between cols
 def row_clear_between_cols(board: Board, row: int, col_start: int, col_end: int):
     return not any(
-        board.get_piece(coordinates)
+        board.try_get_piece(coordinates)
         for coordinates in (Vector(row, col) for col in range(col_start + 1, col_end))
     )
 
