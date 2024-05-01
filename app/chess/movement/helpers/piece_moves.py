@@ -8,11 +8,11 @@ from .base_moves import (
     get_rook_attacking_moves,
 )
 from .special_moves import get_en_passant_moves, get_castle_moves
-from ...board import Board
+from ...board import Board, Move
 from ...piece import Piece, PieceType
 
 
-def get_attacking_moves(piece: Piece, board: Board):
+def get_attacking_moves(piece: Piece, board: Board) -> list[Move]:
     match piece.type:
         case PieceType.Pawn:
             return get_pawn_attacking_moves(piece, board) + get_en_passant_moves(
@@ -35,7 +35,7 @@ def get_attacking_moves(piece: Piece, board: Board):
             return get_king_attacking_moves(piece, board)
 
 
-def get_non_attacking_moves(piece: Piece, board: Board):
+def get_non_attacking_moves(piece: Piece, board: Board) -> list[Move]:
     match piece.type:
         case PieceType.Pawn:
             return get_pawn_non_attacking_moves(piece, board)

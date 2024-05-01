@@ -43,7 +43,7 @@ def valid_castle(king: Piece, rook: Piece | None, board: Board):
         # Don't need to verify type
         # or color as pieces haven't moved
         (not king.has_moved)
-        and (rook and not rook.has_moved)
+        and (rook is not None and not rook.has_moved)
         and row_clear_between_cols(
             board,
             king.coordinates.row,

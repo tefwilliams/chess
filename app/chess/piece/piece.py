@@ -13,22 +13,29 @@ class PieceType(Enum):
 
 
 class Piece:
+    def __init__(self, type: PieceType, color: Color, coordinates: Vector):
+        self._type = type
+        self.__color = color
+
+        self._coordinates = coordinates
+        self._coordinates_history: list[Vector] = []
+
     @property
     def type(self) -> PieceType:
-        raise NotImplementedError()
+        return self._type
 
     @property
     def color(self) -> Color:
-        raise NotImplementedError()
+        return self.__color
 
     @property
     def coordinates(self) -> Vector:
-        raise NotImplementedError()
+        return self._coordinates
 
     @property
     def has_moved(self):
-        raise NotImplementedError()
+        return len(self._coordinates) > 0
 
     @property
     def coordinates_history(self):
-        raise NotImplementedError()
+        return self._coordinates_history
