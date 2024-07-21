@@ -1,6 +1,8 @@
 from .piece import Piece
 from ..vector import Vector
 
+# TODO - remove
+
 
 class MovablePiece:
     def __init__(self, piece: Piece, coordinates: Vector) -> None:

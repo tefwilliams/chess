@@ -1,6 +1,8 @@
 from ..piece import Piece
 from ..vector import Vector
 
+# TODO - remove
+
 
 class BoardSquare(Vector):
     def __init__(self, coordinates: Vector, piece: Piece | None):

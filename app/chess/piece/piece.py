@@ -1,6 +1,5 @@
 from enum import Enum
 from ..color import Color
-from ..vector import Vector
 
 
 class PieceType(Enum):
@@ -13,12 +12,9 @@ class PieceType(Enum):
 
 
 class Piece:
-    def __init__(self, type: PieceType, color: Color, coordinates: Vector):
+    def __init__(self, type: PieceType, color: Color):
         self.__type = type
         self.__color = color
-
-        self._coordinates = coordinates
-        self._coordinates_history: list[Vector] = []
 
     @property
     def type(self) -> PieceType:

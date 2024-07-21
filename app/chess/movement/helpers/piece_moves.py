@@ -9,39 +9,42 @@ from .base_moves import (
 )
 from .special_moves import get_en_passant_moves, get_castle_moves
 from ...board import Board, Move
-from ...piece import Piece, PieceType
+from ...piece import PieceType
+from ...vector import Vector
+
+# TODO - change functions to get 'valid' moves
 
 
-def get_attacking_moves(piece: Piece, board: Board) -> list[Move]:
-    match piece.type:
+def get_attacking_moves(square: Vector, board: Board) -> list[Move]:
+    match board.get_piece(square).type:
         case PieceType.Pawn:
-            return get_pawn_attacking_moves(piece, board) + get_en_passant_moves(
-                piece, board
+            return get_pawn_attacking_moves(square, board) + get_en_passant_moves(
+                square, board
             )
 
         case PieceType.Rook:
-            return get_rook_attacking_moves(piece, board)
+            return get_rook_attacking_moves(square, board)
 
         case PieceType.Knight:
-            return get_knight_attacking_moves(piece, board)
+            return get_knight_attacking_moves(square, board)
 
         case PieceType.Bishop:
-            return get_bishop_attacking_moves(piece, board)
+            return get_bishop_attacking_moves(square, board)
 
         case PieceType.Queen:
-            return get_queen_attacking_moves(piece, board)
+            return get_queen_attacking_moves(square, board)
 
         case PieceType.King:
-            return get_king_attacking_moves(piece, board)
+            return get_king_attacking_moves(square, board)
 
 
-def get_non_attacking_moves(piece: Piece, board: Board) -> list[Move]:
-    match piece.type:
+def get_non_attacking_moves(square: Vector, board: Board) -> list[Move]:
+    match board.get_piece(square).type:
         case PieceType.Pawn:
-            return get_pawn_non_attacking_moves(piece, board)
+            return get_pawn_non_attacking_moves(square, board)
 
         case PieceType.King:
-            return get_castle_moves(piece, board)
+            return get_castle_moves(square, board)
 
         case _:
             return []

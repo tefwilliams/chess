@@ -2,7 +2,6 @@ import os
 import pygame
 from math import floor
 from typing import Callable, Iterable
-from .board_square import BoardSquare
 from .variables import (
     display_size,
     gray,
@@ -16,7 +15,7 @@ from .variables import (
     board_border_thickness,
     square_size,
 )
-from ..board import board_size
+from ..board import board_size, Board
 from ..piece import Piece
 from ..vector import Vector
 
@@ -26,12 +25,12 @@ icons_folder_path = os.path.join(script_dir, "../../icons")
 
 
 class BoardRenderer:
-    def __init__(self) -> None:
+    def __init__(self, board: Board) -> None:
         pygame.init()
         self.screen = pygame.display.set_mode((display_size, display_size))
-        # self.screen = pygame.Surface((display_size, display_size))
-        # screen.blit(self.screen, (0, 0))
         self.screen.fill(brown)
+
+        self.__board = board
 
         pygame.display.set_caption("Chess")
         pygame.display.set_icon(
@@ -94,7 +93,7 @@ class BoardRenderer:
 
     # TODO - maybe make highlight a separate method
     def render_squares(
-        self, squares_to_highlight: Iterable[Vector] = []
+        self, squares_to_highlight: Iterable[Vector] | None = None
     ) -> None:
         for row_number in range(board_size):
             for column_number in range(board_size):
@@ -102,7 +101,7 @@ class BoardRenderer:
 
                 self.__render_square(
                     square,
-                    square in squares_to_highlight,
+                    square in (squares_to_highlight or []),
                 )
 
         pygame.display.update()
@@ -121,13 +120,13 @@ class BoardRenderer:
         )
 
         if (piece := self.__board.try_get_piece(square)) is not None:
-            self.__display_piece(piece)
+            self.__display_piece(piece, square)
 
     def highlight(self, square: Vector):
         self.__render_square(square, True)
         pygame.display.update()
 
-    def __display_piece(self, piece: Piece) -> None:
+    def __display_piece(self, piece: Piece, coordinates: Vector) -> None:
         piece_icon = pygame.image.load(
             f"{icons_folder_path}/{piece.color.name}_{piece.type.name}.png"
         )
@@ -141,7 +140,7 @@ class BoardRenderer:
         icon_height = round(square_size * 0.8)
         icon_width = round(aspect_ratio * icon_height)
 
-        top_left = get_square_location(piece.coordinates) + Vector(
+        top_left = get_square_location(coordinates) + Vector(
             (square_size - icon_width) // 2, (square_size - icon_height) // 2
         )
 

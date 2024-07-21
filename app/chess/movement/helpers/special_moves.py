@@ -6,49 +6,43 @@ from ...shared import last
 from ...vector import Vector
 
 
-def get_castle_moves(king: Piece, board: Board) -> list[Move]:
+def get_castle_moves(square: Vector, board: Board) -> list[Move]:
     moves = []
 
-    # TODO - king can't be in check
-    if king.has_moved:
-        return moves
-
-    left_rook = board.try_get_piece(Vector(0, king.coordinates.row))
-
-    if valid_castle(king, left_rook, board):
-        assert left_rook
+    left_square = Vector(0, square.row)
+    if valid_castle(square, left_square, board):
         moves.append(
             Move(
-                Movement(king, Vector(2, king.coordinates.row)),
-                Movement(left_rook, Vector(3, king.coordinates.row)),
+                Movement(square, Vector(2, square.row)),
+                Movement(left_square, Vector(3, square.row)),
             )
         )
 
-    right_rook = board.try_get_piece(Vector(7, king.coordinates.row))
-
-    if valid_castle(king, right_rook, board):
-        assert right_rook
+    right_square = Vector(7, square.row)
+    if valid_castle(square, right_square, board):
         moves.append(
             Move(
-                Movement(king, Vector(6, king.coordinates.row)),
-                Movement(right_rook, Vector(5, king.coordinates.row)),
+                Movement(square, Vector(6, square.row)),
+                Movement(right_square, Vector(5, square.row)),
             )
         )
 
     return moves
 
 
-def valid_castle(king: Piece, rook: Piece | None, board: Board):
+def valid_castle(king_square: Vector, rook_square: Vector, board: Board):
     return (
         # Don't need to verify type
         # or color as pieces haven't moved
-        (not king.has_moved)
-        and (rook is not None and not rook.has_moved)
+        # TODO - king can't be in check
+        board.try_get_piece(king_square) is not None
+        (not king_square.has_moved)
+        and (rook_square is not None and not rook_square.has_moved)
         and row_clear_between_cols(
             board,
-            king.coordinates.row,
-            min(king.coordinates.col, rook.coordinates.col),
-            max(king.coordinates.col, rook.coordinates.col),
+            king_square.coordinates.row,
+            min(king_square.coordinates.col, rook_square.coordinates.col),
+            max(king_square.coordinates.col, rook_square.coordinates.col),
         )
         # TODO - king can't pass through attacked square (including current square)
     )

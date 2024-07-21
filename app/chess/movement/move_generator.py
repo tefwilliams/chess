@@ -3,7 +3,6 @@ from copy import deepcopy
 from .helpers import get_attacking_moves, get_non_attacking_moves
 from ..board import Board, Move
 from ..color import Color
-from ..piece import Piece
 from ..vector import Vector
 
 
@@ -44,23 +43,23 @@ class MoveGenerator:
 
     def in_check(self, color: Color):
         return (
-            king := self.board.get_king(color)
-        ) is not None and self.__square_attacked(king.coordinates, color)
+            coordinates := self.board.get_king_location(color)
+        ) is not None and self.__square_attacked(coordinates, color)
 
     def __square_attacked(self, square: Vector, color: Color) -> bool:
         return any(
             square
             in (
                 move.primary_movement.attack_location
-                for move in self.get_attacking_moves(piece)
+                for move in self.get_attacking_moves(occupied_square)
             )
-            for piece in self.board.pieces
-            if piece.color != color
+            for occupied_square in self.board.occupied_squares
+            if self.board.get_piece(occupied_square).color != color
         )
 
     def any_possible_moves(self, color: Color) -> bool:
         return any(
-            any(self.get_possible_moves(piece))
-            for piece in self.board.pieces
-            if piece.color == color
+            any(self.get_possible_moves(square))
+            for square in self.board.occupied_squares
+            if self.board.get_piece(square).color != color
         )

@@ -1,12 +1,12 @@
 from .move import Move
 from ..color import Color
-from ..piece import Piece, PieceType, MovablePiece
+from ..piece import Piece, PieceType
 from ..shared import only, last
 from ..vector import Vector
 
 
 class Board:
-    def __init__(self, pieces: set[MovablePiece]) -> None:
+    def __init__(self, pieces: dict[Vector, Piece]) -> None:
         self.__pieces: dict[Vector, Piece] = pieces
         self.__move_history = []
 
@@ -15,7 +15,7 @@ class Board:
         return list(self.__pieces.keys())
 
     def try_get_piece(self, coordinates: Vector) -> Piece | None:
-        return self.__pieces[coordinates]
+        return self.__pieces.get(coordinates)
 
     def get_piece(self, coordinates: Vector) -> Piece:
         piece = self.try_get_piece(coordinates)
@@ -42,11 +42,11 @@ class Board:
 
     # TODO - maybe get_pieces with condition passed
     # although pieces is accessible, so might not be useful
-    def get_king(self, color: Color) -> Piece | None:
-        king = only(
+    def get_king_location(self, color: Color) -> Piece | None:
+        king_location = only(
             (
-                piece
-                for piece in self.__pieces.values()
+                coordinates
+                for coordinates, piece in self.__pieces.items()
                 if piece.type == PieceType.King and piece.color == color
             ),
             f"More than one king on {color.name} team",
@@ -55,7 +55,7 @@ class Board:
         # if king is None:
         #     raise ValueError(f"No king found for {color} team")
 
-        return king
+        return king_location
 
     def get_last_move(self) -> Move | None:
         return last(self.__move_history)

@@ -1,8 +1,8 @@
 from .board import Board, Move, get_starting_pieces, within_board
 from .color import Color
-from .display import BoardRenderer, BoardSquare
+from .display import BoardRenderer
 from .movement import MoveGenerator
-from .piece import Piece, PieceType
+from .piece import PieceType
 from .shared import only
 from .vector import Vector
 
@@ -12,8 +12,8 @@ class Game:
         self.board = Board(get_starting_pieces())
         self.__movement = MoveGenerator(self.board)
         self.player_color = Color.White
-        self.__display = BoardRenderer()
-        self.__display.render_squares(self.board.pieces)
+        self.__display = BoardRenderer(self.board)
+        self.__display.render_squares()
 
     def over(self) -> bool:
         return self.in_check_mate() or self.in_stale_mate()
@@ -34,10 +34,8 @@ class Game:
         self.board.move(move)
 
         # TODO - check for promotion each turn using get_last_move
-        if (
-            last_piece_to_move := self.board.last_piece_to_move
-        ) is not None and should_promote(last_piece_to_move):
-            self.board.promote(last_piece_to_move, PieceType.Queen)
+        if should_promote(self.board, desintation := move.primary_movement.destination):
+            self.board.promote(desintation, PieceType.Queen)
 
         self.swap_player()
 
@@ -98,7 +96,8 @@ class Game:
         )
 
 
-def should_promote(piece: Piece):
-    return piece.type == PieceType.Pawn and piece.coordinates.row == (
+def should_promote(board: Board, coordinates: Vector):
+    # TODO - could potentially use board.last_move
+    return (piece := board.get_piece(coordinates)).type == PieceType.Pawn and coordinates.row == (
         7 if piece.color == Color.White else 0
     )
