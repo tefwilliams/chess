@@ -8,7 +8,7 @@ from ..vector import Vector
 class Board:
     def __init__(self, pieces: dict[Vector, Piece]) -> None:
         self.__pieces: dict[Vector, Piece] = pieces
-        self.__move_history = []
+        self.__move_history: list[Move] = []
 
     @property
     def occupied_squares(self) -> list[Vector]:
@@ -27,7 +27,7 @@ class Board:
 
     def move(self, move: Move):
         for movement in move:
-            self.__pieces.pop(movement.attack_location)
+            self.__pieces.pop(movement.attack_location, None)
 
             self.__pieces[movement.destination] = self.__pieces.pop(
                 movement.origin)
@@ -57,5 +57,16 @@ class Board:
 
         return king_location
 
+    def piece_at_square_has_moved(self, square: Vector) -> bool:
+        self.get_piece(square)
+
+        return any(
+            move.primary_movement.destination == square
+            for move in self.__move_history
+        )
+
     def get_last_move(self) -> Move | None:
         return last(self.__move_history)
+
+    def square_attacked(self, square: Vector, color: Color) -> bool:
+        return False

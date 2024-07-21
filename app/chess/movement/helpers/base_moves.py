@@ -9,48 +9,38 @@ from .helpers import (
     get_squares_until_blocked,
     attacking_square_blocked_callback,
     non_attacking_square_blocked_callback,
-    enemy_piece_at_square,
+    pawn_attacking_square_blocked_callback
 )
-from ...board.move import Move
-from ...board.movement import Movement
-from ...piece import Piece, PieceType
+from ...board import Move, Movement
+from ...color import Color
 from ...board import Board
+from ...vector import Vector
 
 
 # ------------- PAWN -------------
 
 
-def get_pawn_attacking_moves(pawn: Piece, board: Board, en_passant=False) -> list[Move]:
-    assert pawn.type == PieceType.Pawn
+def get_pawn_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
     return [
-        Move(Movement(pawn, destination))
+        Move(Movement(square, destination))
         for step in (unit_step_left, unit_step_right)
         for destination in get_squares_until_blocked(
-            lambda current_square, last_square: (
-                attacking_square_blocked_callback(board, pawn.color)(
-                    current_square, last_square
-                )
-                or not (
-                    en_passant
-                    or enemy_piece_at_square(current_square, pawn.color, board)
-                )
-            ),
-            pawn.coordinates,
-            get_unit_step_forward(pawn.color) + step,
+            pawn_attacking_square_blocked_callback(board, color),
+            square,
+            get_unit_step_forward(color) + step,
             1,
         )
     ]
 
 
-def get_pawn_non_attacking_moves(pawn: Piece, board: Board) -> list[Move]:
-    assert pawn.type == PieceType.Pawn
+def get_pawn_non_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
     return [
-        Move(Movement(pawn, destination))
+        Move(Movement(square, destination))
         for destination in get_squares_until_blocked(
-            non_attacking_square_blocked_callback(board, pawn.color),
-            pawn.coordinates,
-            get_unit_step_forward(pawn.color),
-            1 if pawn.has_moved else 2,
+            non_attacking_square_blocked_callback(board, color),
+            square,
+            get_unit_step_forward(color),
+            1 if board.piece_at_square_has_moved(square) else 2,
         )
     ]
 
@@ -58,14 +48,13 @@ def get_pawn_non_attacking_moves(pawn: Piece, board: Board) -> list[Move]:
 # ------------- ROOK -------------
 
 
-def get_rook_attacking_moves(rook: Piece, board: Board) -> list[Move]:
-    assert rook.type == PieceType.Rook
+def get_rook_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
     return [
-        Move(Movement(rook, destination))
+        Move(Movement(square, destination))
         for step in orthogonal_unit_steps
         for destination in get_squares_until_blocked(
-            attacking_square_blocked_callback(board, rook.color),
-            rook.coordinates,
+            attacking_square_blocked_callback(board, color),
+            square,
             step,
         )
     ]
@@ -74,10 +63,9 @@ def get_rook_attacking_moves(rook: Piece, board: Board) -> list[Move]:
 # ------------- Knight -------------
 
 
-def get_knight_attacking_moves(knight: Piece, board: Board) -> list[Move]:
-    assert knight.type == PieceType.Knight
+def get_knight_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
     return [
-        Move(Movement(knight, destination))
+        Move(Movement(square, destination))
         for step in (
             orthogonal_step + diagonal_step
             for orthogonal_step in orthogonal_unit_steps
@@ -85,8 +73,8 @@ def get_knight_attacking_moves(knight: Piece, board: Board) -> list[Move]:
         )
         if abs(step.row) + abs(step.col) == 3
         for destination in get_squares_until_blocked(
-            attacking_square_blocked_callback(board, knight.color),
-            knight.coordinates,
+            attacking_square_blocked_callback(board, color),
+            square,
             step,
             1,
         )
@@ -96,14 +84,13 @@ def get_knight_attacking_moves(knight: Piece, board: Board) -> list[Move]:
 # ------------- Bishop -------------
 
 
-def get_bishop_attacking_moves(bishop: Piece, board: Board) -> list[Move]:
-    assert bishop.type == PieceType.Bishop
+def get_bishop_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
     return [
-        Move(Movement(bishop, destination))
+        Move(Movement(square, destination))
         for step in diagonal_unit_steps
         for destination in get_squares_until_blocked(
-            attacking_square_blocked_callback(board, bishop.color),
-            bishop.coordinates,
+            attacking_square_blocked_callback(board, color),
+            square,
             step,
         )
     ]
@@ -112,14 +99,13 @@ def get_bishop_attacking_moves(bishop: Piece, board: Board) -> list[Move]:
 # ------------- Queen -------------
 
 
-def get_queen_attacking_moves(queen: Piece, board: Board) -> list[Move]:
-    assert queen.type == PieceType.Queen
+def get_queen_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
     return [
-        Move(Movement(queen, destination))
+        Move(Movement(square, destination))
         for step in diagonal_unit_steps + orthogonal_unit_steps
         for destination in get_squares_until_blocked(
-            attacking_square_blocked_callback(board, queen.color),
-            queen.coordinates,
+            attacking_square_blocked_callback(board, color),
+            square,
             step,
         )
     ]
@@ -128,14 +114,13 @@ def get_queen_attacking_moves(queen: Piece, board: Board) -> list[Move]:
 # ------------- King -------------
 
 
-def get_king_attacking_moves(king: Piece, board: Board) -> list[Move]:
-    assert king.type == PieceType.King
+def get_king_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
     return [
-        Move(Movement(king, destination))
+        Move(Movement(square, destination))
         for step in diagonal_unit_steps + orthogonal_unit_steps
         for destination in get_squares_until_blocked(
-            attacking_square_blocked_callback(board, king.color),
-            king.coordinates,
+            attacking_square_blocked_callback(board, color),
+            square,
             step,
             1,
         )

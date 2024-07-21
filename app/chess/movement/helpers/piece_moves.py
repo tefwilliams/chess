@@ -16,32 +16,32 @@ from ...vector import Vector
 
 
 def get_attacking_moves(square: Vector, board: Board) -> list[Move]:
-    match board.get_piece(square).type:
+    match (piece := board.get_piece(square)).type:
         case PieceType.Pawn:
-            return get_pawn_attacking_moves(square, board) + get_en_passant_moves(
-                square, board
+            return get_pawn_attacking_moves(square, piece.color, board) + get_en_passant_moves(
+                square, piece.color, board
             )
 
         case PieceType.Rook:
-            return get_rook_attacking_moves(square, board)
+            return get_rook_attacking_moves(square, piece.color, board)
 
         case PieceType.Knight:
-            return get_knight_attacking_moves(square, board)
+            return get_knight_attacking_moves(square, piece.color, board)
 
         case PieceType.Bishop:
-            return get_bishop_attacking_moves(square, board)
+            return get_bishop_attacking_moves(square, piece.color, board)
 
         case PieceType.Queen:
-            return get_queen_attacking_moves(square, board)
+            return get_queen_attacking_moves(square, piece.color, board)
 
         case PieceType.King:
-            return get_king_attacking_moves(square, board)
+            return get_king_attacking_moves(square, piece.color, board)
 
 
 def get_non_attacking_moves(square: Vector, board: Board) -> list[Move]:
-    match board.get_piece(square).type:
+    match (piece := board.get_piece(square)).type:
         case PieceType.Pawn:
-            return get_pawn_non_attacking_moves(square, board)
+            return get_pawn_non_attacking_moves(square, piece.color, board)
 
         case PieceType.King:
             return get_castle_moves(square, board)

@@ -34,9 +34,10 @@ class MoveGenerator:
         # after the check has finished
         test_board = deepcopy(self.board)
         self.board = test_board
+        color = self.board.get_piece(move.primary_movement.origin).color
 
         self.board.move(move)
-        in_check = self.in_check(move.primary_movement.piece.color)
+        in_check = self.in_check(color)
 
         self.board = original_board
         return in_check
