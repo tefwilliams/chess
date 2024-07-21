@@ -1,12 +1,12 @@
 from .move import Move
 from ..color import Color
-from ..piece import Piece, PieceType, BoardPiece
+from ..piece import Piece, PieceType, MovablePiece
 from ..shared import only, last
 from ..vector import Vector
 
 
 class Board:
-    def __init__(self, pieces: set[BoardPiece]) -> None:
+    def __init__(self, pieces: set[MovablePiece]) -> None:
         self.__pieces = pieces
         self.last_piece_to_move: Piece | None = None
 
@@ -17,7 +17,7 @@ class Board:
     def try_get_piece(self, coordinates: Vector) -> Piece | None:
         return self.__try_get_piece(coordinates)
 
-    def __try_get_piece(self, coordinates: Vector) -> BoardPiece | None:
+    def __try_get_piece(self, coordinates: Vector) -> MovablePiece | None:
         return only(
             (piece for piece in self.__pieces if piece.coordinates == coordinates),
             f"More than one piece with coordinates: {coordinates}",
@@ -26,7 +26,7 @@ class Board:
     def get_piece(self, coordinates: Vector) -> Piece:
         return self.__get_piece(coordinates)
 
-    def __get_piece(self, coordinates: Vector) -> BoardPiece:
+    def __get_piece(self, coordinates: Vector) -> MovablePiece:
         piece = self.__try_get_piece(coordinates)
 
         if piece is None:
@@ -41,7 +41,8 @@ class Board:
             if piece_to_take:
                 self.__pieces.remove(piece_to_take)
 
-            self.__get_piece(movement.piece.coordinates).move(movement.destination)
+            self.__get_piece(movement.piece.coordinates).move(
+                movement.destination)
 
         self.last_piece_to_move = move.primary_movement.piece
 

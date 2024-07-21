@@ -2,7 +2,7 @@ from .piece import Piece, PieceType
 from ..vector import Vector
 
 
-class BoardPiece(Piece):
+class MovablePiece(Piece):
     def move(self, new_coordinates: Vector):
         self._coordinates_history.append(self.coordinates)
         self._coordinates = new_coordinates
