@@ -3,8 +3,6 @@ from chess import (
     Color,
     Move,
     Movement,
-    MoveGenerator,
-    MovablePiece,
     PieceType,
     Piece,
     Vector,
@@ -21,11 +19,21 @@ def create_pieces(pieces: list[tuple[PieceType, str, Color]]) -> dict[Vector, Pi
     }
 
 
-def create_move(*movements: tuple[MovablePiece, str]):
+def create_move(origin: str, destination: str):
     return Move(
-        *(
-            Movement(piece, to_coordinates(coordinates_as_string))
-            for piece, coordinates_as_string in movements
+        Movement(
+            to_coordinates(origin),
+            to_coordinates(destination)
+        )
+    )
+
+
+def create_en_passant_move(origin: str, destination: str, attack_location: str):
+    return Move(
+        Movement(
+            to_coordinates(origin),
+            to_coordinates(destination),
+            to_coordinates(attack_location)
         )
     )
 
@@ -38,8 +46,8 @@ def to_coordinates(coordinates_as_string: str) -> Vector:
     return Vector(col_strings.index(col), row_strings.index(row))
 
 
-def get_possible_destinations(piece: MovablePiece, board: Board):
+def get_possible_destinations(square: Vector, board: Board):
     return {
         move.primary_movement.destination
-        for move in MoveGenerator(board).get_possible_moves(piece)
+        for move in board.get_possible_moves(square)
     }

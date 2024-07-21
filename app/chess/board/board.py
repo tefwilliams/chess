@@ -87,9 +87,6 @@ class Board:
         return get_non_attacking_moves(square, self)
 
     def __will_be_in_check_after_move(self, move: Move) -> bool:
-        # We want to copy the board
-        # but keep the same instances of pieces
-        # after the check has finished
         test_board = deepcopy(self)
         color = test_board.get_piece(move.primary_movement.origin).color
 
