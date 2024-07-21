@@ -1,9 +1,13 @@
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
+from .pieces import within_board
 from ...color import Color
-from ...board import Board, within_board
 from ...vector import Vector
 
+if TYPE_CHECKING:
+    from ..board import Board
+else:
+    Board = object
 
 # TODO - could move these to board?
 

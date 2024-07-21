@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from .unit_steps import (
     get_unit_step_forward,
     unit_step_left,
@@ -11,16 +12,18 @@ from .helpers import (
     non_attacking_square_blocked_callback,
     pawn_attacking_square_blocked_callback
 )
-from ...board import Move, Movement
+from ..move import Move
+from ..movement import Movement
 from ...color import Color
-from ...board import Board
 from ...vector import Vector
 
+if TYPE_CHECKING:
+    from ..board import Board
 
 # ------------- PAWN -------------
 
 
-def get_pawn_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
+def get_pawn_attacking_moves(square: Vector, color: Color, board: 'Board') -> list[Move]:
     return [
         Move(Movement(square, destination))
         for step in (unit_step_left, unit_step_right)
@@ -33,7 +36,7 @@ def get_pawn_attacking_moves(square: Vector, color: Color, board: Board) -> list
     ]
 
 
-def get_pawn_non_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
+def get_pawn_non_attacking_moves(square: Vector, color: Color, board: 'Board') -> list[Move]:
     return [
         Move(Movement(square, destination))
         for destination in get_squares_until_blocked(
@@ -48,7 +51,7 @@ def get_pawn_non_attacking_moves(square: Vector, color: Color, board: Board) -> 
 # ------------- ROOK -------------
 
 
-def get_rook_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
+def get_rook_attacking_moves(square: Vector, color: Color, board: 'Board') -> list[Move]:
     return [
         Move(Movement(square, destination))
         for step in orthogonal_unit_steps
@@ -63,7 +66,7 @@ def get_rook_attacking_moves(square: Vector, color: Color, board: Board) -> list
 # ------------- Knight -------------
 
 
-def get_knight_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
+def get_knight_attacking_moves(square: Vector, color: Color, board: 'Board') -> list[Move]:
     return [
         Move(Movement(square, destination))
         for step in (
@@ -84,7 +87,7 @@ def get_knight_attacking_moves(square: Vector, color: Color, board: Board) -> li
 # ------------- Bishop -------------
 
 
-def get_bishop_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
+def get_bishop_attacking_moves(square: Vector, color: Color, board: 'Board') -> list[Move]:
     return [
         Move(Movement(square, destination))
         for step in diagonal_unit_steps
@@ -99,7 +102,7 @@ def get_bishop_attacking_moves(square: Vector, color: Color, board: Board) -> li
 # ------------- Queen -------------
 
 
-def get_queen_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
+def get_queen_attacking_moves(square: Vector, color: Color, board: 'Board') -> list[Move]:
     return [
         Move(Movement(square, destination))
         for step in diagonal_unit_steps + orthogonal_unit_steps
@@ -114,7 +117,7 @@ def get_queen_attacking_moves(square: Vector, color: Color, board: Board) -> lis
 # ------------- King -------------
 
 
-def get_king_attacking_moves(square: Vector, color: Color, board: Board) -> list[Move]:
+def get_king_attacking_moves(square: Vector, color: Color, board: 'Board') -> list[Move]:
     return [
         Move(Movement(square, destination))
         for step in diagonal_unit_steps + orthogonal_unit_steps

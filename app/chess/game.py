@@ -1,7 +1,6 @@
 from .board import Board, Move, get_starting_pieces, within_board
 from .color import Color
 from .display import BoardRenderer
-from .movement import MoveGenerator
 from .piece import PieceType
 from .shared import only
 from .vector import Vector
@@ -10,7 +9,6 @@ from .vector import Vector
 class Game:
     def __init__(self) -> None:
         self.board = Board(get_starting_pieces())
-        self.__movement = MoveGenerator(self.board)
         self.player_color = Color.White
         self.__display = BoardRenderer(self.board)
         self.__display.render_squares()
@@ -19,14 +17,14 @@ class Game:
         return self.in_check_mate() or self.in_stale_mate()
 
     def in_check_mate(self) -> bool:
-        return self.__movement.in_check(
+        return self.board.in_check(
             self.player_color
-        ) and not self.__movement.any_possible_moves(self.player_color)
+        ) and not self.board.any_possible_moves(self.player_color)
 
     def in_stale_mate(self) -> bool:
-        return not self.__movement.in_check(
+        return not self.board.in_check(
             self.player_color
-        ) and not self.__movement.any_possible_moves(self.player_color)
+        ) and not self.board.any_possible_moves(self.player_color)
 
     def take_turn(self) -> None:
         move = self.__get_move_selection()
@@ -55,7 +53,7 @@ class Game:
                 or self.__display.get_coordinate_selection(self.__is_valid_origin)
             )
 
-            possible_moves = self.__movement.get_possible_moves(
+            possible_moves = self.board.get_possible_moves(
                 first_selection)
 
             self.__display.highlight(first_selection)

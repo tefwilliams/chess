@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from .base_moves import (
     get_bishop_attacking_moves,
     get_king_attacking_moves,
@@ -8,14 +9,15 @@ from .base_moves import (
     get_rook_attacking_moves,
 )
 from .special_moves import get_en_passant_moves, get_castle_moves
-from ...board import Board, Move
+from ..move import Move
 from ...piece import PieceType
 from ...vector import Vector
 
-# TODO - change functions to get 'valid' moves
+if TYPE_CHECKING:
+    from ..board import Board
 
 
-def get_attacking_moves(square: Vector, board: Board) -> list[Move]:
+def get_attacking_moves(square: Vector, board: 'Board') -> list[Move]:
     match (piece := board.get_piece(square)).type:
         case PieceType.Pawn:
             return get_pawn_attacking_moves(square, piece.color, board) + get_en_passant_moves(
@@ -38,7 +40,7 @@ def get_attacking_moves(square: Vector, board: Board) -> list[Move]:
             return get_king_attacking_moves(square, piece.color, board)
 
 
-def get_non_attacking_moves(square: Vector, board: Board) -> list[Move]:
+def get_non_attacking_moves(square: Vector, board: 'Board') -> list[Move]:
     match (piece := board.get_piece(square)).type:
         case PieceType.Pawn:
             return get_pawn_non_attacking_moves(square, piece.color, board)

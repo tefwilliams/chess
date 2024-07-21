@@ -119,7 +119,7 @@ class BoardRenderer:
             (left_margin, top_margin, square_size, square_size),
         )
 
-        if (piece := self.__board.try_get_piece(square)) is not None:
+        if (piece := self.__board.try_get_piece(square)):
             self.__display_piece(piece, square)
 
     def highlight(self, square: Vector):
