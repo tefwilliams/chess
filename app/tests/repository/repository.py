@@ -6,6 +6,7 @@ from chess import (
     MoveGenerator,
     MovablePiece,
     PieceType,
+    Piece,
     Vector,
 )
 
@@ -13,10 +14,11 @@ col_strings = ["A", "B", "C", "D", "E", "F", "G", "H"]
 row_strings = ["8", "7", "6", "5", "4", "3", "2", "1"]
 
 
-def create_piece(
-    type: PieceType, coordinates_as_string: str, color: Color
-) -> MovablePiece:
-    return MovablePiece(type, color, to_coordinates(coordinates_as_string))
+def create_pieces(pieces: list[tuple[PieceType, str, Color]]) -> dict[Vector, Piece]:
+    return {
+        to_coordinates(coordinates_as_string): Piece(type, color)
+        for type, coordinates_as_string, color in pieces
+    }
 
 
 def create_move(*movements: tuple[MovablePiece, str]):

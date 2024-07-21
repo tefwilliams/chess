@@ -1,24 +1,27 @@
 import pytest
-from chess import PieceType, Board, Color
-from ..repository import create_piece, create_move, to_coordinates
+from chess import PieceType, Board, Color, Piece
+from ..repository import create_pieces, create_move, to_coordinates
 
 
-def test_get_piece_returns_piece_with_specified_coordinates() -> None:
-    piece = create_piece(PieceType.Pawn, "A1", Color.White)
-    get_from_coordinates = to_coordinates("A1")
+def test_try_get_piece_returns_piece_with_specified_coordinates() -> None:
+    white_pawn = Piece(PieceType.Pawn, Color.White)
+    coordinates = to_coordinates("A1")
 
-    board = Board({piece})
+    board = Board({
+        coordinates: white_pawn
+    })
 
-    assert board.try_get_piece(get_from_coordinates) == piece
+    assert board.try_get_piece(coordinates) == white_pawn
 
 
-def test_get_piece_returns_none_if_no_piece_has_specified_coordinates() -> None:
-    piece = create_piece(PieceType.Pawn, "A1", Color.White)
-    get_from_coordinates = to_coordinates("B1")
+def test_try_get_piece_returns_none_if_no_piece_has_specified_coordinates() -> None:
+    white_pawn = Piece(PieceType.Pawn, Color.White)
 
-    board = Board({piece})
+    board = Board({
+        to_coordinates("A1"): white_pawn
+    })
 
-    assert board.try_get_piece(get_from_coordinates) == None
+    assert board.try_get_piece(to_coordinates("B1")) == None
 
 
 @pytest.mark.parametrize(
@@ -35,12 +38,10 @@ def test_get_piece_returns_none_if_no_piece_has_specified_coordinates() -> None:
 def test_is_in_check_returns_true_when_king_in_check(
     black_piece, piece_coordinates
 ) -> None:
-    pieces = {
-        create_piece(PieceType.King, "D4", Color.White),
-        create_piece(black_piece, piece_coordinates, Color.Black),
-    }
-
-    board = Board(pieces)
+    board = Board({
+        to_coordinates("D4"): Piece(PieceType.King, Color.White),
+        to_coordinates(piece_coordinates): Piece(black_piece, Color.Black),
+    })
 
     assert board.is_in_check(Color.White)
 
@@ -61,8 +62,8 @@ def test_is_in_check_returns_false_when_king_not_in_check(
     black_piece, piece_coordinates
 ) -> None:
     pieces = {
-        create_piece(PieceType.King, "D4", Color.White),
-        create_piece(black_piece, piece_coordinates, Color.Black),
+        create_pieces(PieceType.King, "D4", Color.White),
+        create_pieces(black_piece, piece_coordinates, Color.Black),
     }
 
     board = Board(pieces)
@@ -71,8 +72,8 @@ def test_is_in_check_returns_false_when_king_not_in_check(
 
 
 def test_move_via_en_passant_removes_piece() -> None:
-    pawn = create_piece(PieceType.Pawn, "E2", Color.White)
-    enemy_pawn = create_piece(PieceType.Pawn, "G1", Color.Black)
+    pawn = create_pieces(PieceType.Pawn, "E2", Color.White)
+    enemy_pawn = create_pieces(PieceType.Pawn, "G1", Color.Black)
 
     pieces = {pawn, enemy_pawn}
 
@@ -88,8 +89,8 @@ def test_move_via_en_passant_removes_piece() -> None:
 
 
 def test_move_via_queenside_castle_moves_king_and_rook() -> None:
-    king = create_piece(PieceType.King, "A5", Color.White)
-    rook = create_piece(PieceType.Rook, "A1", Color.White)
+    king = create_pieces(PieceType.King, "A5", Color.White)
+    rook = create_pieces(PieceType.Rook, "A1", Color.White)
 
     pieces = {king, rook}
 
@@ -104,8 +105,8 @@ def test_move_via_queenside_castle_moves_king_and_rook() -> None:
 
 
 def test_move_via_kingside_castle_moves_king_and_rook() -> None:
-    king = create_piece(PieceType.King, "A5", Color.White)
-    rook = create_piece(PieceType.Rook, "A8", Color.White)
+    king = create_pieces(PieceType.King, "A5", Color.White)
+    rook = create_pieces(PieceType.Rook, "A8", Color.White)
 
     pieces = {king, rook}
 

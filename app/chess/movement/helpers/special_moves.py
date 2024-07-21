@@ -48,6 +48,7 @@ def valid_castle(king_square: Vector, rook_square: Vector, board: Board):
             min(king_square.col, rook_square.col),
             max(king_square.col, rook_square.col),
         )
+        # TODO - king can't pass through attacked square (including current square) -- SHOULD ADD TEST
         and row_not_attacked_between_cols(
             board,
             king_square.row,
@@ -55,7 +56,6 @@ def valid_castle(king_square: Vector, rook_square: Vector, board: Board):
             king_square.col + (1 if rook_square.col < king_square.col else 3),
             king.color
         )
-        # TODO - king can't pass through attacked square (including current square)
     )
 
 
