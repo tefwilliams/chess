@@ -2,8 +2,10 @@ from __future__ import annotations
 from copy import deepcopy
 
 
+# Check immutability
 class Vector(tuple[int, int]):
     def __init__(self, col: int, row: int) -> None:
+        # TODO - these should be immutable
         self.col = col
         self.row = row
 

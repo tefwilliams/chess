@@ -7,28 +7,18 @@ from ..vector import Vector
 
 class Board:
     def __init__(self, pieces: set[MovablePiece]) -> None:
-        self.__pieces: list[MovablePiece] = pieces
+        self.__pieces: dict[Vector, Piece] = pieces
         self.__move_history = []
 
     @property
-    def pieces(self) -> set[Piece]:
-        return set(self.__pieces)
+    def occupied_squares(self) -> list[Vector]:
+        return list(self.__pieces.keys())
 
     def try_get_piece(self, coordinates: Vector) -> Piece | None:
-        return self.__try_get_piece(coordinates)
-
-    def __try_get_piece(self, coordinates: Vector) -> MovablePiece | None:
-        return only(
-            (piece for coordinates,
-             piece in self.__pieces if piece.coordinates == coordinates),
-            f"More than one piece with coordinates: {coordinates}",
-        )
+        return self.__pieces[coordinates]
 
     def get_piece(self, coordinates: Vector) -> Piece:
-        return self.__get_piece(coordinates)
-
-    def __get_piece(self, coordinates: Vector) -> MovablePiece:
-        piece = self.__try_get_piece(coordinates)
+        piece = self.try_get_piece(coordinates)
 
         if piece is None:
             raise ValueError(f"No piece found for coordinates: {coordinates}")
@@ -37,18 +27,18 @@ class Board:
 
     def move(self, move: Move):
         for movement in move:
-            piece_to_take = self.__try_get_piece(movement.attack_location)
+            self.__pieces.pop(movement.attack_location)
 
-            if piece_to_take:
-                self.__pieces.remove(piece_to_take)
-
-            self.__get_piece(movement.piece.coordinates).move(
-                movement.destination)
+            self.__pieces[movement.destination] = self.__pieces.pop(
+                movement.origin)
 
         self.__move_history.append(move)
 
-    def promote(self, pawn: Piece, new_type: PieceType) -> None:
-        self.__get_piece(pawn.coordinates).type = new_type
+    def promote(self, coordinates: Vector, new_type: PieceType) -> None:
+        # TODO - check that this isn't allowed
+        # I should have to create a new piece and
+        # assign it to these coordinates
+        self.__pieces[coordinates].type = new_type
 
     # TODO - maybe get_pieces with condition passed
     # although pieces is accessible, so might not be useful
@@ -56,7 +46,7 @@ class Board:
         king = only(
             (
                 piece
-                for piece in self.pieces
+                for piece in self.__pieces.values()
                 if piece.type == PieceType.King and piece.color == color
             ),
             f"More than one king on {color.name} team",
