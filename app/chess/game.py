@@ -33,7 +33,7 @@ class Game:
 
         self.board.move(move)
 
-        # Could use piece from move
+        # TODO - check for promotion each turn using get_last_move
         if (
             last_piece_to_move := self.board.last_piece_to_move
         ) is not None and should_promote(last_piece_to_move):
@@ -49,7 +49,7 @@ class Game:
 
         while True:
             self.__display.render_squares(
-                self.board.pieces, self.board.get_last_move() or []
+                self.board.get_last_move() or []
             )
 
             first_selection = (
@@ -57,22 +57,19 @@ class Game:
                 or self.__display.get_coordinate_selection(self.__is_valid_origin)
             )
 
-            selected_piece = self.board.get_piece(first_selection)
-            possible_moves = self.__movement.get_possible_moves(selected_piece)
+            possible_moves = self.__movement.get_possible_moves(
+                first_selection)
 
-            self.__display.highlight(BoardSquare(first_selection, selected_piece))
+            self.__display.highlight(first_selection)
             self.__display.display_possible_moves(
-                BoardSquare(
-                    (coordinates := move.primary_movement.destination),
-                    self.board.try_get_piece(coordinates),
-                )
+                move.primary_movement.destination
                 for move in possible_moves
             )
 
             second_selection = self.__display.get_coordinate_selection()
 
             if second_selection == first_selection:
-                # Deselect piece
+                # Deselect square
                 first_selection = None
                 continue
 
@@ -83,7 +80,7 @@ class Game:
             )
 
             if not move:
-                # Select new piece or deselect
+                # Select new square or deselect
                 first_selection = (
                     second_selection
                     if self.__is_valid_origin(second_selection)

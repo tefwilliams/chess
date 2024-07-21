@@ -8,7 +8,7 @@ from ..vector import Vector
 class Board:
     def __init__(self, pieces: set[MovablePiece]) -> None:
         self.__pieces = pieces
-        self.last_piece_to_move: Piece | None = None
+        self.__move_history = []
 
     @property
     def pieces(self) -> set[Piece]:
@@ -44,7 +44,7 @@ class Board:
             self.__get_piece(movement.piece.coordinates).move(
                 movement.destination)
 
-        self.last_piece_to_move = move.primary_movement.piece
+        self.__move_history.append(move)
 
     def promote(self, pawn: Piece, new_type: PieceType) -> None:
         self.__get_piece(pawn.coordinates).type = new_type
@@ -66,10 +66,5 @@ class Board:
 
         return king
 
-    def get_last_move(self) -> tuple[Vector, Vector] | None:
-        return (
-            (previous_coordinates, last_piece_to_move.coordinates)
-            if (last_piece_to_move := self.last_piece_to_move)
-            and (previous_coordinates := last(last_piece_to_move.coordinates_history))
-            else None
-        )
+    def get_last_move(self) -> Move | None:
+        return last(self.__move_history)

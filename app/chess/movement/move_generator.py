@@ -11,21 +11,21 @@ class MoveGenerator:
     def __init__(self, board: Board) -> None:
         self.board = board
 
-    def get_possible_moves(self, piece: Piece) -> list[Move]:
+    def get_possible_moves(self, square: Vector) -> list[Move]:
         return [
             move
-            for move in self.get_unobstructed_moves(piece)
+            for move in self.get_unobstructed_moves(square)
             if not self.__will_be_in_check_after_move(move)
         ]
 
-    def get_unobstructed_moves(self, piece: Piece) -> list[Move]:
-        return self.get_attacking_moves(piece) + self.get_non_attacking_moves(piece)
+    def get_unobstructed_moves(self, square: Vector) -> list[Move]:
+        return self.get_attacking_moves(square) + self.get_non_attacking_moves(square)
 
-    def get_attacking_moves(self, piece: Piece) -> list[Move]:
-        return get_attacking_moves(piece, self.board)
+    def get_attacking_moves(self, square: Vector) -> list[Move]:
+        return get_attacking_moves(square, self.board)
 
-    def get_non_attacking_moves(self, piece: Piece) -> list[Move]:
-        return get_non_attacking_moves(piece, self.board)
+    def get_non_attacking_moves(self, square: Vector) -> list[Move]:
+        return get_non_attacking_moves(square, self.board)
 
     def __will_be_in_check_after_move(self, move: Move) -> bool:
         original_board = self.board
