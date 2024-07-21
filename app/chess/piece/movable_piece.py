@@ -1,12 +1,16 @@
-from .piece import Piece, PieceType
+from .piece import Piece
 from ..vector import Vector
 
 
-class MovablePiece(Piece):
-    def move(self, new_coordinates: Vector):
-        self._coordinates_history.append(self.coordinates)
-        self._coordinates = new_coordinates
+class MovablePiece:
+    def __init__(self, piece: Piece, coordinates: Vector) -> None:
+        self.__piece = piece
+        self.__coordinates = coordinates
 
-    @Piece.type.setter
-    def type(self, new_type: PieceType):
-        self._type = new_type
+    @property
+    def piece(self):
+        return self.__piece
+
+    @property
+    def coordinates(self):
+        return self.__coordinates

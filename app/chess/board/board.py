@@ -7,7 +7,7 @@ from ..vector import Vector
 
 class Board:
     def __init__(self, pieces: set[MovablePiece]) -> None:
-        self.__pieces = pieces
+        self.__pieces: list[MovablePiece] = pieces
         self.__move_history = []
 
     @property
@@ -19,7 +19,8 @@ class Board:
 
     def __try_get_piece(self, coordinates: Vector) -> MovablePiece | None:
         return only(
-            (piece for piece in self.__pieces if piece.coordinates == coordinates),
+            (piece for coordinates,
+             piece in self.__pieces if piece.coordinates == coordinates),
             f"More than one piece with coordinates: {coordinates}",
         )
 
