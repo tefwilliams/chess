@@ -45,7 +45,13 @@ class Game:
         first_selection = None
 
         while True:
-            self.__display.render_squares(self.board.get_last_move() or [])
+            self.__display.render_squares(
+                (last_move := self.board.get_last_move())
+                and (
+                    last_move.primary_movement.origin,
+                    last_move.primary_movement.destination,
+                )
+            )
 
             first_selection = (
                 first_selection

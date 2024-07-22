@@ -43,7 +43,7 @@ class Board:
 
     # TODO - maybe get_pieces with condition passed
     # although pieces is accessible, so might not be useful
-    def get_king_location(self, color: Color) -> Piece | None:
+    def get_king_location(self, color: Color) -> Vector | None:
         king_location = only(
             (
                 coordinates
