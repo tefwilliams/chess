@@ -1,6 +1,6 @@
 import pytest
-from chess import Board, Color, PieceType, Piece
-from ..repository import to_coordinates, get_possible_destinations
+from chess import Color, PieceType, Piece
+from ..repository import create_board, get_possible_destinations
 
 
 @pytest.mark.parametrize(
@@ -11,72 +11,66 @@ from ..repository import to_coordinates, get_possible_destinations
     ],
 )
 def test_bishop_can_only_move_diagonally(color: Color) -> None:
-    bishop_location = to_coordinates("F4")
+    board = create_board(
+        {
+            "F4": Piece(PieceType.Bishop, color),
+        }
+    )
 
-    board = Board({
-        bishop_location: Piece(PieceType.Bishop, color),
-    })
-
-    assert {
-        to_coordinates("B8"),
-        to_coordinates("C7"),
-        to_coordinates("D6"),
-        to_coordinates("E5"),
-        to_coordinates("G3"),
-        to_coordinates("H2"),
-        to_coordinates("C1"),
-        to_coordinates("D2"),
-        to_coordinates("E3"),
-        to_coordinates("G5"),
-        to_coordinates("H6"),
-    } == get_possible_destinations(bishop_location, board)
+    assert sorted(
+        [
+            "B8",
+            "C7",
+            "D6",
+            "E5",
+            "G3",
+            "H2",
+            "C1",
+            "D2",
+            "E3",
+            "G5",
+            "H6",
+        ]
+    ) == get_possible_destinations("F4", board)
 
 
 @pytest.mark.parametrize(
-    "destination, obstructing_piece, obstructing_piece_location",
+    "destination, obstructing_pieces",
     [
-        ("C1", Piece(PieceType.Bishop, Color.White), "C1"),
-        ("C1", Piece(PieceType.Queen, Color.Black), "E3"),
-        ("E5", Piece(PieceType.Pawn, Color.White), "E5"),
-        ("D6", Piece(PieceType.King, Color.White), "E5"),
-        ("G3", Piece(PieceType.Rook, Color.White), "G3"),
-        ("C7", Piece(PieceType.Knight, Color.White), "C7"),
+        ("C1", {"C1": Piece(PieceType.Bishop, Color.White)}),
+        ("C1", {"E3": Piece(PieceType.Queen, Color.Black)}),
+        ("E5", {"E5": Piece(PieceType.Pawn, Color.White)}),
+        ("D6", {"E5": Piece(PieceType.King, Color.White)}),
+        ("G3", {"G3": Piece(PieceType.Rook, Color.White)}),
+        ("C7", {"C7": Piece(PieceType.Knight, Color.White)}),
     ],
 )
 def test_bishop_cannot_move_if_obstructed(
-    destination: str, obstructing_piece: Piece, obstructing_piece_location: str
+    destination: str, obstructing_pieces: dict[str, Piece]
 ) -> None:
-    bishop_location = to_coordinates("F4")
+    board = create_board(
+        {"F4": Piece(PieceType.Bishop, Color.White), **obstructing_pieces}
+    )
 
-    board = Board({
-        bishop_location: Piece(PieceType.Bishop, Color.White),
-        to_coordinates(obstructing_piece_location): obstructing_piece
-    })
-
-    assert not to_coordinates(
-        destination) in get_possible_destinations(bishop_location, board)
+    assert not destination in get_possible_destinations("F4", board)
 
 
 @pytest.mark.parametrize(
-    "destination, opposing_piece, opposing_piece_location",
+    "destination, opposing_pieces",
     [
-        ("C1", Piece(PieceType.Bishop, Color.White), "C1"),
-        ("C1", Piece(PieceType.Queen, Color.Black), "E3"),
-        ("E5", Piece(PieceType.Pawn, Color.White), "E5"),
-        ("D6", Piece(PieceType.King, Color.White), "E5"),
-        ("G3", Piece(PieceType.Rook, Color.White), "G3"),
-        ("C7", Piece(PieceType.Knight, Color.White), "C7"),
+        ("C1", {"C1": Piece(PieceType.Bishop, Color.White)}),
+        ("C1", {"E3": Piece(PieceType.Queen, Color.Black)}),
+        ("E5", {"E5": Piece(PieceType.Pawn, Color.White)}),
+        ("D6", {"E5": Piece(PieceType.King, Color.White)}),
+        ("G3", {"G3": Piece(PieceType.Rook, Color.White)}),
+        ("C7", {"C7": Piece(PieceType.Knight, Color.White)}),
     ],
 )
 def test_bishop_can_take_opposing_piece(
-    destination: str, opposing_piece: Piece, opposing_piece_location: str
+    destination: str, opposing_pieces: dict[str, Piece]
 ) -> None:
-    bishop_location = to_coordinates("F4")
+    board = create_board(
+        {"F4": Piece(PieceType.Bishop, Color.White), **opposing_pieces}
+    )
 
-    board = Board({
-        bishop_location: Piece(PieceType.Bishop, Color.White),
-        to_coordinates(opposing_piece_location): opposing_piece
-    })
-
-    assert not to_coordinates(
-        destination) in get_possible_destinations(bishop_location, board)
+    assert not destination in get_possible_destinations("F4", board)
