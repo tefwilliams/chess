@@ -32,6 +32,7 @@ class Game:
         self.board.move(move)
 
         # TODO - check for promotion each turn using get_last_move
+        # This probably belongs on the board
         if should_promote(self.board, desintation := move.primary_movement.destination):
             self.board.promote(desintation, PieceType.Queen)
 

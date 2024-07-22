@@ -15,7 +15,12 @@ def create_board(pieces: dict[str, Piece]) -> Board:
 
 
 def create_move(origin: str, destination: str):
-    return Move(Movement(to_coordinates(origin), to_coordinates(destination)))
+    return Move(
+        Movement(
+            to_coordinates(origin),
+            to_coordinates(destination),
+        )
+    )
 
 
 def create_en_passant_move(origin: str, destination: str, attack_location: str):
@@ -25,6 +30,25 @@ def create_en_passant_move(origin: str, destination: str, attack_location: str):
             to_coordinates(destination),
             to_coordinates(attack_location),
         )
+    )
+
+
+def create_castle_move(origin: str, destination: str):
+    return Move(
+        Movement(
+            origin_coords := to_coordinates(origin),
+            destination_coords := to_coordinates(destination),
+        ),
+        Movement(
+            Vector(
+                7 if origin_coords.col < destination_coords.col else 0,
+                origin_coords.row,
+            ),
+            Vector(
+                5 if origin_coords.col < destination_coords.col else 3,
+                origin_coords.row,
+            ),
+        ),
     )
 
 

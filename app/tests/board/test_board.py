@@ -1,6 +1,12 @@
 import pytest
 from chess import PieceType, Board, Color, Piece
-from ..repository import create_move, create_en_passant_move, to_coordinates
+from ..repository import (
+    create_board,
+    create_move,
+    create_en_passant_move,
+    create_castle_move,
+    to_coordinates,
+)
 
 
 def test_try_get_piece_returns_piece_with_specified_coordinates() -> None:
@@ -13,15 +19,13 @@ def test_try_get_piece_returns_piece_with_specified_coordinates() -> None:
 
 
 def test_try_get_piece_returns_none_if_no_piece_has_specified_coordinates() -> None:
-    white_pawn = Piece(PieceType.Pawn, Color.White)
+    board = Board({to_coordinates("A1"): Piece(PieceType.Pawn, Color.White)})
 
-    board = Board({to_coordinates("A1"): white_pawn})
-
-    assert board.try_get_piece(to_coordinates("B1")) == None
+    assert board.try_get_piece(to_coordinates("B1")) is None
 
 
 @pytest.mark.parametrize(
-    "black_piece, piece_coordinates",
+    "black_piece, coordinates",
     [
         (PieceType.Queen, "A1"),
         (PieceType.Queen, "F4"),
@@ -32,12 +36,12 @@ def test_try_get_piece_returns_none_if_no_piece_has_specified_coordinates() -> N
     ],
 )
 def test_is_in_check_returns_true_when_king_in_check(
-    black_piece, piece_coordinates
+    black_piece: PieceType, coordinates: str
 ) -> None:
-    board = Board(
+    board = create_board(
         {
-            to_coordinates("D4"): Piece(PieceType.King, Color.White),
-            to_coordinates(piece_coordinates): Piece(black_piece, Color.Black),
+            "D4": Piece(PieceType.King, Color.White),
+            coordinates: Piece(black_piece, Color.Black),
         }
     )
 
@@ -45,7 +49,7 @@ def test_is_in_check_returns_true_when_king_in_check(
 
 
 @pytest.mark.parametrize(
-    "black_piece, piece_coordinates",
+    "black_piece, coordinates",
     [
         (PieceType.Queen, "A2"),
         (PieceType.Queen, "F3"),
@@ -57,12 +61,12 @@ def test_is_in_check_returns_true_when_king_in_check(
     ],
 )
 def test_is_in_check_returns_false_when_king_not_in_check(
-    black_piece, piece_coordinates
+    black_piece, coordinates
 ) -> None:
-    board = Board(
+    board = create_board(
         {
-            to_coordinates("D4"): Piece(PieceType.King, Color.White),
-            to_coordinates(piece_coordinates): Piece(black_piece, Color.Black),
+            "D4": Piece(PieceType.King, Color.White),
+            coordinates: Piece(black_piece, Color.Black),
         }
     )
 
@@ -70,10 +74,8 @@ def test_is_in_check_returns_false_when_king_not_in_check(
 
 
 def test_move_via_en_passant_removes_piece() -> None:
-    pawn = Piece(PieceType.Pawn, Color.White)
     enemy_pawn = Piece(PieceType.Pawn, Color.Black)
-
-    board = Board({to_coordinates("E2"): pawn, to_coordinates("G1"): enemy_pawn})
+    board = create_board({"E2": Piece(PieceType.Pawn, Color.White), "G1": enemy_pawn})
 
     enemy_pawn_to_e1 = create_move("G1", "E1")
     board.move(enemy_pawn_to_e1)
@@ -90,14 +92,14 @@ def test_move_via_queenside_castle_moves_king_and_rook() -> None:
     king = Piece(PieceType.King, Color.White)
     rook = Piece(PieceType.Rook, Color.White)
 
-    board = Board({to_coordinates("A5"): king, to_coordinates("A1"): rook})
+    board = create_board({"E1": king, "A1": rook})
 
-    king_to_a3 = create_move("A5", "A3")
+    king_to_a3 = create_castle_move("E1", "C1")
     board.move(king_to_a3)
 
     assert (
-        board.get_piece(to_coordinates("A3")) == king
-        and board.get_piece(to_coordinates("A4")) == rook
+        board.get_piece(to_coordinates("C1")) == king
+        and board.get_piece(to_coordinates("D1")) == rook
     )
 
 
@@ -105,12 +107,12 @@ def test_move_via_kingside_castle_moves_king_and_rook() -> None:
     king = Piece(PieceType.King, Color.White)
     rook = Piece(PieceType.Rook, Color.White)
 
-    board = Board({to_coordinates("A5"): king, to_coordinates("A8"): rook})
+    board = create_board({"E1": king, "H1": rook})
 
-    king_to_a7 = create_move((king, "A7"))
+    king_to_a7 = create_castle_move("E1", "G1")
     board.move(king_to_a7)
 
     assert (
-        board.get_piece(to_coordinates("A7")) == king
-        and board.get_piece(to_coordinates("A6")) == rook
+        board.get_piece(to_coordinates("G1")) == king
+        and board.get_piece(to_coordinates("F1")) == rook
     )

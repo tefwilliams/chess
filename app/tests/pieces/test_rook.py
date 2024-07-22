@@ -1,70 +1,74 @@
 import pytest
-from chess import Board, Color, PieceType, MovablePiece
-from ..repository import create_pieces, to_coordinates, get_possible_destinations
+from chess import Color, PieceType, Piece
+from ..repository import create_board, get_possible_destinations
 
 
 @pytest.mark.parametrize(
-    "square_to_move_to, should_be_able_to_move",
+    "color",
     [
-        ("A2", False),
-        ("E2", False),
-        ("C1", False),
-        ("H4", True),
-        ("F3", True),
-        ("B4", True),
-        ("F6", True),
+        Color.White,
+        Color.Black,
     ],
 )
-def test_rook_can_only_move_diagonally_or_orthogonally(
-    square_to_move_to: str, should_be_able_to_move: bool
-) -> None:
-    rook = create_pieces(PieceType.Rook, "F4", Color.White)
+def test_rook_can_only_move_orthogonally(color: Color) -> None:
+    board = create_board({"F4": Piece(PieceType.Rook, color)})
 
-    can_move = to_coordinates(square_to_move_to) in get_possible_destinations(
-        rook, Board({rook})
-    )
-
-    assert can_move == should_be_able_to_move
+    assert sorted(
+        [
+            "F8",
+            "F7",
+            "F6",
+            "F5",
+            "F3",
+            "F2",
+            "F1",
+            "A4",
+            "B4",
+            "C4",
+            "D4",
+            "E4",
+            "G4",
+            "H4",
+        ]
+    ) == get_possible_destinations("F4", board)
 
 
 @pytest.mark.parametrize(
-    "square_to_move_to, obstructing_piece",
+    "square_to_move_to, obstructing_pieces",
     [
-        ("B4", create_pieces(PieceType.Pawn, "B4", Color.White)),
-        ("B4", create_pieces(PieceType.King, "C4", Color.White)),
-        ("F6", create_pieces(PieceType.Rook, "F6", Color.White)),
-        ("F6", create_pieces(PieceType.Rook, "F5", Color.Black)),
-        ("H4", create_pieces(PieceType.Bishop, "H4", Color.White)),
-        ("H4", create_pieces(PieceType.Queen, "G4", Color.Black)),
-        ("F3", create_pieces(PieceType.Pawn, "F3", Color.White)),
-        ("F1", create_pieces(PieceType.Pawn, "F2", Color.Black)),
+        ("B4", {"B4": Piece(PieceType.Pawn, Color.White)}),
+        ("B4", {"C4": Piece(PieceType.King, Color.White)}),
+        ("F6", {"F6": Piece(PieceType.Rook, Color.White)}),
+        ("F6", {"F5": Piece(PieceType.Rook, Color.Black)}),
+        ("H4", {"H4": Piece(PieceType.Bishop, Color.White)}),
+        ("H4", {"G4": Piece(PieceType.Queen, Color.Black)}),
+        ("F3", {"F3": Piece(PieceType.Pawn, Color.White)}),
+        ("F1", {"F2": Piece(PieceType.Pawn, Color.Black)}),
     ],
 )
 def test_rook_cannot_move_if_obstructed(
-    square_to_move_to: str, obstructing_piece: MovablePiece
+    square_to_move_to: str, obstructing_pieces: dict[str, Piece]
 ) -> None:
-    rook = create_pieces(PieceType.Rook, "F4", Color.White)
-
-    assert not to_coordinates(square_to_move_to) in get_possible_destinations(
-        rook, Board({rook, obstructing_piece})
+    board = create_board(
+        {"F4": Piece(PieceType.Rook, Color.White), **obstructing_pieces}
     )
+
+    assert not square_to_move_to in get_possible_destinations("F4", board)
 
 
 @pytest.mark.parametrize(
-    "square_to_move_to, opposing_piece",
+    "square_to_move_to, opposing_pieces",
     [
-        ("B4", create_pieces(PieceType.Pawn, "B4", Color.Black)),
-        ("F6", create_pieces(PieceType.Rook, "F6", Color.Black)),
-        ("H4", create_pieces(PieceType.Bishop, "H4", Color.Black)),
-        ("F3", create_pieces(PieceType.Pawn, "F3", Color.Black)),
-        ("F1", create_pieces(PieceType.Pawn, "F1", Color.Black)),
+        ("B4", {"B4": Piece(PieceType.Pawn, Color.Black)}),
+        ("F6", {"F6": Piece(PieceType.Rook, Color.Black)}),
+        ("H4", {"H4": Piece(PieceType.Bishop, Color.Black)}),
+        ("F3", {"F3": Piece(PieceType.Pawn, Color.Black)}),
+        ("F1", {"F1": Piece(PieceType.Pawn, Color.Black)}),
     ],
 )
 def test_rook_can_take_opposing_piece(
-    square_to_move_to: str, opposing_piece: MovablePiece
+    square_to_move_to: str, opposing_pieces: dict[str, Piece]
 ) -> None:
-    rook = create_pieces(PieceType.Rook, "F4", Color.White)
+    board = create_board({"F4": Piece(PieceType.Rook, Color.White), **opposing_pieces})
 
-    assert to_coordinates(square_to_move_to) in get_possible_destinations(
-        rook, Board({rook, opposing_piece})
-    )
+    assert square_to_move_to in get_possible_destinations("F4", board)

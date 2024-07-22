@@ -28,18 +28,18 @@ class Board:
         return piece
 
     def move(self, move: Move):
+        # TODO - add move validation
+
         for movement in move:
             self.__pieces.pop(movement.attack_location, None)
-
             self.__pieces[movement.destination] = self.__pieces.pop(movement.origin)
 
         self.__move_history.append(move)
 
     def promote(self, coordinates: Vector, new_type: PieceType) -> None:
-        # TODO - check that this isn't allowed
-        # I should have to create a new piece and
-        # assign it to these coordinates
-        self.__pieces[coordinates].type = new_type
+        color = self.get_piece(coordinates).color
+
+        self.__pieces[coordinates] = Piece(new_type, color)
 
     # TODO - maybe get_pieces with condition passed
     # although pieces is accessible, so might not be useful

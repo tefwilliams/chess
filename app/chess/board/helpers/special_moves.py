@@ -1,6 +1,11 @@
 from typing import TYPE_CHECKING
 from .helpers import get_squares_until_blocked, non_attacking_square_blocked_callback
-from .unit_steps import unit_step_left, unit_step_right, get_unit_step_forward, get_unit_step_backward
+from .unit_steps import (
+    unit_step_left,
+    unit_step_right,
+    get_unit_step_forward,
+    get_unit_step_backward,
+)
 from ..move import Move
 from ..movement import Movement
 from ...color import Color
@@ -11,7 +16,7 @@ if TYPE_CHECKING:
     from ..board import Board
 
 
-def get_castle_moves(square: Vector, board: 'Board') -> list[Move]:
+def get_castle_moves(square: Vector, board: "Board") -> list[Move]:
     return [
         Move(
             Movement(square, Vector(king_destination_col, square.row)),
@@ -26,12 +31,9 @@ def get_castle_moves(square: Vector, board: 'Board') -> list[Move]:
         )
     ]
 
-# TODO - perhaps create moves and then validate
 
-
-def valid_castle(king_square: Vector, rook_square: Vector, board: 'Board'):
+def valid_castle(king_square: Vector, rook_square: Vector, board: "Board"):
     return (
-        # TODO - king can't be in check
         (king := board.get_piece(king_square))
         and king.type == PieceType.King
         and (rook := board.try_get_piece(rook_square))
@@ -45,33 +47,35 @@ def valid_castle(king_square: Vector, rook_square: Vector, board: 'Board'):
             min(king_square.col, rook_square.col),
             max(king_square.col, rook_square.col),
         )
-        # TODO - king can't pass through attacked square (including current square) -- SHOULD ADD TEST
+        # King can't pass through attacked square
         and row_not_attacked_between_cols(
             board,
             king_square.row,
             king_square.col - (3 if rook_square.col < king_square.col else 1),
             king_square.col + (1 if rook_square.col < king_square.col else 3),
-            king.color
+            king.color,
         )
     )
 
 
 # TODO - maybe adapt to get square for row between cols
-def row_clear_between_cols(board: 'Board', row: int, col_start: int, col_end: int):
+def row_clear_between_cols(board: "Board", row: int, col_start: int, col_end: int):
     return not any(
         board.try_get_piece(coordinates)
         for coordinates in (Vector(col, row) for col in range(col_start + 1, col_end))
     )
 
 
-def row_not_attacked_between_cols(board: 'Board', row: int, col_start: int, col_end: int, color: Color):
+def row_not_attacked_between_cols(
+    board: "Board", row: int, col_start: int, col_end: int, color: Color
+):
     return not any(
         board.square_attacked(coordinates, color)
         for coordinates in (Vector(col, row) for col in range(col_start + 1, col_end))
     )
 
 
-def get_en_passant_moves(square: Vector, color: Color, board: 'Board') -> list[Move]:
+def get_en_passant_moves(square: Vector, color: Color, board: "Board") -> list[Move]:
     return [
         move
         for step in (unit_step_left, unit_step_right)
@@ -81,17 +85,28 @@ def get_en_passant_moves(square: Vector, color: Color, board: 'Board') -> list[M
             get_unit_step_forward(color) + step,
             1,
         )
-        if valid_en_passant(move := Move(Movement(square, destination, destination + get_unit_step_backward(color))), board)
+        if valid_en_passant(
+            move := Move(
+                Movement(
+                    square, destination, destination + get_unit_step_backward(color)
+                )
+            ),
+            board,
+        )
     ]
 
 
-def valid_en_passant(move: Move, board: 'Board'):
+def valid_en_passant(move: Move, board: "Board"):
     return (
         # Destination is clear due to non_attacking_square_blocked_callback
-        (attacker := board.get_piece(move.primary_movement.origin)).type == PieceType.Pawn
+        (attacker := board.get_piece(move.primary_movement.origin)).type
+        == PieceType.Pawn
         and (
-            (defender := board.try_get_piece(
-                defender_location := move.primary_movement.attack_location))
+            (
+                defender := board.try_get_piece(
+                    defender_location := move.primary_movement.attack_location
+                )
+            )
             and defender.type == PieceType.Pawn
         )
         and attacker.color != defender.color
@@ -99,5 +114,9 @@ def valid_en_passant(move: Move, board: 'Board'):
         and (last_move := board.get_last_move())
         and last_move.primary_movement.destination == defender_location
         # Defender just moved two rows
-        and abs(last_move.primary_movement.origin.row - last_move.primary_movement.destination.row) == 2
+        and abs(
+            last_move.primary_movement.origin.row
+            - last_move.primary_movement.destination.row
+        )
+        == 2
     )
