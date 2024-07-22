@@ -1,5 +1,5 @@
 from enum import Enum
-from ..color import Color
+from .color import Color
 
 
 class PieceType(Enum):

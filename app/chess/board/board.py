@@ -9,7 +9,7 @@ from ..vector import Vector
 
 class Board:
     def __init__(self, pieces: dict[Vector, Piece]) -> None:
-        self.__pieces: dict[Vector, Piece] = pieces
+        self.__pieces = {**pieces}
         self.__move_history: list[Move] = []
 
     @property
@@ -85,13 +85,11 @@ class Board:
         return get_non_attacking_moves(square, self)
 
     def __will_be_in_check_after_move(self, move: Move) -> bool:
-        test_board = deepcopy(self)
-        color = test_board.get_piece(move.primary_movement.origin).color
+        board = Board(self.__pieces)
+        color = board.get_piece(move.primary_movement.origin).color
 
-        test_board.move(move)
-        in_check = test_board.in_check(color)
-
-        return in_check
+        board.move(move)
+        return board.in_check(color)
 
     def in_check(self, color: Color):
         return (
