@@ -1,33 +1,26 @@
+from copy import deepcopy
+from .helpers import get_attacking_moves, get_non_attacking_moves
 from .move import Move
 from ..color import Color
-from ..piece import Piece, PieceType, BoardPiece
+from ..piece import Piece, PieceType
 from ..shared import only, last
 from ..vector import Vector
 
 
 class Board:
-    def __init__(self, pieces: set[BoardPiece]) -> None:
-        self.__pieces = pieces
-        self.last_piece_to_move: Piece | None = None
+    def __init__(self, pieces: dict[Vector, Piece]) -> None:
+        self.__pieces = {**pieces}
+        self.__move_history: list[Move] = []
 
     @property
-    def pieces(self) -> set[Piece]:
-        return set(self.__pieces)
+    def occupied_squares(self) -> list[Vector]:
+        return list(self.__pieces.keys())
 
     def try_get_piece(self, coordinates: Vector) -> Piece | None:
-        return self.__try_get_piece(coordinates)
-
-    def __try_get_piece(self, coordinates: Vector) -> BoardPiece | None:
-        return only(
-            (piece for piece in self.__pieces if piece.coordinates == coordinates),
-            f"More than one piece with coordinates: {coordinates}",
-        )
+        return self.__pieces.get(coordinates)
 
     def get_piece(self, coordinates: Vector) -> Piece:
-        return self.__get_piece(coordinates)
-
-    def __get_piece(self, coordinates: Vector) -> BoardPiece:
-        piece = self.__try_get_piece(coordinates)
+        piece = self.try_get_piece(coordinates)
 
         if piece is None:
             raise ValueError(f"No piece found for coordinates: {coordinates}")
@@ -35,26 +28,26 @@ class Board:
         return piece
 
     def move(self, move: Move):
+        # TODO - add move validation
+
         for movement in move:
-            piece_to_take = self.__try_get_piece(movement.attack_location)
+            self.__pieces.pop(movement.attack_location, None)
+            self.__pieces[movement.destination] = self.__pieces.pop(movement.origin)
 
-            if piece_to_take:
-                self.__pieces.remove(piece_to_take)
+        self.__move_history.append(move)
 
-            self.__get_piece(movement.piece.coordinates).move(movement.destination)
+    def promote(self, coordinates: Vector, new_type: PieceType) -> None:
+        color = self.get_piece(coordinates).color
 
-        self.last_piece_to_move = move.primary_movement.piece
-
-    def promote(self, pawn: Piece, new_type: PieceType) -> None:
-        self.__get_piece(pawn.coordinates).type = new_type
+        self.__pieces[coordinates] = Piece(new_type, color)
 
     # TODO - maybe get_pieces with condition passed
     # although pieces is accessible, so might not be useful
-    def get_king(self, color: Color) -> Piece | None:
-        king = only(
+    def get_king_location(self, color: Color) -> Vector | None:
+        king_location = only(
             (
-                piece
-                for piece in self.pieces
+                coordinates
+                for coordinates, piece in self.__pieces.items()
                 if piece.type == PieceType.King and piece.color == color
             ),
             f"More than one king on {color.name} team",
@@ -63,12 +56,60 @@ class Board:
         # if king is None:
         #     raise ValueError(f"No king found for {color} team")
 
-        return king
+        return king_location
 
-    def get_last_move(self) -> tuple[Vector, Vector] | None:
+    def piece_at_square_has_moved(self, square: Vector) -> bool:
+        self.get_piece(square)
+
+        return any(
+            move.primary_movement.destination == square for move in self.__move_history
+        )
+
+    def get_last_move(self) -> Move | None:
+        return last(self.__move_history)
+
+    def get_possible_moves(self, square: Vector) -> list[Move]:
+        return [
+            move
+            for move in self.get_unobstructed_moves(square)
+            if not self.__will_be_in_check_after_move(move)
+        ]
+
+    def get_unobstructed_moves(self, square: Vector) -> list[Move]:
+        return self.get_attacking_moves(square) + self.get_non_attacking_moves(square)
+
+    def get_attacking_moves(self, square: Vector) -> list[Move]:
+        return get_attacking_moves(square, self)
+
+    def get_non_attacking_moves(self, square: Vector) -> list[Move]:
+        return get_non_attacking_moves(square, self)
+
+    def __will_be_in_check_after_move(self, move: Move) -> bool:
+        board = Board(self.__pieces)
+        color = board.get_piece(move.primary_movement.origin).color
+
+        board.move(move)
+        return board.in_check(color)
+
+    def in_check(self, color: Color):
         return (
-            (previous_coordinates, last_piece_to_move.coordinates)
-            if (last_piece_to_move := self.last_piece_to_move)
-            and (previous_coordinates := last(last_piece_to_move.coordinates_history))
-            else None
+            coordinates := self.get_king_location(color)
+        ) is not None and self.square_attacked(coordinates, color)
+
+    def square_attacked(self, square: Vector, color: Color) -> bool:
+        return any(
+            square
+            in (
+                move.primary_movement.attack_location
+                for move in self.get_attacking_moves(occupied_square)
+            )
+            for occupied_square in self.occupied_squares
+            if self.get_piece(occupied_square).color != color
+        )
+
+    def any_possible_moves(self, color: Color) -> bool:
+        return any(
+            any(self.get_possible_moves(square))
+            for square in self.occupied_squares
+            if self.get_piece(square).color == color
         )

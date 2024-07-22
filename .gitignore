@@ -1,5 +1,7 @@
 ﻿.vscode
+.venv
 __pycache__
+.pytest_cache
 chess_moves.txt
 **/chess.egg-info
 .DS_Store

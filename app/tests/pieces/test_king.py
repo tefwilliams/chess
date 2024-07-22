@@ -1,139 +1,143 @@
 import pytest
-from chess import Board, Color, PieceType, MovablePiece
+from chess import Color, PieceType, Piece
 from ..repository import (
-    create_piece,
-    to_coordinates,
+    create_board,
     get_possible_destinations,
     create_move,
 )
 
 
 @pytest.mark.parametrize(
-    "square_to_move_to, should_be_able_to_move",
+    "color",
     [
-        ("A2", False),
-        ("B1", False),
-        ("B4", False),
-        ("F6", False),
-        ("F3", True),
-        ("E5", True),
-        ("G4", True),
-        ("E4", True),
+        Color.White,
+        Color.Black,
     ],
 )
-def test_king_can_only_move_to_adjacent_squares(
-    square_to_move_to: str, should_be_able_to_move: bool
-) -> None:
-    king = create_piece(PieceType.King, "F4", Color.White)
-
-    can_move = to_coordinates(square_to_move_to) in get_possible_destinations(
-        king, Board({king})
+def test_king_can_only_move_to_adjacent_squares(color: Color) -> None:
+    board = create_board(
+        {
+            "F4": Piece(PieceType.King, color),
+        }
     )
 
-    assert can_move == should_be_able_to_move
+    assert sorted(
+        [
+            "F5",
+            "G5",
+            "G4",
+            "G3",
+            "F3",
+            "E3",
+            "E4",
+            "E5",
+        ]
+    ) == get_possible_destinations("F4", board)
 
 
 @pytest.mark.parametrize(
-    "square_to_move_to, obstructing_piece",
+    "square_to_move_to, obstructing_pieces",
     [
-        ("F3", create_piece(PieceType.Bishop, "F3", Color.White)),
-        ("E5", create_piece(PieceType.Rook, "E5", Color.White)),
-        ("G4", create_piece(PieceType.Queen, "G4", Color.White)),
-        ("E4", create_piece(PieceType.Pawn, "E4", Color.White)),
+        ("F3", {"F3": Piece(PieceType.Bishop, Color.White)}),
+        ("E5", {"E5": Piece(PieceType.Rook, Color.White)}),
+        ("G4", {"G4": Piece(PieceType.Queen, Color.White)}),
+        ("E4", {"E4": Piece(PieceType.Pawn, Color.White)}),
     ],
 )
 def test_king_cannot_move_if_obstructed(
-    square_to_move_to: str, obstructing_piece: MovablePiece
+    square_to_move_to: str, obstructing_pieces: dict[str, Piece]
 ) -> None:
-    king = create_piece(PieceType.King, "F4", Color.White)
 
-    assert not to_coordinates(square_to_move_to) in get_possible_destinations(
-        king, Board({king, obstructing_piece})
+    board = create_board(
+        {"F4": Piece(PieceType.King, Color.White), **obstructing_pieces}
     )
+
+    assert not square_to_move_to in get_possible_destinations("F4", board)
 
 
 @pytest.mark.parametrize(
-    "square_to_move_to, opposing_piece",
+    "square_to_move_to, opposing_pieces",
     [
-        ("F3", create_piece(PieceType.Bishop, "F3", Color.Black)),
-        ("E5", create_piece(PieceType.Rook, "E5", Color.Black)),
-        ("G4", create_piece(PieceType.Queen, "G4", Color.Black)),
-        ("E4", create_piece(PieceType.Pawn, "E4", Color.Black)),
+        ("F3", {"F3": Piece(PieceType.Bishop, Color.Black)}),
+        ("E5", {"E5": Piece(PieceType.Rook, Color.Black)}),
+        ("G4", {"G4": Piece(PieceType.Queen, Color.Black)}),
+        ("E4", {"E4": Piece(PieceType.Pawn, Color.Black)}),
     ],
 )
 def test_king_can_take_opposing_piece(
-    square_to_move_to: str, opposing_piece: MovablePiece
+    square_to_move_to: str, opposing_pieces: dict[str, Piece]
 ) -> None:
-    king = create_piece(PieceType.King, "F4", Color.White)
+    board = create_board({"F4": Piece(PieceType.King, Color.White), **opposing_pieces})
 
-    assert to_coordinates(square_to_move_to) in get_possible_destinations(
-        king, Board({king, opposing_piece})
-    )
+    assert square_to_move_to in get_possible_destinations("F4", board)
 
 
 @pytest.mark.parametrize(
     "square_to_move_to, other_pieces, should_be_able_to_move",
     [
-        ("C1", [], True),
-        ("G1", [create_piece(PieceType.Rook, "E5", Color.Black)], False),
-        ("C1", [create_piece(PieceType.Rook, "E5", Color.Black)], False),
-        # TODO - this should still fail after fixing castle rules
-        ("G1", [create_piece(PieceType.Rook, "E4", Color.Black)], True),
-        ("C1", [create_piece(PieceType.Rook, "E4", Color.Black)], False),
-        ("B1", [create_piece(PieceType.Rook, "E7", Color.Black)], False),
+        ("C1", {}, True),
+        ("G1", {}, True),
+        ("B1", {}, False),
+        ("G1", {"E5": Piece(PieceType.Rook, Color.Black)}, False),
+        ("C1", {"E5": Piece(PieceType.Rook, Color.Black)}, False),
+        ("G1", {"F4": Piece(PieceType.Rook, Color.Black)}, False),
+        ("C1", {"F4": Piece(PieceType.Rook, Color.Black)}, True),
+        ("C1", {"E4": Piece(PieceType.Rook, Color.Black)}, False),
+        ("C1", {"A7": Piece(PieceType.Rook, Color.Black)}, True),
+        ("B1", {"E7": Piece(PieceType.Rook, Color.Black)}, False),
     ],
 )
 def test_king_can_move_via_castle(
     square_to_move_to: str,
-    other_pieces: list[MovablePiece],
+    other_pieces: dict[Piece, str],
     should_be_able_to_move: bool,
 ) -> None:
-    king = create_piece(PieceType.King, "E1", Color.White)
-
-    rooks = [
-        create_piece(PieceType.Rook, "A1", Color.White),
-        create_piece(PieceType.Rook, "H1", Color.White),
-    ]
-
-    can_move = to_coordinates(square_to_move_to) in get_possible_destinations(
-        king, Board({king, *rooks, *other_pieces})
+    board = create_board(
+        {
+            "E1": Piece(PieceType.King, Color.White),
+            "A1": Piece(PieceType.Rook, Color.White),
+            "H1": Piece(PieceType.Rook, Color.White),
+            **other_pieces,
+        }
     )
+
+    can_move = square_to_move_to in get_possible_destinations("E1", board)
 
     assert can_move == should_be_able_to_move
 
 
 def test_king_cannot_move_via_castle_if_rook_has_moved() -> None:
-    king = create_piece(PieceType.King, "E1", Color.White)
-    rook = create_piece(PieceType.Rook, "A1", Color.White)
+    board = create_board(
+        {
+            "E1": Piece(PieceType.King, Color.White),
+            "A1": Piece(PieceType.Rook, Color.White),
+        }
+    )
 
-    board = Board({king, rook})
+    rook_to_a2 = create_move("A1", "A2")
+    board.move(rook_to_a2)
 
-    rook_to_A2 = create_move((rook, "A2"))
-    board.move(rook_to_A2)
+    rook_to_a1 = create_move("A2", "A1")
+    board.move(rook_to_a1)
 
-    rook_to_A1 = create_move((rook, "A1"))
-    board.move(rook_to_A1)
-
-    assert to_coordinates("A3") not in get_possible_destinations(king, board)
+    assert "A3" not in get_possible_destinations("E1", board)
 
 
 def test_king_cannot_move_via_castle_if_king_has_moved() -> None:
-    king = create_piece(PieceType.King, "E1", Color.White)
+    board = create_board(
+        {
+            "E1": Piece(PieceType.King, Color.White),
+            "A1": Piece(PieceType.Rook, Color.White),
+            "H1": Piece(PieceType.Rook, Color.White),
+        }
+    )
 
-    rooks = [
-        create_piece(PieceType.Rook, "A1", Color.White),
-        create_piece(PieceType.Rook, "H1", Color.White),
-    ]
+    king_to_e2 = create_move("E1", "E2")
+    board.move(king_to_e2)
 
-    board = Board({king, *rooks})
-
-    king_to_E2 = create_move((king, "E2"))
-    board.move(king_to_E2)
-
-    king_to_E1 = create_move((king, "E1"))
-    board.move(king_to_E1)
+    king_to_e1 = create_move("E2", "E1")
+    board.move(king_to_e1)
 
     assert all(
-        to_coordinates(square) not in get_possible_destinations(king, board)
-        for square in ["C1", "G1"]
+        square not in get_possible_destinations("E1", board) for square in ["C1", "G1"]
     )

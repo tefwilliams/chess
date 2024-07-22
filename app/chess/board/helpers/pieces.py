@@ -1,44 +1,44 @@
-from ..color import Color
-from ..piece import PieceType, MovablePiece
-from ..vector import Vector
+from ...color import Color
+from ...piece import PieceType, Piece
+from ...vector import Vector
 
 board_size = 8
 
 
 def get_starting_pieces():
-    return set(
-        piece
+    return {
+        coordinates: piece
         for coordinates in (
             Vector(col, row) for row in range(board_size) for col in range(board_size)
         )
         if ((piece := get_starting_piece(coordinates)) is not None)
-    )
+    }
 
 
-def get_starting_piece(coordinates: Vector) -> MovablePiece | None:
+def get_starting_piece(coordinates: Vector) -> Piece | None:
     # White starts at the bottom of the board
     color = Color.White if coordinates.row in [6, 7] else Color.Black
 
     match coordinates.row:
         case 1 | 6:
-            return MovablePiece(PieceType.Pawn, color, coordinates)
+            return Piece(PieceType.Pawn, color)
 
         case 0 | 7:
             match coordinates.col:
                 case 0 | 7:
-                    return MovablePiece(PieceType.Rook, color, coordinates)
+                    return Piece(PieceType.Rook, color)
 
                 case 1 | 6:
-                    return MovablePiece(PieceType.Knight, color, coordinates)
+                    return Piece(PieceType.Knight, color)
 
                 case 2 | 5:
-                    return MovablePiece(PieceType.Bishop, color, coordinates)
+                    return Piece(PieceType.Bishop, color)
 
                 case 3:
-                    return MovablePiece(PieceType.Queen, color, coordinates)
+                    return Piece(PieceType.Queen, color)
 
                 case 4:
-                    return MovablePiece(PieceType.King, color, coordinates)
+                    return Piece(PieceType.King, color)
 
         case _:
             return None

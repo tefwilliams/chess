@@ -2,7 +2,6 @@ import os
 import pygame
 from math import floor
 from typing import Callable, Iterable
-from .board_square import BoardSquare
 from .variables import (
     display_size,
     gray,
@@ -16,9 +15,8 @@ from .variables import (
     board_border_thickness,
     square_size,
 )
-from ..board import board_size
+from ..board import board_size, Board
 from ..piece import Piece
-from ..shared import only
 from ..vector import Vector
 
 
@@ -27,12 +25,12 @@ icons_folder_path = os.path.join(script_dir, "../../icons")
 
 
 class BoardRenderer:
-    def __init__(self) -> None:
+    def __init__(self, board: Board) -> None:
         pygame.init()
         self.screen = pygame.display.set_mode((display_size, display_size))
-        # self.screen = pygame.Surface((display_size, display_size))
-        # screen.blit(self.screen, (0, 0))
         self.screen.fill(brown)
+
+        self.__board = board
 
         pygame.display.set_caption("Chess")
         pygame.display.set_icon(
@@ -87,29 +85,30 @@ class BoardRenderer:
         inner_size = display_size - inner_margin * 2
 
         pygame.draw.rect(
-            self.screen, brown, [inner_margin, inner_margin, inner_size, inner_size]
+            self.screen, brown, [inner_margin,
+                                 inner_margin, inner_size, inner_size]
         )
 
         pygame.display.update()
 
     # TODO - maybe make highlight a separate method
     def render_squares(
-        self, pieces: set[Piece], squares_to_highlight: Iterable[Vector] = []
+        self, squares_to_highlight: Iterable[Vector] | None = None
     ) -> None:
         for row_number in range(board_size):
             for column_number in range(board_size):
                 square = Vector(column_number, row_number)
-                piece = only(piece for piece in pieces if piece.coordinates == square)
 
                 self.__render_square(
-                    BoardSquare(square, piece),
-                    square in squares_to_highlight,
+                    square,
+                    square in (squares_to_highlight or []),
                 )
 
         pygame.display.update()
 
-    def __render_square(self, square: BoardSquare, highlighted: bool = False):
-        odd_color, even_color = (yellow, light_green) if highlighted else (cream, green)
+    def __render_square(self, square: Vector, highlighted: bool = False):
+        odd_color, even_color = (
+            yellow, light_green) if highlighted else (cream, green)
         square_color = odd_color if sum(square) % 2 == 0 else even_color
 
         left_margin, top_margin = get_square_location(square)
@@ -120,14 +119,14 @@ class BoardRenderer:
             (left_margin, top_margin, square_size, square_size),
         )
 
-        if square.piece:
-            self.__display_piece(square.piece)
+        if (piece := self.__board.try_get_piece(square)):
+            self.__display_piece(piece, square)
 
-    def highlight(self, square: BoardSquare):
+    def highlight(self, square: Vector):
         self.__render_square(square, True)
         pygame.display.update()
 
-    def __display_piece(self, piece: Piece) -> None:
+    def __display_piece(self, piece: Piece, coordinates: Vector) -> None:
         piece_icon = pygame.image.load(
             f"{icons_folder_path}/{piece.color.name}_{piece.type.name}.png"
         )
@@ -141,7 +140,7 @@ class BoardRenderer:
         icon_height = round(square_size * 0.8)
         icon_width = round(aspect_ratio * icon_height)
 
-        top_left = get_square_location(piece.coordinates) + Vector(
+        top_left = get_square_location(coordinates) + Vector(
             (square_size - icon_width) // 2, (square_size - icon_height) // 2
         )
 
@@ -150,15 +149,16 @@ class BoardRenderer:
         )
         self.screen.blit(scaled_piece_icon, top_left)
 
-    def display_possible_moves(self, squares: Iterable[BoardSquare]) -> None:
-        for coordinates in squares:
-            has_piece = coordinates.piece is not None
+    def display_possible_moves(self, squares: Iterable[Vector]) -> None:
+        for square in squares:
+            has_piece = self.__board.try_get_piece(square) is not None
 
             pygame.draw.circle(
                 self.screen,
                 gray,
-                center=get_square_location(coordinates, True),
-                radius=round(square_size * 0.4 if has_piece else square_size * 0.2),
+                center=get_square_location(square, True),
+                radius=round(
+                    square_size * 0.4 if has_piece else square_size * 0.2),
                 width=round(square_size * 0.1 if has_piece else 0),
             )
 

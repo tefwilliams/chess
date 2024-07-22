@@ -1,8 +1,11 @@
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
+from .pieces import within_board
 from ...color import Color
-from ...board import Board, within_board
 from ...vector import Vector
+
+if TYPE_CHECKING:
+    from ..board import Board
 
 
 # TODO - could move these to board?
@@ -31,7 +34,7 @@ def get_squares_until_blocked(
 
 
 def attacking_square_blocked_callback(
-    board: Board, color: Color
+    board: "Board", color: Color
 ) -> Callable[[Vector, Vector | None], bool]:
     return lambda current_square, last_square: (
         friendly_piece_at_square(current_square, color, board)
@@ -42,7 +45,7 @@ def attacking_square_blocked_callback(
 
 
 def non_attacking_square_blocked_callback(
-    board: Board, color: Color
+    board: "Board", color: Color
 ) -> Callable[[Vector, Vector | None], bool]:
     return lambda current_square, _: (
         friendly_piece_at_square(current_square, color, board)
@@ -50,9 +53,18 @@ def non_attacking_square_blocked_callback(
     )
 
 
-def friendly_piece_at_square(square: Vector, color: Color, board: Board):
+def friendly_piece_at_square(square: Vector, color: Color, board: "Board"):
     return (piece := board.try_get_piece(square)) is not None and piece.color == color
 
 
-def enemy_piece_at_square(square: Vector, color: Color, board: Board):
+def enemy_piece_at_square(square: Vector, color: Color, board: "Board"):
     return (piece := board.try_get_piece(square)) is not None and piece.color != color
+
+
+def pawn_attacking_square_blocked_callback(
+    board: "Board", color: Color
+) -> Callable[[Vector, Vector | None], bool]:
+    return lambda current_square, _: (
+        friendly_piece_at_square(current_square, color, board)
+        or not enemy_piece_at_square(current_square, color, board)
+    )
