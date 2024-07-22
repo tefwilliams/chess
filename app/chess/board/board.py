@@ -31,8 +31,7 @@ class Board:
         for movement in move:
             self.__pieces.pop(movement.attack_location, None)
 
-            self.__pieces[movement.destination] = self.__pieces.pop(
-                movement.origin)
+            self.__pieces[movement.destination] = self.__pieces.pop(movement.origin)
 
         self.__move_history.append(move)
 
@@ -63,8 +62,7 @@ class Board:
         self.get_piece(square)
 
         return any(
-            move.primary_movement.destination == square
-            for move in self.__move_history
+            move.primary_movement.destination == square for move in self.__move_history
         )
 
     def get_last_move(self) -> Move | None:
@@ -115,5 +113,5 @@ class Board:
         return any(
             any(self.get_possible_moves(square))
             for square in self.occupied_squares
-            if self.get_piece(square).color != color
+            if self.get_piece(square).color == color
         )

@@ -40,8 +40,7 @@ def attacking_square_blocked_callback(
     return lambda current_square, last_square: (
         friendly_piece_at_square(current_square, color, board)
         or (
-            last_square is not None and enemy_piece_at_square(
-                last_square, color, board)
+            last_square is not None and enemy_piece_at_square(last_square, color, board)
         )
     )
 
@@ -66,7 +65,7 @@ def enemy_piece_at_square(square: Vector, color: Color, board: Board):
 def pawn_attacking_square_blocked_callback(
     board: Board, color: Color
 ) -> Callable[[Vector, Vector | None], bool]:
-    return lambda current_square, last_square: (
+    return lambda current_square, _: (
         friendly_piece_at_square(current_square, color, board)
-        or not enemy_piece_at_square(last_square, color, board)
+        or not enemy_piece_at_square(current_square, color, board)
     )

@@ -44,22 +44,18 @@ class Game:
         first_selection = None
 
         while True:
-            self.__display.render_squares(
-                self.board.get_last_move() or []
-            )
+            self.__display.render_squares(self.board.get_last_move() or [])
 
             first_selection = (
                 first_selection
                 or self.__display.get_coordinate_selection(self.__is_valid_origin)
             )
 
-            possible_moves = self.board.get_possible_moves(
-                first_selection)
+            possible_moves = self.board.get_possible_moves(first_selection)
 
             self.__display.highlight(first_selection)
             self.__display.display_possible_moves(
-                move.primary_movement.destination
-                for move in possible_moves
+                move.primary_movement.destination for move in possible_moves
             )
 
             second_selection = self.__display.get_coordinate_selection()
@@ -96,6 +92,8 @@ class Game:
 
 def should_promote(board: Board, coordinates: Vector):
     # TODO - could potentially use board.last_move
-    return (piece := board.get_piece(coordinates)).type == PieceType.Pawn and coordinates.row == (
-        7 if piece.color == Color.White else 0
+    return (
+        piece := board.get_piece(coordinates)
+    ).type == PieceType.Pawn and coordinates.row == (
+        0 if piece.color == Color.White else 7
     )

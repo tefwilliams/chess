@@ -76,11 +76,14 @@ def test_king_can_take_opposing_piece(
     "square_to_move_to, other_pieces, should_be_able_to_move",
     [
         ("C1", {}, True),
+        ("G1", {}, True),
+        ("B1", {}, False),
         ("G1", {"E5": Piece(PieceType.Rook, Color.Black)}, False),
         ("C1", {"E5": Piece(PieceType.Rook, Color.Black)}, False),
-        # TODO - this should still fail after fixing castle rules
-        ("G1", {"E4": Piece(PieceType.Rook, Color.Black)}, True),
+        ("G1", {"F4": Piece(PieceType.Rook, Color.Black)}, False),
+        ("C1", {"F4": Piece(PieceType.Rook, Color.Black)}, True),
         ("C1", {"E4": Piece(PieceType.Rook, Color.Black)}, False),
+        ("C1", {"A7": Piece(PieceType.Rook, Color.Black)}, True),
         ("B1", {"E7": Piece(PieceType.Rook, Color.Black)}, False),
     ],
 )
