@@ -12,8 +12,8 @@ class Board:
         self.__move_history: list[Move] = []
 
     @property
-    def __occupied_squares(self) -> list[Vector]:
-        return list(self.__pieces.keys())
+    def __occupied_squares(self) -> tuple[Vector, ...]:
+        return tuple(self.__pieces.keys())
 
     def try_get_piece(self, coordinates: Vector) -> Piece | None:
         return self.__pieces.get(coordinates)
@@ -39,23 +39,6 @@ class Board:
         color = self.get_piece(coordinates).color
 
         self.__pieces[coordinates] = Piece(new_type, color)
-
-    # TODO - maybe get_pieces with condition passed
-    # although pieces is accessible, so might not be useful
-    def __get_king_location(self, color: Color) -> Vector | None:
-        king_location = only(
-            (
-                coordinates
-                for coordinates, piece in self.__pieces.items()
-                if piece.type == PieceType.King and piece.color == color
-            ),
-            f"More than one king on {color.name} team",
-        )
-
-        # if king is None:
-        #     raise ValueError(f"No king found for {color} team")
-
-        return king_location
 
     def piece_at_square_has_moved(self, square: Vector) -> bool:
         self.get_piece(square)
@@ -90,10 +73,14 @@ class Board:
         board.move(move)
         return board.in_check(color)
 
-    def in_check(self, color: Color):
-        return (
-            coordinates := self.__get_king_location(color)
-        ) is not None and self.square_attacked(coordinates, color)
+    def in_check(self, color: Color) -> bool:
+        king_location = only(
+            square
+            for square, piece in self.__pieces.items()
+            if piece.type == PieceType.King and piece.color == color
+        )
+
+        return king_location is not None and self.square_attacked(king_location, color)
 
     def square_attacked(self, square: Vector, color: Color) -> bool:
         return any(

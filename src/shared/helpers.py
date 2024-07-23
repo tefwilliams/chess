@@ -4,16 +4,16 @@ from typing import Iterator, TypeVar
 T = TypeVar("T")
 
 
-def only(iterator: Iterator[T], error_message: str = "") -> T | None:
+def only(iterator: Iterator[T]) -> T | None:
     """
     Return the only item from the iterator.
     Returns None the iterator is exhausted.
-    Raise RuntimeError with optional error message if more than item in iterator.
+    Raise ValueError if more than one item in iterator.
     """
     results = [iterator]
 
     if len(results) > 1:
-        raise RuntimeError(error_message)
+        raise ValueError("Multiple items returned by iterator")
 
     return next(iterator, None)
 

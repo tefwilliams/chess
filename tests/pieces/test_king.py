@@ -89,7 +89,7 @@ def test_king_can_take_opposing_piece(
 )
 def test_king_can_move_via_castle(
     square_to_move_to: str,
-    other_pieces: dict[Piece, str],
+    other_pieces: dict[str, Piece],
     should_be_able_to_move: bool,
 ) -> None:
     board = create_board(
