@@ -21,7 +21,7 @@ from ..vector import Vector
 
 
 script_dir = os.path.dirname(__file__)
-icons_folder_path = os.path.join(script_dir, "../icons")
+icons_folder_path = os.path.join(script_dir, "../../icons")
 
 
 class BoardRenderer:
