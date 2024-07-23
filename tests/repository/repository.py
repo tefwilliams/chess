@@ -66,6 +66,6 @@ def to_grid_string(coordinates: Vector) -> str:
 
 def get_possible_destinations(square: str, board: Board) -> list[str]:
     return sorted(
-        to_grid_string(move.primary_movement.destination)
+        to_grid_string(move.destination)
         for move in board.get_possible_moves(to_coordinates(square))
     )

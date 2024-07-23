@@ -99,24 +99,15 @@ def get_en_passant_moves(square: Vector, color: Color, board: "Board") -> list[M
 def valid_en_passant(move: Move, board: "Board"):
     return (
         # Destination is clear due to non_attacking_square_blocked_callback
-        (attacker := board.get_piece(move.primary_movement.origin)).type
-        == PieceType.Pawn
+        (attacker := board.get_piece(move.origin)).type == PieceType.Pawn
         and (
-            (
-                defender := board.try_get_piece(
-                    defender_location := move.primary_movement.attack_location
-                )
-            )
+            (defender := board.try_get_piece(defender_location := move.attack_location))
             and defender.type == PieceType.Pawn
         )
         and attacker.color != defender.color
         # Defender is last piece to move
         and (last_move := board.get_last_move())
-        and last_move.primary_movement.destination == defender_location
+        and last_move.destination == defender_location
         # Defender just moved two rows
-        and abs(
-            last_move.primary_movement.origin.row
-            - last_move.primary_movement.destination.row
-        )
-        == 2
+        and abs(last_move.origin.row - last_move.destination.row) == 2
     )

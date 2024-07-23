@@ -33,7 +33,7 @@ class Game:
 
         # TODO - check for promotion each turn using get_last_move
         # This probably belongs on the board
-        if should_promote(self.board, desintation := move.primary_movement.destination):
+        if should_promote(self.board, desintation := move.destination):
             self.board.promote(desintation, PieceType.Queen)
 
         self.swap_player()
@@ -48,8 +48,8 @@ class Game:
             self.__display.render_squares(
                 (last_move := self.board.get_last_move())
                 and (
-                    last_move.primary_movement.origin,
-                    last_move.primary_movement.destination,
+                    last_move.origin,
+                    last_move.destination,
                 )
             )
 
@@ -62,7 +62,7 @@ class Game:
 
             self.__display.highlight(first_selection)
             self.__display.display_possible_moves(
-                move.primary_movement.destination for move in possible_moves
+                move.destination for move in possible_moves
             )
 
             second_selection = self.__display.get_coordinate_selection()
@@ -73,9 +73,7 @@ class Game:
                 continue
 
             move = only(
-                move
-                for move in possible_moves
-                if move.primary_movement.destination == second_selection
+                move for move in possible_moves if move.destination == second_selection
             )
 
             if not move:

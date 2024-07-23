@@ -29,7 +29,7 @@ class Board:
     def move(self, move: Move):
         # TODO - add move validation
 
-        for movement in move:
+        for movement in move.movements:
             self.__pieces.pop(movement.attack_location, None)
             self.__pieces[movement.destination] = self.__pieces.pop(movement.origin)
 
@@ -60,9 +60,7 @@ class Board:
     def piece_at_square_has_moved(self, square: Vector) -> bool:
         self.get_piece(square)
 
-        return any(
-            move.primary_movement.destination == square for move in self.__move_history
-        )
+        return any(move.destination == square for move in self.__move_history)
 
     def get_last_move(self) -> Move | None:
         return last(self.__move_history)
@@ -87,7 +85,7 @@ class Board:
 
     def __will_be_in_check_after_move(self, move: Move) -> bool:
         board = Board(self.__pieces)
-        color = board.get_piece(move.primary_movement.origin).color
+        color = board.get_piece(move.origin).color
 
         board.move(move)
         return board.in_check(color)
@@ -101,7 +99,7 @@ class Board:
         return any(
             square
             in (
-                move.primary_movement.attack_location
+                move.attack_location
                 for move in self.__get_attacking_moves(occupied_square)
             )
             for occupied_square in self.__occupied_squares
