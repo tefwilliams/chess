@@ -1,5 +1,5 @@
 import pytest
-from chess import Color, PieceType, Piece
+from src import Color, PieceType, Piece
 from ..repository import (
     create_board,
     get_possible_destinations,

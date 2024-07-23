@@ -1,4 +1,4 @@
-from chess import Game
+from src import Game
 
 game = Game()
 

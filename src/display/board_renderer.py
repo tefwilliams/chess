@@ -21,7 +21,7 @@ from ..vector import Vector
 
 
 script_dir = os.path.dirname(__file__)
-icons_folder_path = os.path.join(script_dir, "../../icons")
+icons_folder_path = os.path.join(script_dir, "../icons")
 
 
 class BoardRenderer:
@@ -85,8 +85,7 @@ class BoardRenderer:
         inner_size = display_size - inner_margin * 2
 
         pygame.draw.rect(
-            self.screen, brown, [inner_margin,
-                                 inner_margin, inner_size, inner_size]
+            self.screen, brown, [inner_margin, inner_margin, inner_size, inner_size]
         )
 
         pygame.display.update()
@@ -107,8 +106,7 @@ class BoardRenderer:
         pygame.display.update()
 
     def __render_square(self, square: Vector, highlighted: bool = False):
-        odd_color, even_color = (
-            yellow, light_green) if highlighted else (cream, green)
+        odd_color, even_color = (yellow, light_green) if highlighted else (cream, green)
         square_color = odd_color if sum(square) % 2 == 0 else even_color
 
         left_margin, top_margin = get_square_location(square)
@@ -119,7 +117,7 @@ class BoardRenderer:
             (left_margin, top_margin, square_size, square_size),
         )
 
-        if (piece := self.__board.try_get_piece(square)):
+        if piece := self.__board.try_get_piece(square):
             self.__display_piece(piece, square)
 
     def highlight(self, square: Vector):
@@ -157,8 +155,7 @@ class BoardRenderer:
                 self.screen,
                 gray,
                 center=get_square_location(square, True),
-                radius=round(
-                    square_size * 0.4 if has_piece else square_size * 0.2),
+                radius=round(square_size * 0.4 if has_piece else square_size * 0.2),
                 width=round(square_size * 0.1 if has_piece else 0),
             )
 

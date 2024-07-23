@@ -1,4 +1,4 @@
-from chess import (
+from src import (
     Board,
     Move,
     Movement,
