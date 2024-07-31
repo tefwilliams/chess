@@ -1,6 +1,6 @@
-from ...color import Color
-from ...piece import PieceType, Piece
-from ...vector import Vector
+from ..color import Color
+from ..piece import PieceType, Piece
+from ..vector import Vector
 
 board_size = 8
 

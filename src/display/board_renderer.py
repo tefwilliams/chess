@@ -15,7 +15,7 @@ from .variables import (
     board_border_thickness,
     square_size,
 )
-from ..board import board_size, Board
+from ..board import Board
 from ..piece import Piece
 from ..vector import Vector
 
@@ -94,8 +94,8 @@ class BoardRenderer:
     def render_squares(
         self, squares_to_highlight: Iterable[Vector] | None = None
     ) -> None:
-        for row_number in range(board_size):
-            for column_number in range(board_size):
+        for row_number in range(Board.size):
+            for column_number in range(Board.size):
                 square = Vector(column_number, row_number)
 
                 self.__render_square(

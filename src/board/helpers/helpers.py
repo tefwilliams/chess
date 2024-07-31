@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Callable
 
-from .pieces import within_board
+from ...shared import within_board
 from ...color import Color
 from ...vector import Vector
 

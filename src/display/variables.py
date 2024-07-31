@@ -1,4 +1,4 @@
-from ..board import board_size
+from ..board import Board
 
 board_edge_thickness = 20  # px
 board_border_thickness = 5  # px
@@ -16,5 +16,5 @@ cream = (238, 238, 210)
 yellow = (246, 246, 105)
 
 display_size = (
-    board_edge_thickness * 2 + board_border_thickness * 4 + square_size * board_size
+    board_edge_thickness * 2 + board_border_thickness * 4 + square_size * Board.size
 )
