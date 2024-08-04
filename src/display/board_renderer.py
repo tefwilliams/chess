@@ -143,7 +143,7 @@ class BoardRenderer:
         )
 
         scaled_piece_icon = pygame.transform.scale(
-            piece_icon, (round(icon_width), round(icon_height))
+            piece_icon, (icon_width, icon_height)
         )
         self.screen.blit(scaled_piece_icon, top_left)
 

@@ -24,7 +24,7 @@ def get_squares_until_blocked(
     while (
         within_board(current_square)
         and not square_blocked(current_square, last_square)
-        and not (max_number_steps is not None and len(squares) >= max_number_steps)
+        and (not max_number_steps or len(squares) < max_number_steps)
     ):
         squares.append(current_square)
         last_square = current_square

@@ -11,7 +11,7 @@ def get_starting_pieces():
         for coordinates in (
             Vector(col, row) for row in range(board_size) for col in range(board_size)
         )
-        if ((piece := get_starting_piece(coordinates)) is not None)
+        if (piece := get_starting_piece(coordinates))
     }
 
 

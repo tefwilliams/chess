@@ -36,21 +36,20 @@ class MovementEngine:
         return movement_engine.in_check(color)
 
     def in_check(self, color: Color) -> bool:
-        king_location = only(
-            square
-            for square, piece in self.__board.pieces.items()
-            if piece.type == PieceType.King and piece.color == color
-        )
-
         return (
-            king_location is not None
-            and self.__aggressive_move_generator.square_attacked(king_location, color)
+            king_location := only(
+                square
+                for square, piece in self.__board.pieces.items()
+                if piece.type == PieceType.King and piece.color == color
+            )
+        ) is not None and self.__aggressive_move_generator.square_attacked(
+            king_location, color
         )
 
     def any_possible_moves(self, color: Color) -> bool:
         return any(
             move
-            for square in self.__board.pieces
-            if self.__board.get_piece(square).color == color
+            for square, piece in self.__board.pieces.items()
+            if piece.color == color
             for move in self.get_possible_moves(square)
         )
