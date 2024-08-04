@@ -1,6 +1,6 @@
-from src import Game
+from src import Game, get_starting_pieces
 
-game = Game()
+game = Game(get_starting_pieces())
 
 while not game.over():
     game.take_turn()

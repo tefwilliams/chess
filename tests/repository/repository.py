@@ -2,6 +2,7 @@ from src import (
     Board,
     Move,
     Movement,
+    MovementEngine,
     Piece,
     Vector,
 )
@@ -67,5 +68,5 @@ def to_grid_string(coordinates: Vector) -> str:
 def get_possible_destinations(square: str, board: Board) -> list[str]:
     return sorted(
         to_grid_string(move.destination)
-        for move in board.get_possible_moves(to_coordinates(square))
+        for move in MovementEngine(board).get_possible_moves(to_coordinates(square))
     )

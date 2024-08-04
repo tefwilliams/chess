@@ -1,4 +1,4 @@
-from typing import Iterator, TypeVar
+from typing import Iterator, TypeGuard, TypeVar
 
 
 T = TypeVar("T")
@@ -24,3 +24,7 @@ def last(list: list[T]) -> T | None:
     Returns None if the list is empty.
     """
     return next(reversed(list), None)
+
+
+def has_two_items(iterator: tuple[T, ...]) -> TypeGuard[tuple[T, T]]:
+    return len(iterator) == 2

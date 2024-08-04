@@ -1,5 +1,5 @@
 import pytest
-from src import PieceType, Board, Color, Piece
+from src import PieceType, Board, Color, Piece, MovementEngine
 from ..repository import (
     create_board,
     create_move,
@@ -45,7 +45,7 @@ def test_is_in_check_returns_true_when_king_in_check(
         }
     )
 
-    assert board.in_check(Color.White)
+    assert MovementEngine(board).in_check(Color.White)
 
 
 @pytest.mark.parametrize(
@@ -70,7 +70,7 @@ def test_is_in_check_returns_false_when_king_not_in_check(
         }
     )
 
-    assert not board.in_check(Color.White)
+    assert not MovementEngine(board).in_check(Color.White)
 
 
 def test_move_via_en_passant_removes_piece() -> None:
