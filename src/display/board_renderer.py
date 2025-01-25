@@ -107,14 +107,14 @@ class BoardRenderer:
 
     def __render_square(self, square: Vector, highlighted: bool = False):
         odd_color, even_color = (yellow, light_green) if highlighted else (cream, green)
-        square_color = odd_color if sum(square) % 2 == 0 else even_color
+        square_color = odd_color if (square.col + square.row) % 2 == 0 else even_color
 
-        left_margin, top_margin = get_square_location(square)
+        top_left = get_square_location(square)
 
         pygame.draw.rect(
             self.screen,
             square_color,
-            (left_margin, top_margin, square_size, square_size),
+            (top_left.col, top_left.row, square_size, square_size),
         )
 
         if piece := self.__board.try_get_piece(square):
@@ -145,16 +145,18 @@ class BoardRenderer:
         scaled_piece_icon = pygame.transform.scale(
             piece_icon, (icon_width, icon_height)
         )
-        self.screen.blit(scaled_piece_icon, top_left)
+        self.screen.blit(scaled_piece_icon, [top_left.col, top_left.row])
 
     def display_possible_moves(self, squares: Iterable[Vector]) -> None:
         for square in squares:
             has_piece = self.__board.try_get_piece(square) is not None
 
+            square_location = get_square_location(square, True)
+
             pygame.draw.circle(
                 self.screen,
                 gray,
-                center=get_square_location(square, True),
+                center=[square_location.col, square_location.row],
                 radius=round(square_size * 0.4 if has_piece else square_size * 0.2),
                 width=round(square_size * 0.1 if has_piece else 0),
             )
